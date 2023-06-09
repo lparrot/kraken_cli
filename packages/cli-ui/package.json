@@ -1,12 +1,27 @@
 {
-  "name": "cli-ui",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@kraken/cli-ui",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "nuxt build && shx rm -rf ../cli/dist/www && shx cp -r .output ../cli/dist/www",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate && shx mv dist ../cli/dist/www",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "dependencies": {
+    "@kraken/cli": "workspace:*",
+    "@quasar/extras": "^1.16.4",
+    "lodash": "^4.17.21",
+    "quasar": "^2.12.0",
+    "sass": "^1.62.1",
+    "stringcase": "^4.3.1"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "@types/lodash": "^4.14.195",
+    "@types/node": "^18",
+    "nuxt": "^3.5.2",
+    "nuxt-quasar-ui": "^1.7.4",
+    "shx": "^0.3.4"
+  }
 }

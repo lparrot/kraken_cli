@@ -1,11 +1,11 @@
 import {Argv as YargsOptions} from 'yargs'
-import {get_project_paths} from "../utils/folders.js";
-import {logger} from "../utils/logger.js";
+import {get_project_paths} from "../../utils/folders.js";
+import {logger} from "../../utils/logger.js";
 import path from "path";
 import inquirer from "inquirer";
-import {isBlank} from "../utils/string.js";
+import {isBlank} from "../../utils/string.js";
 import {sentencecase} from "stringcase";
-import {generate} from "../services/template.js";
+import {generate} from "../../services/template.js";
 
 export default {
   command: 'page',

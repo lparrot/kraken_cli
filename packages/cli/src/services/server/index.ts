@@ -1,25 +1,69 @@
 import cors from 'cors'
 import express from 'express'
-import {ApiController} from "./api/api.js";
-import {config} from "../config.js";
+import {ApiController} from "./api/index.js";
+import {config} from "../../config.js";
 import path, {dirname} from "path";
 import {fileURLToPath} from "url";
+import {UnknownRoutesHandler} from "./middlewares/unknownRoutes.handler.js";
+import {ExceptionsHandler} from "./middlewares/exceptions.handler.js";
+import {logger} from "../../utils/logger.js";
 
-export function createServer(options = {port: config.API_PORT}) {
+const www = path.resolve(dirname(fileURLToPath(import.meta.url)), '..', 'www')
+
+interface ServerOptions {
+  port: number
+  web: boolean
+  cwd: string | null
+}
+
+export function createServer(options: Partial<ServerOptions>) {
+  options = Object.assign({}, {port: config.API_PORT, web: true}, options)
+
+  if (options.cwd != null) {
+    try {
+      process.chdir(options.cwd)
+      logger('success', 'Positionnement dans le dossier ' + options.cwd)
+    } catch (err) {
+      logger('error', 'Erreur lors du position dans le dossier ' + options.cwd)
+    }
+  }
+
+  /**
+   * On créé une nouvelle "application" express
+   */
   const app = express()
 
-  const www = path.resolve(dirname(fileURLToPath(import.meta.url)), '..', 'www')
+  if (options.web) {
+    app.use(express.static(www))
+  }
 
+  /**
+   * On dit à Express que l'on souhaite parser le body des requêtes en JSON
+   * @example app.post('/', (req) => req.body.prop)
+   */
   app.use(express.json())
 
-  app.use(express.static(www))
-
+  /**
+   * On dit à Express que l'on souhaite autoriser tous les noms de domaines
+   * à faire des requêtes sur notre API.
+   */
   app.use(cors())
 
   app.use('/api', ApiController)
 
+  /**
+   * Pour toutes les autres routes non définies, on retourne une erreur
+   */
+  app.all('*', UnknownRoutesHandler)
+
+  /**
+   * Gestion des erreurs
+   * /!\ Cela doit être le dernier `app.use`
+   */
+  app.use(ExceptionsHandler)
+
   const server = app.listen(options.port, () => {
-    // logger('success', `Accès au serveur : http://localhost:${options.port}`)
+    logger('success', `Accès au serveur : http://localhost:${options.port}`)
   })
 
   for (let signal of ["SIGTERM", "SIGINT"])
