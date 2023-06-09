@@ -18,6 +18,7 @@ importers:
       '@types/pluralize': ^0.0.29
       '@types/shelljs': ^0.8.12
       '@types/yargs': ^17.0.24
+      chalk: ^5.2.0
       cors: ^2.8.5
       dotenv: ^16.1.4
       ejs: ^3.1.9
@@ -37,6 +38,7 @@ importers:
       typescript: ^5.1.3
       yargs: ^17.7.2
     dependencies:
+      chalk: 5.2.0
       cors: 2.8.5
       dotenv: 16.1.4
       ejs: 3.1.9
@@ -70,7 +72,6 @@ importers:
 
   packages/cli-ui:
     specifiers:
-      '@kraken/cli': workspace:*
       '@nuxt/devtools': latest
       '@quasar/extras': ^1.16.4
       '@types/lodash': ^4.14.195
@@ -83,7 +84,6 @@ importers:
       shx: ^0.3.4
       stringcase: ^4.3.1
     dependencies:
-      '@kraken/cli': link:../cli
       '@quasar/extras': 1.16.4
       lodash: 4.17.21
       quasar: 2.12.0

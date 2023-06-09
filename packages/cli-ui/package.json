@@ -3,13 +3,12 @@
   "private": true,
   "scripts": {
     "build": "nuxt build && shx rm -rf ../cli/dist/www && shx cp -r .output ../cli/dist/www",
-    "dev": "nuxt dev",
+    "dev": "nuxt prepare && nuxt dev",
     "generate": "nuxt generate && shx mv dist ../cli/dist/www",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@kraken/cli": "workspace:*",
     "@quasar/extras": "^1.16.4",
     "lodash": "^4.17.21",
     "quasar": "^2.12.0",
