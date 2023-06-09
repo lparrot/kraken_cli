@@ -16,7 +16,7 @@ interface ServerOptions {
   cwd: string | null
 }
 
-export function createServer(options: Partial<ServerOptions>) {
+export function createServer(options: Partial<ServerOptions> = {}) {
   options = Object.assign({}, {port: config.API_PORT, web: true}, options)
 
   if (options.cwd != null) {
