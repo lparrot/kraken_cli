@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<style>
+		body {
+			font-family: Tahoma, serif;
+		}
+	</style>
+	<title>Soleil</title>
+</head>
+
+<body>
+<header>
+	<table>
+		<tr>
+			<td>
+				<img alt="logo" src="cid:logo" style="vertical-align: middle" th:src="|cid:logo|" th:width="100">
+			</td>
+			<td>
+				<h2 style="display: inline"><%= name %></h2>
+			</td>
+		</tr>
+	</table>
+</header>
+<main layout:fragment="content">
+	<code>Redéfinissez ce fragment grâce à l'attribut layout:fragment="content"</code>
+</main>
+<footer layout:fragment="footer">
+	<%= name %> © - version <span th:text="${@environment.getProperty('info.app.version')}"></span>
+</footer>
+</body>
+
+</html>

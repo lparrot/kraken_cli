@@ -1,0 +1,18 @@
+# editorconfig.org
+root = true
+
+[*]
+indent_style = tab
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = 300
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.properties]
+ij_any_keep_indents_on_empty_lines = true
+ij_properties_keep_blank_lines = true

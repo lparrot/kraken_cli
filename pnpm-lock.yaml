@@ -1,0 +1,24 @@
+lockfileVersion: 5.4
+
+importers:
+
+  packages/cli:
+    specifiers:
+      commander: ^10.0.1
+      figlet: ^1.6.0
+    dependencies:
+      commander: 10.0.1
+      figlet: 1.6.0
+
+packages:
+
+  /commander/10.0.1:
+    resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
+    engines: {node: '>=14'}
+    dev: false
+
+  /figlet/1.6.0:
+    resolution: {integrity: sha512-31EQGhCEITv6+hi2ORRPyn3bulaV9Fl4xOdR169cBzH/n1UqcxsiSB/noo6SJdD7Kfb1Ljit+IgR1USvF/XbdA==}
+    engines: {node: '>= 0.4.0'}
+    hasBin: true
+    dev: false
