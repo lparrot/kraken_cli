@@ -2,7 +2,7 @@
   "name": "@kraken/cli-ui",
   "private": true,
   "scripts": {
-    "build": "nuxt build && shx rm -rf ../cli/dist/www && shx cp -r .output ../cli/dist/www",
+    "build": "nuxt build && shx rm -rf ../cli/dist/www && shx mkdir -p ../cli/dist/www && shx cp -r .output/* ../cli/dist/www",
     "dev": "nuxt prepare && nuxt dev",
     "generate": "nuxt generate && shx mv dist ../cli/dist/www",
     "preview": "nuxt preview",

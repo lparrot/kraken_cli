@@ -7,6 +7,7 @@ import {fileURLToPath} from "url";
 import {UnknownRoutesHandler} from "./middlewares/unknownRoutes.handler.js";
 import {ExceptionsHandler} from "./middlewares/exceptions.handler.js";
 import {logger} from "../../utils/logger.js";
+import {GenerateController} from "./api/generate.js";
 
 const www = path.resolve(dirname(fileURLToPath(import.meta.url)), '..', 'www')
 
@@ -50,6 +51,7 @@ export function createServer(options: Partial<ServerOptions> = {}) {
   app.use(cors())
 
   app.use('/api', ApiController)
+  app.use('/api/generate', GenerateController)
 
   /**
    * Pour toutes les autres routes non définies, on retourne une erreur

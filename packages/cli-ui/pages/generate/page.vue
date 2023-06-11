@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {sentencecase} from "stringcase";
-import {kebabCase} from "lodash";
+import kebabCase from "lodash/kebabCase";
 import {QInput} from "quasar";
 
 interface Form {
@@ -10,33 +10,32 @@ interface Form {
 
 const $q = useQuasar()
 
-const form = ref<Partial<Form>>({})
-const readonly_inputs = ref({title: true})
+const form = ref<Partial<Form>>()
+const readonly_inputs = ref()
+
+function init() {
+  form.value = {}
+  readonly_inputs.value = {title: true}
+}
+
+init()
 
 async function onSubmit() {
   $q.loading.show({message: 'Création de la page en cours ...'})
   try {
-    const {result, err} = await $fetch('/api/generate/page', {
+    const {success} = await useApiFetch('/api/generate/page', {
       method: 'post',
       body: {
         name: form.value.nom,
         title: form.value.title
       }
     })
-    if (isNotBlank(result)) {
-      $q.dialog({
-        message: convertLineBreakToBR(result),
-        color: 'green',
-        html: true,
-        style: {minWidth: '800px'}
+    if (success) {
+      $q.notify({
+        message: 'Création de la page effectuée avec succès',
+        color: 'green'
       })
-    } else {
-      $q.dialog({
-        message: convertLineBreakToBR(err),
-        color: 'red',
-        html: true,
-        style: {minWidth: '800px'}
-      })
+      init()
     }
   } finally {
     $q.loading.hide()

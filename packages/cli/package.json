@@ -12,7 +12,7 @@
     "dev": "npm run copy:templates && tsc --watch",
     "build": "npm run copy:templates && tsc",
     "api:watch": "nodemon ---watch dist/src/services/server --exec \"node dist/express-api.js\"",
-    "copy:templates": "shx mkdir -p dist && shx rm -rf ./dist/templates && shx cp -r src/templates dist/templates",
+    "copy:templates": "shx rm -rf dist && shx mkdir -p dist && shx cp -r src/templates dist/templates",
     "prepublishOnly": "npm run build"
   },
   "keywords": [],
