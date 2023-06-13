@@ -7,6 +7,7 @@ import {UnknownRoutesHandler} from "./middlewares/unknownRoutes.handler.js";
 import {ExceptionsHandler} from "./middlewares/exceptions.handler.js";
 import {logger} from "../../utils/logger.js";
 import {getModules} from "../../utils/folders.js";
+import {db} from "../../db/index.js";
 
 const www = path.resolve(dirname(fileURLToPath(import.meta.url)), '..', 'www')
 
@@ -17,6 +18,12 @@ interface ServerOptions {
 }
 
 export async function createServer(options: Partial<ServerOptions> = {}) {
+  try {
+    await db.authenticate()
+  } catch (error) {
+    console.error('Impossible de se connecter à la base de données:', error);
+  }
+
   options = Object.assign({}, {port: config.API_PORT, web: true}, options)
 
   if (options.cwd != null) {

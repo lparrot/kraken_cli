@@ -5,7 +5,9 @@ import {localize, setLocale} from "@vee-validate/i18n";
 
 export default defineNuxtPlugin(nuxt => {
   Object.keys(AllRules).forEach(rule => {
-    defineRule(rule, AllRules[rule])
+    if (typeof AllRules[rule] === 'function') {
+      defineRule(rule, AllRules[rule])
+    }
   })
 
   configure({

@@ -30,6 +30,14 @@ export const useApiFetch = <T>(request: string, opts?: NitroFetchOptions<any>): 
           message: response._data.error
         })
       }
+      if (response.status === 400) {
+        if (response._data.message != null) {
+          Notify.create({
+            color: 'red',
+            message: response._data.message
+          })
+        }
+      }
     },
 
     ...opts

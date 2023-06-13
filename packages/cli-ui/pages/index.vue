@@ -5,6 +5,8 @@ interface InfoResponse {
 
 const info = ref<InfoResponse>()
 
+const projects = useState('projects')
+
 info.value = await useApiFetch<InfoResponse>('/api/paths')
 
 async function openCurrentProjectFolder() {
@@ -23,6 +25,10 @@ async function openCurrentProjectFolder() {
     </tr>
     </tbody>
   </q-markup-table>
+
+  <div v-for="project in projects" :key="project.id">
+    {{ project.name }}
+  </div>
 </template>
 
 <style scoped>

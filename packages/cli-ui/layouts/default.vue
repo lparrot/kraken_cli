@@ -1,9 +1,25 @@
 <script lang="ts" setup>
 const drawer = ref(true)
+const projects = useState('projects')
 
 function toggleDrawer() {
   drawer.value = !drawer.value
 }
+
+async function getProjects() {
+  const {projects: res} = await useApiFetch('/api/projects')
+  projects.value = res
+}
+
+async function addProject() {
+  const {projects} = await useApiFetch('/api/projects', {
+    method: 'post',
+    body: {name: 'CCS NG', path: 'C:/Users/laure/IdeaProjects/ccs_ng'},
+  })
+  projects.value = projects
+}
+
+await getProjects()
 </script>
 
 <template>
@@ -29,6 +45,15 @@ function toggleDrawer() {
             </q-item-section>
             <q-item-section>
               <q-item-label>Tableau de bord</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable dense @click="addProject">
+            <q-item-section avatar>
+              <q-icon color="grey-6" name="add"/>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Ajouter un projet</q-item-label>
             </q-item-section>
           </q-item>
 
