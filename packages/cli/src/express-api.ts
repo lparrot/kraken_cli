@@ -4,4 +4,4 @@ import {isBlank} from "./utils/string.js";
 
 dotenv.config()
 
-createServer({web: false, cwd: isBlank(process.env.EXPRESS_DEV_CWD) ? null : process.env.EXPRESS_DEV_CWD})
+await createServer({web: false, cwd: isBlank(process.env.EXPRESS_DEV_CWD) ? null : process.env.EXPRESS_DEV_CWD})

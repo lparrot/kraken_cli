@@ -1,7 +1,7 @@
 <template>
 	<section class="container-fluid">
-
-	</section>
+    <%= title %>
+  </section>
 </template>
 
 <script>

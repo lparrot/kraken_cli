@@ -2,11 +2,9 @@ import {NuxtConfig} from "nuxt/config";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig(<NuxtConfig>{
-  devtools: {
-    enabled: true
-  },
-
   ssr: true,
+
+  telemetry: false,
 
   app: {
     head: {
@@ -20,6 +18,11 @@ export default defineNuxtConfig(<NuxtConfig>{
 
   modules: [
     'nuxt-quasar-ui',
+    '@vee-validate/nuxt'
+  ],
+
+  buildModules: [
+    '@vueuse/nuxt',
   ],
 
   quasar: {
@@ -51,6 +54,15 @@ export default defineNuxtConfig(<NuxtConfig>{
         info: '#66e5ff',
         warning: '#F2C037'
       }
+    }
+  },
+
+  veeValidate: {
+    componentNames: {
+      Form: 'VeeForm',
+      Field: 'VeeField',
+      FieldArray: 'VeeFieldArray',
+      ErrorMessage: 'VeeErrorMessage',
     }
   },
 

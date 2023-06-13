@@ -9,10 +9,11 @@
     "kn": "dist/index.js"
   },
   "scripts": {
-    "dev": "npm run copy:templates && tsc --watch",
-    "build": "npm run copy:templates && tsc",
+    "dev": "npm run clean:dist && npm run templates:build && tsc --watch",
+    "build": "npm run clean:dist && npm run templates:build && tsc",
     "api:watch": "nodemon ---watch dist/src/services/server --exec \"node dist/express-api.js\"",
-    "copy:templates": "shx rm -rf dist && shx mkdir -p dist && shx cp -r src/templates dist/templates",
+    "templates:build": "shx cp -r src/templates dist/templates",
+    "clean:dist": "shx rm -rf dist && shx mkdir -p dist",
     "prepublishOnly": "npm run build"
   },
   "keywords": [],
@@ -33,6 +34,7 @@
     "pluralize": "^8.0.0",
     "shelljs": "^0.8.5",
     "stringcase": "^4.3.1",
+    "win-select-folder": "^1.0.1",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

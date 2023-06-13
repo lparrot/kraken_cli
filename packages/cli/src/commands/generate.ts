@@ -7,7 +7,7 @@ export default {
   description: 'Generation de fichiers via template',
   async builder(yargs: YargsOptions) {
     await getModules('generate/*.js', module => {
-      yargs.command(module)
+      yargs.command(module.default)
     })
     yargs.demandCommand()
   }

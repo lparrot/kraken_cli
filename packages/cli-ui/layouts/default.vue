@@ -29,10 +29,17 @@ function toggleDrawer() {
             </q-item-section>
             <q-item-section>
               <q-item-label>Tableau de bord</q-item-label>
-              <q-item-label caption>Informations sur le projet</q-item-label>
             </q-item-section>
           </q-item>
 
+          <q-item dense exact to="/generate/init">
+            <q-item-section avatar>
+              <q-icon color="grey-6" name="create_new_folder"/>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Créer un nouveau projet</q-item-label>
+            </q-item-section>
+          </q-item>
           <q-separator dark spaced/>
 
           <q-item-label header>Génération côté Back</q-item-label>

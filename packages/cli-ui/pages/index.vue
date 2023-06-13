@@ -5,13 +5,15 @@ interface InfoResponse {
 
 const info = ref<InfoResponse>()
 
-async function handleInit() {
-  info.value = await useApiFetch<InfoResponse>('/api/paths')
+info.value = await useApiFetch<InfoResponse>('/api/paths')
+
+async function openCurrentProjectFolder() {
+  await useApiFetch('/api/shell/open_current_project')
 }
 </script>
 
 <template>
-  <q-btn color="primary" @click="handleInit">Click here</q-btn>
+  <q-btn color="green" label="Ouvrir le dossier du projet" @click="openCurrentProjectFolder"></q-btn>
 
   <q-markup-table v-if="info != null" bordered class="q-mt-md" dense flat>
     <tbody>

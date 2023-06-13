@@ -8,10 +8,14 @@ interface Form {
   title: string
 }
 
+interface ReadOnlyInputs {
+  title: boolean
+}
+
 const $q = useQuasar()
 
 const form = ref<Partial<Form>>()
-const readonly_inputs = ref()
+const readonly_inputs = ref<ReadOnlyInputs>()
 
 function init() {
   form.value = {}
@@ -53,19 +57,17 @@ watch(
 </script>
 
 <template>
-  <q-page padding>
-    <q-form class="column q-gutter-y-md" @submit.prevent="onSubmit">
-      <q-input v-model="form.nom" clearable label="Nom du fichier (sans l'extension .vue)" stack-label standout/>
+  <q-form class="column q-gutter-y-md" @submit.prevent="onSubmit">
+    <q-input v-model="form.nom" clearable dense filled label="Nom du fichier (sans l'extension .vue)" stack-label/>
 
-      <q-input ref="input_title" v-model="form.title" :readonly="readonly_inputs.title" clearable label="Titre de la page" stack-label standout>
-        <template #append>
-          <q-btn v-if="readonly_inputs.title" dense flat icon="edit" round @click="readonly_inputs.title = !readonly_inputs.title"/>
-        </template>
-      </q-input>
+    <q-input ref="input_title" v-model="form.title" :readonly="readonly_inputs.title" dense filled label="Titre de la page" stack-label>
+      <template #append>
+        <q-btn v-if="readonly_inputs.title" dense flat icon="edit" round @click="readonly_inputs.title = !readonly_inputs.title"/>
+      </template>
+    </q-input>
 
-      <q-btn color="primary" icon="add_circle" label="Créer la page" type="submit"/>
-    </q-form>
-  </q-page>
+    <q-btn color="primary" icon="add_circle" label="Créer la page" type="submit"/>
+  </q-form>
 </template>
 
 <style scoped>

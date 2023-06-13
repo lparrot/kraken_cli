@@ -14,7 +14,7 @@ export default {
     yargs.option('open', {alias: 'o', describe: `Ouvre directement le navigateur`, type: 'string'})
   },
   async handler(options: any) {
-    createServer()
+    await createServer()
 
     shell.exec(`node ${path.join(ui_server_path, 'index.mjs')}`, {
       async: true, env: {

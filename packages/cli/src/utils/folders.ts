@@ -69,6 +69,6 @@ export async function getModules(glob: string, callback: (module: any) => void) 
 
   for await (const file of files) {
     const module = await import(path.join(callDirname, file))
-    callback(module.default)
+    callback(module)
   }
 }

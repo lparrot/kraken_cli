@@ -1,13 +1,12 @@
 import cors from 'cors'
 import express from 'express'
-import {ApiController} from "./api/index.js";
 import {config} from "../../config.js";
 import path, {dirname} from "path";
 import {fileURLToPath} from "url";
 import {UnknownRoutesHandler} from "./middlewares/unknownRoutes.handler.js";
 import {ExceptionsHandler} from "./middlewares/exceptions.handler.js";
 import {logger} from "../../utils/logger.js";
-import {GenerateController} from "./api/generate.js";
+import {getModules} from "../../utils/folders.js";
 
 const www = path.resolve(dirname(fileURLToPath(import.meta.url)), '..', 'www')
 
@@ -17,7 +16,7 @@ interface ServerOptions {
   cwd: string | null
 }
 
-export function createServer(options: Partial<ServerOptions> = {}) {
+export async function createServer(options: Partial<ServerOptions> = {}) {
   options = Object.assign({}, {port: config.API_PORT, web: true}, options)
 
   if (options.cwd != null) {
@@ -25,7 +24,7 @@ export function createServer(options: Partial<ServerOptions> = {}) {
       process.chdir(options.cwd)
       logger('success', 'Positionnement dans le dossier ' + options.cwd)
     } catch (err) {
-      logger('error', 'Erreur lors du position dans le dossier ' + options.cwd)
+      logger('error', 'Erreur lors du positionnement dans le dossier ' + options.cwd)
     }
   }
 
@@ -50,8 +49,9 @@ export function createServer(options: Partial<ServerOptions> = {}) {
    */
   app.use(cors())
 
-  app.use('/api', ApiController)
-  app.use('/api/generate', GenerateController)
+  await getModules('api/*.js', module => {
+    app.use(module.default.url, module.default.router)
+  })
 
   /**
    * Pour toutes les autres routes non définies, on retourne une erreur

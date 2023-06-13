@@ -20,7 +20,7 @@ const cli = yargs(hideBin(process.argv))
   .strict();
 
 await getModules('commands/*.js', module => {
-  cli.command(module)
+  cli.command(module.default)
 })
 
 cli.argv

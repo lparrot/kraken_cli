@@ -17,6 +17,23 @@ export interface ProjectPath {
   get_current_package?: (dirname: string) => string | undefined;
 }
 
+export interface TemplateInitOptions {
+  cwd?: string
+  name: string
+  description: string
+  group_id: string
+  artifact_id: string
+  socle_version: string
+  node_version: string
+  db_host: string
+  db_port: string
+  db_name: string
+  db_user: string
+  db_password: string
+  install_librairies: boolean
+  create_git_repo: boolean
+}
+
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
