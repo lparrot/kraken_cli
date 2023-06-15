@@ -1,34 +1,40 @@
 <script setup lang="ts">
-interface InfoResponse {
-  success: boolean
-}
+import {ProjectAttributes} from "@types/kraken";
 
-const info = ref<InfoResponse>()
+const info = ref()
 
-const projects = useState('projects')
-
-info.value = await useApiFetch<InfoResponse>('/api/paths')
+const project = useState<ProjectAttributes>('project')
 
 async function openCurrentProjectFolder() {
   await useApiFetch('/api/shell/open_current_project')
 }
+
+watch(project,
+  async (newVal: ProjectAttributes) => {
+    info.value = await useApiFetch('/api/paths', {
+      params: {
+        path: newVal.path
+      }
+    })
+  },
+  {immediate: true, deep: true})
 </script>
 
 <template>
-  <q-btn color="green" label="Ouvrir le dossier du projet" @click="openCurrentProjectFolder"></q-btn>
+  <div v-if="info != null">
+    <q-btn color="green" label="Ouvrir le dossier du projet" @click="openCurrentProjectFolder"></q-btn>
 
-  <q-markup-table v-if="info != null" bordered class="q-mt-md" dense flat>
-    <tbody>
-    <tr v-for="(value, key) in info" :key="key">
-      <td>{{ key }}</td>
-      <td>{{ value }}</td>
-    </tr>
-    </tbody>
-  </q-markup-table>
-
-  <div v-for="project in projects" :key="project.id">
-    {{ project.name }}
+    <q-markup-table bordered class="q-mt-md" dense flat>
+      <tbody>
+      <tr v-for="(value, key) in info" :key="key">
+        <td>{{ key }}</td>
+        <td>{{ value }}</td>
+      </tr>
+      </tbody>
+    </q-markup-table>
   </div>
+
+  <div v-else>Aucun projet selectionné. Veuillez selectionner un projet dans la liste, importez en un ou créez en un nouveau.</div>
 </template>
 
 <style scoped>

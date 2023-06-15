@@ -1,9 +1,9 @@
 import {Argv as YargsOptions} from "yargs";
 import shell from "shelljs";
 import {config} from "../config.js";
-import {createServer} from "../services/server/index.js";
 import path, {dirname} from "path";
 import {fileURLToPath} from "url";
+import {createServer} from "../api/index.js";
 
 const ui_server_path = path.resolve(dirname(fileURLToPath(import.meta.url)), '..', 'www', 'server')
 

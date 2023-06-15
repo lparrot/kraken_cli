@@ -25,6 +25,14 @@ export default defineNuxtConfig(<NuxtConfig>{
     '@vueuse/nuxt',
   ],
 
+  typescript: {
+    tsConfig: {
+      compilerOptions: {
+        types: ['@types/kraken']
+      }
+    }
+  },
+
   quasar: {
     lang: 'fr',
     extras: {

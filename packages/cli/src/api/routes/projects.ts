@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {normalize} from "path";
-import {Project} from "../../../db/index.js";
+import {Project} from "../../db/index.js";
 
 const meta = {
   url: '/api/projects',
@@ -8,7 +8,12 @@ const meta = {
 }
 
 meta.router.get('/', async (req, res) => {
-  return res.json({projects: await Project.findAll()})
+  return res.json(await Project.findAll())
+})
+
+meta.router.get('/:id', async (req, res) => {
+  const id = req.params.id
+  return res.json(await Project.findByPk(id))
 })
 
 meta.router.post('/', async (req, res) => {
@@ -21,7 +26,15 @@ meta.router.post('/', async (req, res) => {
   }
 
   await Project.create({name, path: normalize(path)})
-  return res.json({projects: await Project.findAll()})
+  return res.json(await Project.findAll())
+})
+
+meta.router.delete('/:id', async (req, res) => {
+  await Project.destroy({
+    where: {
+      id: req.params.id
+    }
+  })
 })
 
 export default meta

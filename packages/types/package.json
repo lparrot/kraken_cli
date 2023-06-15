@@ -1,0 +1,10 @@
+{
+  "name": "@types/kraken",
+  "version": "1.0.0",
+  "description": "",
+  "types": "index.d.ts",
+  "scripts": {
+  },
+  "author": "",
+  "license": "ISC"
+}

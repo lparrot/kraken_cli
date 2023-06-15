@@ -62,8 +62,10 @@ export default {
   }
 }
 
-export async function generatePage(options: { targetPath: string, data: { name: string, title: string } }, callback?: Function) {
+export async function generatePage(options: { cwd?: string, targetPath: string, data: { name: string, title: string } }, callback?: Function) {
+  console.log(options)
   await generate({
+      cwd: options.cwd == null ? process.cwd() : options.cwd,
       templatePath: 'page',
       targetPath: options.targetPath,
       data: options.data,

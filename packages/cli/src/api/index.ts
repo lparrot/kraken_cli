@@ -1,13 +1,13 @@
 import cors from 'cors'
 import express from 'express'
-import {config} from "../../config.js";
 import path, {dirname} from "path";
 import {fileURLToPath} from "url";
 import {UnknownRoutesHandler} from "./middlewares/unknownRoutes.handler.js";
 import {ExceptionsHandler} from "./middlewares/exceptions.handler.js";
-import {logger} from "../../utils/logger.js";
-import {getModules} from "../../utils/folders.js";
-import {db} from "../../db/index.js";
+import {logger} from "../utils/logger.js";
+import {config} from '../config.js'
+import {db} from "../db/index.js";
+import {getModules} from "../utils/folders.js";
 
 const www = path.resolve(dirname(fileURLToPath(import.meta.url)), '..', 'www')
 
@@ -56,7 +56,7 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
    */
   app.use(cors())
 
-  await getModules('api/*.js', module => {
+  await getModules('routes/*.js', (module: any) => {
     app.use(module.default.url, module.default.router)
   })
 

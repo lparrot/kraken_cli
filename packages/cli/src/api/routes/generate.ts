@@ -1,11 +1,11 @@
 import {Router} from 'express'
-import {get_project_paths} from "../../../utils/folders.js";
-import {generatePage} from "../../../commands/generate/page.js";
-import {get_versions, initializeProject} from "../../../commands/init.js";
-import {TemplateInitOptions} from "../../../../types/index.js";
 import shell from "shelljs";
 import path from "path";
 import {snakecase} from "stringcase";
+import {get_project_paths} from "../../utils/folders.js";
+import {generatePage} from "../../commands/generate/page.js";
+import {get_versions, initializeProject} from "../../commands/init.js";
+import {TemplateInitOptions} from "../../../types/index.js";
 
 const meta = {
   url: '/api/generate',
@@ -13,8 +13,16 @@ const meta = {
 }
 
 meta.router.post('/page', async (req, res) => {
-  let project_paths = get_project_paths();
-  await generatePage({targetPath: project_paths?.web_pages_path!, data: req.body})
+  const {cwd, name, title} = req.body
+  let project_paths = get_project_paths(cwd);
+  await generatePage({
+    cwd,
+    targetPath: project_paths?.web_pages_path!,
+    data: {
+      name,
+      title
+    }
+  })
   return res.status(200).json({success: true})
 })
 

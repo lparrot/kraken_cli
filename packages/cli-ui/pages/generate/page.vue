@@ -13,6 +13,7 @@ interface ReadOnlyInputs {
 }
 
 const $q = useQuasar()
+const project = useState("project")
 
 const form = ref<Partial<Form>>()
 const readonly_inputs = ref<ReadOnlyInputs>()
@@ -31,7 +32,8 @@ async function onSubmit() {
       method: 'post',
       body: {
         name: form.value.nom,
-        title: form.value.title
+        title: form.value.title,
+        cwd: project.value.path
       }
     })
     if (success) {

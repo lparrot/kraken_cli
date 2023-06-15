@@ -1,6 +1,6 @@
 import {Router} from 'express'
-import {get_project_paths} from "../../../utils/folders.js";
 import shell from "shelljs";
+import {get_project_paths} from "../../utils/folders.js";
 
 const meta = {
   url: '/api/shell',

@@ -20,6 +20,7 @@
     "vee-validate": "^4.9.6"
   },
   "devDependencies": {
+    "@types/kraken": "workspace:*",
     "@types/lodash": "^4.14.195",
     "@types/node": "^18",
     "@vueuse/core": "^10.1.2",

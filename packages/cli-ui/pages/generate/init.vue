@@ -40,7 +40,6 @@ const readonly_inputs = ref<ReadOnlyInputs>()
 const versions = ref()
 const folder = ref()
 const storage = useKrakenSessionStorage()
-const validator = ref()
 
 versions.value = await useApiFetch<any>('/api/generate/init/info')
 
@@ -79,7 +78,7 @@ const buttonChooseFolderLabel = computed(() => form.value.folder == null ? 'Choi
 async function handleSelectFolder() {
   readonly_inputs.value.select_folder = true
   try {
-    const {folder} = await useApiFetch('/api/fs/home')
+    const folder = await useApiFetch<string>('/api/fs/folder')
     if (folder != null) {
       storage.value.init.folder = folder
     }
@@ -119,7 +118,7 @@ watch(
 
 <template>
   <ClientOnly>
-    <VeeForm ref="validator" #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
+    <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
       <q-btn :disable="readonly_inputs.select_folder" :label="buttonChooseFolderLabel" color="blue" icon="folder" @click="handleSelectFolder"/>
 
       <template v-if="storage.init.folder != null">

@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
-import {createServer} from "./services/server/index.js";
 import {isBlank} from "./utils/string.js";
+import {createServer} from "./api/index.js";
 
 dotenv.config()
 
