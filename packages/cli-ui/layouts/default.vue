@@ -3,12 +3,14 @@ import {Ref} from "vue";
 import {Dialog} from "quasar";
 import {AddProject} from "#components";
 import {ProjectAttributes} from "@types/kraken";
+import {useEventBus} from "@vueuse/core";
 
 const storage = useKrakenSessionStorage()
 const router = useRouter()
+const projectsBus = useEventBus('projects')
 
 const drawer = ref(true)
-const project = useState<ProjectAttributes>('project')
+const project = useState<ProjectAttributes | null>('project')
 const projects: Ref<ProjectAttributes[]> = useState('projects')
 
 if (storage.value.selection.project != null) {
@@ -21,6 +23,21 @@ function toggleDrawer() {
 
 async function getProjects() {
   projects.value = await useApiFetch('/api/projects')
+}
+
+async function deleteSelectedProject() {
+  Dialog.create({
+    title: 'Confirmation',
+    message: 'Etes vous sûr de vouloir supprimer le projet ' + project.value?.name + ' ?',
+    cancel: true,
+    persistent: true
+  }).onOk(async () => {
+    await useApiFetch(`/api/projects/${project.value?.id}`, {
+      method: 'delete'
+    })
+    project.value = null
+    projectsBus.emit()
+  })
 }
 
 async function openDialogAddProject() {
@@ -39,6 +56,8 @@ async function onSelectProject(param_project: ProjectAttributes) {
   project.value = param_project
   router.push('/')
 }
+
+projectsBus.on(async () => await getProjects())
 
 await getProjects()
 </script>
@@ -69,6 +88,15 @@ await getProjects()
               </q-btn>
             </template>
           </q-select>
+
+          <q-item v-if="project != null" class="text-red-4" clickable dense exact @click="deleteSelectedProject">
+            <q-item-section avatar>
+              <q-icon name="remove_circle"/>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Supprimer le projet selectionné</q-item-label>
+            </q-item-section>
+          </q-item>
 
           <q-item dense exact to="/generate/init">
             <q-item-section avatar>

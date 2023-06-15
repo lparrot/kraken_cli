@@ -8,9 +8,10 @@ const meta = {
 }
 
 meta.router.get('/open_current_project', (req, res) => {
-  const {project_path} = get_project_paths()!
+  const path = req.query.path as string
+  const {project_path} = get_project_paths(path)!
   shell.exec(`start ${project_path}`)
-  return res.status(200)
+  return res.status(200).send()
 })
 
 export default meta

@@ -20,7 +20,7 @@ meta.router.get('/folder', async (req, res) => {
 meta.router.put('/cwd', body('path').notEmpty({ignore_whitespace: true}), async (req, res) => {
   const cwd = req.body.path
   process.chdir(cwd)
-  return res.status(200)
+  return res.status(200).send()
 })
 
 export default meta

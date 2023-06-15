@@ -35,6 +35,7 @@ meta.router.delete('/:id', async (req, res) => {
       id: req.params.id
     }
   })
+  return res.status(200).send()
 })
 
 export default meta

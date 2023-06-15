@@ -6,6 +6,7 @@ import {get_project_paths} from "../../utils/folders.js";
 import {generatePage} from "../../commands/generate/page.js";
 import {get_versions, initializeProject} from "../../commands/init.js";
 import {TemplateInitOptions} from "../../../types/index.js";
+import {Project} from "../../db/index.js";
 
 const meta = {
   url: '/api/generate',
@@ -38,12 +39,19 @@ meta.router.post('/init', async (req, res) => {
   const project_path = path.join(req.body.cwd, snakecase(req.body.name))
 
   if (is_idea_installed) {
-    shell.exec(`idea ${project_path}`)
+    shell.exec(`idea ${project_path}`, {async: true})
   } else {
-    shell.exec(`start ${project_path}`)
+    shell.exec(`start ${project_path}`, {async: true})
   }
 
-  return res.json()
+  if (req.body.with_create) {
+    return res.json(await Project.create({
+      name: req.body.name,
+      path: project_path
+    }))
+  }
+
+  return res.json(body)
 })
 
 export default meta

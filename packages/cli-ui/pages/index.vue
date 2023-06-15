@@ -6,7 +6,11 @@ const info = ref()
 const project = useState<ProjectAttributes>('project')
 
 async function openCurrentProjectFolder() {
-  await useApiFetch('/api/shell/open_current_project')
+  await useApiFetch('/api/shell/open_current_project', {
+    query: {
+      path: project.value.path
+    }
+  })
 }
 
 watch(project,

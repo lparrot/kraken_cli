@@ -55,6 +55,7 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
    * à faire des requêtes sur notre API.
    */
   app.use(cors())
+  app.options('*', cors())
 
   await getModules('routes/*.js', (module: any) => {
     app.use(module.default.url, module.default.router)

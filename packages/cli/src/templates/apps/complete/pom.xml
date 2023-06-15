@@ -9,7 +9,8 @@
 	<packaging>pom</packaging>
 
 	<name><%= name %></name>
-	<description><%= description %></description>
+	<description><% if (locals.description) { %><%= description %><% } %>
+  </description>
 
 	<modules>
 		<module>web</module>

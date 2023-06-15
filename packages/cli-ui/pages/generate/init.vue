@@ -2,6 +2,7 @@
 import {QInput} from "quasar";
 import stringcase from 'stringcase'
 import {useKrakenSessionStorage} from "~/composables/useKrakenSessionStorage";
+import {useEventBus} from "@vueuse/core";
 
 interface Form {
   folder?: string
@@ -34,11 +35,12 @@ interface ReadOnlyInputs {
 }
 
 const $q = useQuasar()
+const project = useState('project')
+const projectsBus = useEventBus('projects')
 
 const form = ref<Form>()
 const readonly_inputs = ref<ReadOnlyInputs>()
 const versions = ref()
-const folder = ref()
 const storage = useKrakenSessionStorage()
 
 versions.value = await useApiFetch<any>('/api/generate/init/info')
@@ -90,14 +92,16 @@ async function handleSelectFolder() {
 async function submitForm(values, validator) {
   $q.loading.show({message: 'Génération du projet en cours'})
   try {
-    await useApiFetch('/api/generate/init', {
+    project.value = await useApiFetch('/api/generate/init', {
       method: 'post',
       body: {
         ...form.value,
-        cwd: storage.value.init.folder
+        cwd: storage.value.init.folder,
+        with_create: true
       }
     })
     init()
+    projectsBus.emit()
   } finally {
     $q.loading.hide()
   }
@@ -132,9 +136,7 @@ watch(
 
         <template v-if="form.name != null">
 
-          <VeeField #default="{errorMessage, meta, field}" name="description" rules="required">
-            <q-input v-model="form.description" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Description du projet" stack-label v-bind="field"/>
-          </VeeField>
+          <q-input v-model="form.description" dense filled hide-bottom-space label="Description du projet" stack-label/>
 
           <VeeField #default="{errorMessage, meta, value, field}" label="group ID" name="group_id" rules="required">
             <q-input v-model="form.group_id" :error-message="errorMessage" :readonly="readonly_inputs.group_id" dense filled hide-bottom-space label="Group ID" stack-label v-bind="field">
