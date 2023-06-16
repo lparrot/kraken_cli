@@ -54,26 +54,25 @@ export default {
     }
 
     await generatePage({
-      targetPath: paths.web_pages_path,
       data
-    }, () => {
-      logger('success', `Page ${answers['name']} générée avec succès.`)
     })
   }
 }
 
-export async function generatePage(options: { cwd?: string, targetPath: string, data: { name: string, title: string } }, callback?: Function) {
-  console.log(options)
+export async function generatePage(options: { cwd?: string, data: { name: string, title: string } }, paths?: any) {
+  const {cwd, data} = options
+
+  if (paths == null) {
+    paths = get_project_paths(cwd)
+  }
+
   await generate({
-      cwd: options.cwd == null ? process.cwd() : options.cwd,
+      cwd,
+      data,
       templatePath: 'page',
-      targetPath: options.targetPath,
-      data: options.data,
-    },
-    async () => {
-      if (callback != null) {
-        await callback()
-      }
+      targetPath: paths.web_pages_path,
+    }, () => {
+      logger('success', `Page ${options.data.name} générée avec succès.`)
     }
   )
 }

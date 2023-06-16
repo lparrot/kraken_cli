@@ -57,7 +57,7 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
   app.use(cors())
   app.options('*', cors())
 
-  await getModules('routes/*.js', (module: any) => {
+  await getModules('routes/**/*.js', (module: any) => {
     app.use(module.default.url, module.default.router)
   })
 

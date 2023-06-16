@@ -95,7 +95,6 @@ await getProjects()
             </q-item-section>
             <q-item-section>
               <q-item-label>Retirer le projet selectionné</q-item-label>
-              <q-item-label caption class="text-red-4">Retirer de la liste sans le supprimer</q-item-label>
             </q-item-section>
           </q-item>
 

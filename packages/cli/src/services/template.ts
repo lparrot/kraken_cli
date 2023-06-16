@@ -7,7 +7,7 @@ import fs_extra from "fs-extra";
 import {fileURLToPath} from "url";
 import {TemplateGeneratorOptions} from "../../types/index.js";
 
-export async function generate(options: TemplateGeneratorOptions, postProcess: (options: TemplateGeneratorOptions) => void) {
+export async function generate(options: TemplateGeneratorOptions, postProcess?: (options: TemplateGeneratorOptions) => void) {
   const templatePath = path.join(dirname(fileURLToPath(import.meta.url)), '..', 'templates', options.templatePath)
 
   const targetPath = options.targetPath
