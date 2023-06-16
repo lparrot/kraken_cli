@@ -4,6 +4,8 @@ import {TemplateInitOptions} from "../../types/index.js";
 import {dotcase, pascalcase, pathcase, snakecase} from "stringcase";
 import path from "path";
 import {logger} from "../utils/logger.js";
+import {removeAllAccents} from "../utils/string.js";
+import inquirer from "inquirer";
 
 export default {
   command: 'init',
@@ -11,6 +13,60 @@ export default {
   async handler() {
     const versions = await get_versions()
 
+    if (!versions.is_node_installed) {
+      return logger('error', `Node.js doit être installé et la variable d'environnement PATH correctement configurée.`)
+    }
+
+    if (!versions.is_mvn_installed) {
+      return logger('error', `Maven doit être installé et la variable d'environnement PATH correctement configurée.`)
+    }
+
+    const current_dir = process.cwd()
+
+    const answers = await inquirer.prompt([
+      {
+        type: 'list', name: 'template', message: 'Template à utiliser ?', choices: [
+          {value: 'simple', name: 'Simple'},
+          {value: 'complete', name: 'Complet'},
+        ]
+      },
+      {type: 'input', name: 'name', message: 'Nom du projet ?', transformer: (value: string) => removeAllAccents(value)},
+      {type: 'input', name: 'description', message: 'Description du projet ?', transformer: (value: string) => removeAllAccents(value)},
+      {type: 'input', name: 'group_id', message: 'GroupID ?', default: 'fr.intradef.cdadr'},
+      {
+        type: 'input',
+        name: 'artifact_id',
+        message: 'ArtifactID ?',
+        default: (answers: any) => removeAllAccents(snakecase(answers['name'])),
+        transformer: (value: string) => removeAllAccents(snakecase(value))
+      },
+      {type: 'input', name: 'socle_version', message: 'Version de Kraken ?', default: versions.last_npm_version.replace(/[\n\r]+/g, '')},
+      {type: 'input', name: 'node_version', message: 'Version de NodeJS ?', default: () => versions.node_version.replace(/[\n\r]+/g, '')},
+      {type: 'input', name: 'db_host', message: `IP ou nom d'hôte de la BDD de dev ?`, default: '127.0.0.1', when: (answers: any) => answers['template'] === 'complete'},
+      {type: 'input', name: 'db_port', message: `Port utilisé par la BDD de dev ?`, default: '3306', when: (answers: any) => answers['template'] === 'complete'},
+      {type: 'input', name: 'db_name', message: `Nom de la base de données de dev ?`, default: (answers: any) => snakecase(answers['name']), transformer: (value: string) => snakecase(value), when: (answers) => answers['template'] === 'complete'},
+      {type: 'input', name: 'db_user', message: `Utilisateur de la BDD de dev ?`, default: 'root', when: (answers: any) => answers['template'] === 'complete'},
+      {type: 'input', name: 'db_password', message: `Mot de passe de la BDD de dev ?`, default: 'root', when: (answers: any) => answers['template'] === 'complete'},
+      {type: 'confirm', name: 'install_librairies', message: `Télécharger et installer les librairies Maven et NPM ?`, default: true},
+      {type: 'confirm', name: 'create_git_repo', message: `Initialiser un dépôt Git ?`, default: true},
+    ])
+
+    await initializeProject(answers['template'], {
+      cwd: current_dir,
+      name: answers['name'],
+      description: answers['description'],
+      group_id: answers['group_id'],
+      artifact_id: answers['artifact_id'],
+      socle_version: answers['socle_version'],
+      node_version: answers['node_version'],
+      db_host: answers['db_host'],
+      db_port: answers['db_port'],
+      db_name: answers['db_name'],
+      db_user: answers['db_user'],
+      db_password: answers['db_password'],
+      install_librairies: answers['install_librairies'],
+      create_git_repo: answers['create_git_repo'],
+    })
   }
 }
 
@@ -33,16 +89,6 @@ export async function initializeProject(templateType: string, data: TemplateInit
   const group_id = dotcase(data.group_id)
   const classname = pascalcase(short_name)
   const cwd = data.cwd == null ? process.cwd() : data.cwd
-
-  console.log({
-    ...data,
-    short_name,
-    group_id,
-    classname,
-    version: '1.0.0',
-    package: `${group_id}.${short_name}`,
-    package_folder: `${pathcase(group_id)}/${short_name}`
-  })
 
   await generate({
       templatePath: `apps/${templateType}`,
