@@ -127,7 +127,7 @@ watch(
 
       <template v-if="storage.init.folder != null">
         <div>
-          <VeeField #default="{errorMessage, meta, field}" name="name" rules="required">
+          <VeeField #default="{errorMessage, meta, field}" label="nom" name="name" rules="required">
             <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du projet" stack-label v-bind="field"/>
           </VeeField>
 

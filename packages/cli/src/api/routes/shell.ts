@@ -14,4 +14,11 @@ meta.router.get('/open_current_project', (req, res) => {
   return res.status(200).send()
 })
 
+meta.router.get('/open_in_idea', (req, res) => {
+  const path = req.query.path as string
+  const {project_path} = get_project_paths(path)!
+  shell.exec(`idea ${project_path}`)
+  return res.status(200).send()
+})
+
 export default meta

@@ -61,7 +61,7 @@ watch(
 
 <template>
   <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
-    <VeeField #default="{errorMessage, meta, field}" name="name" rules="required">
+    <VeeField #default="{errorMessage, meta, field}" label="nom" name="name" rules="required">
       <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du fichier (sans l'extension .vue)" stack-label v-bind="field" @update:model-value="form.name = deburr(stringcase.pathcase($event))"/>
     </VeeField>
 

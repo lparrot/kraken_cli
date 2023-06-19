@@ -25,6 +25,22 @@ async function getProjects() {
   projects.value = await useApiFetch('/api/projects')
 }
 
+async function openSelectedProjectFolder() {
+  await useApiFetch('/api/shell/open_current_project', {
+    query: {
+      path: project.value?.path
+    }
+  })
+}
+
+async function openSelectedProjectIdea() {
+  await useApiFetch('/api/shell/open_in_idea', {
+    query: {
+      path: project.value?.path
+    }
+  })
+}
+
 async function deleteSelectedProject() {
   Dialog.create({
     title: 'Confirmation',
@@ -89,99 +105,112 @@ await getProjects()
             </template>
           </q-select>
 
-          <q-item v-if="project != null" class="text-red-4" clickable dense exact @click="deleteSelectedProject">
-            <q-item-section avatar>
-              <q-icon name="remove_circle"/>
-            </q-item-section>
+          <q-item v-if="project != null" class="text-red-4" dense @click="deleteSelectedProject">
             <q-item-section>
-              <q-item-label>Retirer le projet selectionné</q-item-label>
+              <q-btn-group flat spread>
+                <q-btn color="yellow" dense flat icon="folder" @click="openSelectedProjectFolder">
+                  <q-tooltip>Ouvrir le dossier du projet</q-tooltip>
+                </q-btn>
+                <q-btn color="red" dense flat icon="remove_circle" @click="deleteSelectedProject">
+                  <q-tooltip>Supprimer le projet de la liste (pas de suppression sur le disque)</q-tooltip>
+                </q-btn>
+                <q-btn color="red" dense flat @click="openSelectedProjectIdea">
+                  <q-img src="/idea.png" width="2em"/>
+                  <q-tooltip>Ouvrir le projet dans Intellij Idea</q-tooltip>
+                </q-btn>
+              </q-btn-group>
             </q-item-section>
           </q-item>
 
-          <q-item dense exact to="/generate/init">
-            <q-item-section avatar>
-              <q-icon color="grey-6" name="create_new_folder"/>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Créer un nouveau projet</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-list v-if="project != null" dense padding>
+          <q-list dense padding>
             <q-item-label header>Général</q-item-label>
 
-            <q-item dense exact to="/">
+            <template v-if="project != null">
+              <q-item dense exact to="/">
+                <q-item-section avatar>
+                  <q-icon color="grey-6" name="space_dashboard"/>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Tableau de bord</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+
+            <q-item dense exact to="/generate/init">
               <q-item-section avatar>
-                <q-icon color="grey-6" name="space_dashboard"/>
+                <q-icon color="grey-6" name="create_new_folder"/>
               </q-item-section>
               <q-item-section>
-                <q-item-label>Tableau de bord</q-item-label>
+                <q-item-label>Créer un nouveau projet</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-separator dark spaced/>
+            <template v-if="project != null">
 
-            <q-item-label header>Génération côté Back</q-item-label>
+              <q-separator dark spaced/>
 
-            <q-item dense exact to="/generate/controller">
-              <q-item-section avatar>
-                <q-icon color="grey-6" name="api"/>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Controlleur</q-item-label>
-                <q-item-label caption>Génération d'un controlleur Rest</q-item-label>
-              </q-item-section>
-            </q-item>
+              <q-item-label header>Génération côté Back</q-item-label>
 
-            <q-separator inset="item" spaced/>
+              <q-item dense exact to="/generate/controller">
+                <q-item-section avatar>
+                  <q-icon color="grey-6" name="api"/>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Controlleur</q-item-label>
+                  <q-item-label caption>Génération d'un controlleur Rest</q-item-label>
+                </q-item-section>
+              </q-item>
 
-            <q-item dense exact to="/generate/ref">
-              <q-item-section avatar>
-                <q-icon color="grey-6" name="view_list"/>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Referentiel</q-item-label>
-                <q-item-label caption>Permet de créer les classes de type referentiel</q-item-label>
-              </q-item-section>
-            </q-item>
+              <q-separator inset="item" spaced/>
 
-            <q-separator inset="item" spaced/>
+              <q-item dense exact to="/generate/ref">
+                <q-item-section avatar>
+                  <q-icon color="grey-6" name="view_list"/>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Referentiel</q-item-label>
+                  <q-item-label caption>Permet de créer les classes de type referentiel</q-item-label>
+                </q-item-section>
+              </q-item>
 
-            <q-item dense exact to="/generate/timer">
-              <q-item-section avatar>
-                <q-icon color="grey-6" name="view_list"/>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Timer</q-item-label>
-                <q-item-label caption>Crée une classe de timer et le script SQL associé</q-item-label>
-              </q-item-section>
-            </q-item>
+              <q-separator inset="item" spaced/>
 
-            <q-separator dark spaced/>
+              <q-item dense exact to="/generate/timer">
+                <q-item-section avatar>
+                  <q-icon color="grey-6" name="view_list"/>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Timer</q-item-label>
+                  <q-item-label caption>Crée une classe de timer et le script SQL associé</q-item-label>
+                </q-item-section>
+              </q-item>
 
-            <q-item-label header>Génération côté Front</q-item-label>
+              <q-separator dark spaced/>
 
-            <q-item dense exact to="/generate/page">
-              <q-item-section avatar>
-                <q-icon color="grey-6" name="article"/>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Page</q-item-label>
-                <q-item-label caption>Génération d'une page .vue</q-item-label>
-              </q-item-section>
-            </q-item>
+              <q-item-label header>Génération côté Front</q-item-label>
 
-            <q-separator inset="item" spaced/>
+              <q-item dense exact to="/generate/page">
+                <q-item-section avatar>
+                  <q-icon color="grey-6" name="article"/>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Page</q-item-label>
+                  <q-item-label caption>Génération d'une page .vue</q-item-label>
+                </q-item-section>
+              </q-item>
 
-            <q-item dense exact to="/generate/store">
-              <q-item-section avatar>
-                <q-icon color="grey-6" name="save"/>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Store</q-item-label>
-                <q-item-label caption>Génération d'un store Nuxt</q-item-label>
-              </q-item-section>
-            </q-item>
+              <q-separator inset="item" spaced/>
+
+              <q-item dense exact to="/generate/store">
+                <q-item-section avatar>
+                  <q-icon color="grey-6" name="save"/>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Store</q-item-label>
+                  <q-item-label caption>Génération d'un store Nuxt</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
           </q-list>
         </q-drawer>
 
