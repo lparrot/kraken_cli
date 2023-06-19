@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "npm run clean:dist && npm run templates:build && tsc --watch",
     "build": "npm run clean:dist && npm run templates:build && tsc",
-    "api:watch": "cross-env NODE_ENV=development nodemon ---watch dist/src/services/server --exec \"node dist/express-api.js\"",
+    "api:watch": "cross-env NODE_ENV=development nodemon --exec \"node dist/express-api.js\"",
     "templates:build": "shx cp -r src/templates dist/templates",
     "clean:dist": "shx rm -rf dist && shx mkdir -p dist",
     "prepublishOnly": "npm run build"
@@ -22,6 +22,7 @@
   "dependencies": {
     "chalk": "^5.2.0",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.8",
     "dotenv": "^16.1.4",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
