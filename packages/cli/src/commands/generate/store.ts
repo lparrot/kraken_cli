@@ -36,7 +36,7 @@ export default {
       filename: answers['name'],
     }
 
-    await generateStore(options, paths)
+    await generateStore({data}, paths)
   }
 }
 
