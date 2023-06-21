@@ -21,6 +21,8 @@ export default {
         API_PORT: config.API_PORT.toString(),
         NITRO_PORT: config.NUXT_PORT.toString(),
         NITRO_HOST: 'localhost',
+        NITRO_SHUTDOWN: 'true',
+        NITRO_SHUTDOWN_FORCE: 'false',
         ...process.env
       }
     })

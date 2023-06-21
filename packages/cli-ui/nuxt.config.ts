@@ -34,6 +34,10 @@ export default defineNuxtConfig(<NuxtConfig>{
     }
   },
 
+  nitro: {
+    preset: 'node-server'
+  },
+
   vite: {
     vue: {
       script: {

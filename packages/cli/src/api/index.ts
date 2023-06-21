@@ -77,15 +77,16 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
   app.use(ExceptionsHandler)
 
   const server = app.listen(options.port, () => {
-    logger('success', `Accès au serveur : http://localhost:${options.port}`)
+    logger('success', `API : http://localhost:${options.port}`)
   })
 
   for (let signal of ["SIGTERM", "SIGINT"])
     process.on(signal, () => {
-      console.info(`${signal} signal received.`);
-      console.log("Closing http server.");
+      logger('success', "Coupure du serveur en cours ...");
+      // console.info(`${signal} signal received.`);
+      // console.log("Closing http server.");
       server.close((err) => {
-        console.log("Http server closed.");
+        logger('success', "Accès à l'API: Coupé");
         process.exit(err ? 1 : 0);
       });
     });
