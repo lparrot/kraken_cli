@@ -18,17 +18,27 @@ export default defineNuxtConfig(<NuxtConfig>{
 
   modules: [
     'nuxt-quasar-ui',
-    '@vee-validate/nuxt'
+    '@vee-validate/nuxt',
+    '@pinia/nuxt'
   ],
 
   buildModules: [
-    '@vueuse/nuxt',
+    '@vueuse/nuxt'
   ],
 
   typescript: {
     tsConfig: {
       compilerOptions: {
         types: ['@types/kraken']
+      }
+    }
+  },
+
+  vite: {
+    vue: {
+      script: {
+        defineModel: true,
+        propsDestructure: true,
       }
     }
   },
@@ -72,6 +82,10 @@ export default defineNuxtConfig(<NuxtConfig>{
       FieldArray: 'VeeFieldArray',
       ErrorMessage: 'VeeErrorMessage',
     }
+  },
+
+  pinia: {
+    autoImports: ['defineStore', 'acceptHMRUpdate']
   },
 
   experimental: {

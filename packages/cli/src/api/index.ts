@@ -7,7 +7,6 @@ import {ExceptionsHandler} from "./middlewares/exceptions.handler.js";
 import {logger} from "../utils/logger.js";
 import {config} from '../config.js'
 import {db} from "../db/index.js";
-import {getModules} from "../utils/folders.js";
 
 const www = path.resolve(dirname(fileURLToPath(import.meta.url)), '..', 'www')
 
@@ -57,9 +56,14 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
   app.use(cors())
   app.options('*', cors())
 
-  await getModules('routes/**/*.js', (module: any) => {
-    app.use(module.default.url, module.default.router)
-  })
+  app.use('/api', (await import('./routes/index.js')).default)
+  app.use('/api/shell', (await import('./routes/shell.js')).default)
+  app.use('/api/projects', (await import('./routes/projects.js')).default)
+  app.use('/api/fs', (await import('./routes/fs.js')).default)
+  app.use('/api/generate/init', (await import('./routes/generate/init.js')).default)
+  app.use('/api/generate/page', (await import('./routes/generate/page.js')).default)
+  app.use('/api/generate/store', (await import('./routes/generate/store.js')).default)
+  app.use('/api/generate/timer', (await import('./routes/generate/timer.js')).default)
 
   /**
    * Pour toutes les autres routes non définies, on retourne une erreur

@@ -3,6 +3,7 @@ import {QInput} from "quasar";
 import stringcase from 'stringcase'
 import {useKrakenSessionStorage} from "~/composables/useKrakenSessionStorage";
 import {useEventBus} from "@vueuse/core";
+import {useAppStore} from "~/store/app";
 
 interface Form {
   folder?: string
@@ -35,7 +36,7 @@ interface ReadOnlyInputs {
 }
 
 const $q = useQuasar()
-const project = useState('project')
+const appStore = useAppStore()
 const projectsBus = useEventBus('projects')
 
 const form = ref<Form>()
@@ -92,7 +93,7 @@ async function handleSelectFolder() {
 async function submitForm(values, validator) {
   $q.loading.show({message: 'Génération du projet en cours'})
   try {
-    project.value = await useApiFetch('/api/generate/init', {
+    const project = await useApiFetch('/api/generate/init', {
       method: 'post',
       body: {
         ...form.value,
@@ -100,6 +101,7 @@ async function submitForm(values, validator) {
         with_create: true
       }
     })
+    await appStore.setProject(project.id)
     init()
     projectsBus.emit()
   } finally {

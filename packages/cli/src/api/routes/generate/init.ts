@@ -6,12 +6,9 @@ import {get_versions, initializeProject} from "../../../commands/init.js";
 import {TemplateInitOptions} from "../../../../types/index.js";
 import {Project} from "../../../db/index.js";
 
-const meta = {
-  url: '/api/generate/init',
-  router: Router()
-}
+const router = Router()
 
-meta.router.post('/', async (req, res) => {
+router.post('/', async (req, res) => {
   const body = req.body as TemplateInitOptions;
   await initializeProject('complete', body)
 
@@ -34,8 +31,8 @@ meta.router.post('/', async (req, res) => {
   return res.json(body)
 })
 
-meta.router.get('/info', async (req, res) => {
+router.get('/info', async (req, res) => {
   return res.json(await get_versions())
 })
 
-export default meta
+export default router

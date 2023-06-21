@@ -1,4 +1,6 @@
 import fs from 'fs'
+import {get_project_paths} from "./folders.js";
+import {find} from "find-in-files";
 
 export const REGEX = {
   className: '[A-Z][A-Za-z0-9\<\>\._? ]+',
@@ -19,4 +21,9 @@ export function readAllProperty(content: string) {
 export function readAllMethods(content: string) {
   const regex = content.matchAll(new RegExp(`(?<scope>${REGEX.scope})? (?<return_type>${REGEX.className}) (?<name>${REGEX.method})[ ]*[(]{1}[.]*[)]{1}`, 'g'));
   return Array.from(regex, m => Object.assign({}, m.groups))
+}
+
+export async function getSpringBootApplicationClass(cwd: string) {
+  const projectPaths = get_project_paths(cwd);
+  return find('@SpringBootApplication', projectPaths?.server_java_path!, '.java$')
 }

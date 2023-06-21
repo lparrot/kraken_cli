@@ -2,21 +2,18 @@ import {Router} from "express";
 import {normalize} from "path";
 import {Project} from "../../db/index.js";
 
-const meta = {
-  url: '/api/projects',
-  router: Router()
-}
+const router = Router()
 
-meta.router.get('/', async (req, res) => {
+router.get('/', async (req, res) => {
   return res.json(await Project.findAll())
 })
 
-meta.router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   const id = req.params.id
   return res.json(await Project.findByPk(id))
 })
 
-meta.router.post('/', async (req, res) => {
+router.post('/', async (req, res) => {
   const {name, path} = req.body
 
   const projects = await Project.findAll({where: {path: normalize(path)}})
@@ -29,7 +26,7 @@ meta.router.post('/', async (req, res) => {
   return res.json(await Project.findAll())
 })
 
-meta.router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   await Project.destroy({
     where: {
       id: req.params.id
@@ -38,4 +35,4 @@ meta.router.delete('/:id', async (req, res) => {
   return res.status(200).send()
 })
 
-export default meta
+export default router

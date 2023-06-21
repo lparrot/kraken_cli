@@ -9,11 +9,13 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.4.11",
     "@quasar/extras": "^1.16.4",
     "@vee-validate/i18n": "^4.9.6",
     "@vee-validate/nuxt": "^4.9.6",
     "@vee-validate/rules": "^4.9.6",
     "lodash": "^4.17.21",
+    "pinia": "^2.1.4",
     "quasar": "^2.12.0",
     "sass": "^1.62.1",
     "stringcase": "^4.3.1",
@@ -25,7 +27,7 @@
     "@types/node": "^18",
     "@vueuse/core": "^10.1.2",
     "@vueuse/nuxt": "^10.1.2",
-    "nuxt": "^3.5.2",
+    "nuxt": "^3.5.3",
     "nuxt-quasar-ui": "^1.7.4",
     "shx": "^0.3.4"
   }

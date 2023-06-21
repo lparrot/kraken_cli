@@ -2,12 +2,9 @@ import {Router} from 'express'
 import {validationResult} from "express-validator";
 import {get_project_paths} from "../../utils/folders.js";
 
-const meta = {
-  url: '/api',
-  router: Router()
-}
+const router = Router()
 
-meta.router.get('/paths', (req, res) => {
+router.get('/paths', (req, res) => {
   const result = validationResult(req)
 
   if (result.isEmpty()) {
@@ -24,4 +21,4 @@ meta.router.get('/paths', (req, res) => {
   return res.status(400).json({errors: result.array()})
 })
 
-export default meta
+export default router

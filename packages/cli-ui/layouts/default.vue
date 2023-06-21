@@ -1,34 +1,29 @@
 <script lang="ts" setup>
-import {Ref} from "vue";
 import {Dialog} from "quasar";
 import {AddProject} from "#components";
 import {ProjectAttributes} from "@types/kraken";
 import {useEventBus} from "@vueuse/core";
+import {useAppStore} from "~/store/app";
 
+const appStore = useAppStore()
 const storage = useKrakenSessionStorage()
 const router = useRouter()
 const projectsBus = useEventBus('projects')
 
 const drawer = ref(true)
-const project = useState<ProjectAttributes | null>('project')
-const projects: Ref<ProjectAttributes[]> = useState('projects')
 
 if (storage.value.selection.project != null) {
-  project.value = await useApiFetch(`/api/projects/${storage.value.selection.project}`)
+  await appStore.setProject(storage.value.selection.project)
 }
 
 function toggleDrawer() {
   drawer.value = !drawer.value
 }
 
-async function getProjects() {
-  projects.value = await useApiFetch('/api/projects')
-}
-
 async function openSelectedProjectFolder() {
   await useApiFetch('/api/shell/open_current_project', {
     query: {
-      path: project.value?.path
+      path: appStore.project.path
     }
   })
 }
@@ -36,7 +31,7 @@ async function openSelectedProjectFolder() {
 async function openSelectedProjectIdea() {
   await useApiFetch('/api/shell/open_in_idea', {
     query: {
-      path: project.value?.path
+      path: appStore.project.path
     }
   })
 }
@@ -44,14 +39,14 @@ async function openSelectedProjectIdea() {
 async function deleteSelectedProject() {
   Dialog.create({
     title: 'Confirmation',
-    message: 'Etes vous sûr de vouloir supprimer le projet ' + project.value?.name + ' ?',
+    message: 'Etes vous sûr de vouloir supprimer le projet ' + appStore.project.name + ' ?',
     cancel: true,
     persistent: true
   }).onOk(async () => {
-    await useApiFetch(`/api/projects/${project.value?.id}`, {
+    await useApiFetch(`/api/projects/${appStore.project.id}`, {
       method: 'delete'
     })
-    project.value = null
+    await appStore.setProject(null)
     projectsBus.emit()
   })
 }
@@ -60,22 +55,24 @@ async function openDialogAddProject() {
   Dialog.create({
     component: AddProject
   }).onOk(async payload => {
-    projects.value = await useApiFetch('/api/projects', {
+    await useApiFetch('/api/projects', {
       method: 'post',
       body: payload
     })
+
+    await appStore.fetchProjects()
   })
 }
 
 async function onSelectProject(param_project: ProjectAttributes) {
   storage.value.selection.project = param_project.id
-  project.value = param_project
+  await appStore.setProject(param_project.id)
   router.push('/')
 }
 
-projectsBus.on(async () => await getProjects())
+projectsBus.on(async () => await appStore.fetchProjects())
 
-await getProjects()
+await appStore.fetchProjects()
 </script>
 
 <template>
@@ -97,7 +94,7 @@ await getProjects()
         </q-header>
 
         <q-drawer v-model="drawer" bordered show-if-above>
-          <q-select :model-value="project" :options="projects" class="q-ma-md" dense filled label="Projet selectionné" option-label="name" stack-label @update:model-value="onSelectProject">
+          <q-select :model-value="appStore.project" :options="appStore.projects" class="q-ma-md" dense filled label="Projet selectionné" option-label="name" options-dense stack-label @update:model-value="onSelectProject">
             <template v-slot:after>
               <q-btn color="green" dense flat icon="add_circle" round @click="openDialogAddProject">
                 <q-tooltip>Ajouter un projet déjà existant</q-tooltip>
@@ -105,10 +102,10 @@ await getProjects()
             </template>
           </q-select>
 
-          <q-item v-if="project != null" class="text-red-4" dense @click="deleteSelectedProject">
+          <q-item v-if="appStore.project != null" class="text-red-4" dense @click="deleteSelectedProject">
             <q-item-section>
               <q-btn-group flat spread>
-                <q-btn color="yellow" dense flat icon="folder" @click="openSelectedProjectFolder">
+                <q-btn color="orange" dense flat icon="folder" @click="openSelectedProjectFolder">
                   <q-tooltip>Ouvrir le dossier du projet</q-tooltip>
                 </q-btn>
                 <q-btn color="red" dense flat icon="remove_circle" @click="deleteSelectedProject">
@@ -125,7 +122,7 @@ await getProjects()
           <q-list dense padding>
             <q-item-label header>Général</q-item-label>
 
-            <template v-if="project != null">
+            <template v-if="appStore.project != null">
               <q-item dense exact to="/">
                 <q-item-section avatar>
                   <q-icon color="grey-6" name="space_dashboard"/>
@@ -145,7 +142,7 @@ await getProjects()
               </q-item-section>
             </q-item>
 
-            <template v-if="project != null">
+            <template v-if="appStore.project != null">
 
               <q-separator dark spaced/>
 
