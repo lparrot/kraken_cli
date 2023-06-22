@@ -3,12 +3,12 @@ import {get_project_paths} from "../../utils/folders.js";
 import {logger} from "../../utils/logger.js";
 import inquirer from "inquirer";
 import {isBlank} from "../../utils/string.js";
-import {pascalcase, pathcase} from "stringcase";
+import {lowercase, pascalcase} from "stringcase";
 import {generate} from "../../services/template.js";
 
 export default {
   command: 'ctrl [-n]',
-  description: `Génération d'un controlleur Rest`,
+  description: `Génération d'un controlleur Rest et son service associé`,
   builder(yargs: YargsOptions) {
     yargs.option('name', {alias: 'n', describe: `Nom du fichier`, type: 'string'})
     yargs.option('url', {alias: 'u', describe: `Url du webservice`, type: 'string'})
@@ -43,8 +43,8 @@ export default {
     ])
 
     const data = {
-      name: pascalcase(answers['name']),
-      url: pathcase(answers['url']),
+      name: answers['name'],
+      url: answers['url'],
     }
 
     await generateControlleur({data})
@@ -55,7 +55,7 @@ export async function generateControlleur(options: { cwd?: string, data: { name:
   const {cwd, data} = options
 
   data.name = pascalcase(data.name)
-  data.url = pathcase(data.url)
+  data.url = lowercase(data.url)
 
   await generate({
       cwd,

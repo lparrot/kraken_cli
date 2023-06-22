@@ -1,10 +1,10 @@
 import {Notify} from "quasar";
 import {NitroFetchOptions} from "nitropack";
 
-export const useApiFetch = <T>(request: string, opts?: NitroFetchOptions<any>): Promise<T> => {
+export const useApiFetch = <T>(input: string, opts?: NitroFetchOptions<any>): Promise<T> => {
   const config = useRuntimeConfig()
 
-  return $fetch<T>(request, {
+  return $fetch<T>(input.toString(), {
     retry: false,
 
     baseURL: `http://localhost:${config.public.API_PORT}`,

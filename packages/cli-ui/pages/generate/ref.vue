@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useAppStore} from "~/store/app";
+import {useStateStore} from "~/store/state";
 
 interface Form {
   name: string
@@ -7,7 +7,7 @@ interface Form {
 }
 
 const $q = useQuasar()
-const appStore = useAppStore()
+const $state = useStateStore()
 
 const form = ref<Partial<Form>>()
 

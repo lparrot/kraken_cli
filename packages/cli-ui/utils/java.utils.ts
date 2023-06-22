@@ -1,7 +1,6 @@
-import {useAppStore} from "~/store/app";
+import {useStateStore} from "~/store/state";
 
 export function convertPathToPackage(path: string) {
-  const appStore = useAppStore()
-
-  return path.replaceAll(appStore.paths?.server_java_path! + '\\', '').replaceAll("\\", '.')
+  const $state = useStateStore()
+  return path.replaceAll($state.infos?.server_java_path! + $state.infos?.separator, '').replaceAll($state.infos?.separator!, '.')
 }

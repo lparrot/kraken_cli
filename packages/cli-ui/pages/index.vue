@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import {useAppStore} from "~/store/app";
+import {useStateStore} from "~/store/state";
 
 const info = ref()
 
-const appStore = useAppStore()
+const $state = useStateStore()
 </script>
 
 <template>
-  <div v-if="appStore.paths != null">
+  <div v-if="$state.infos != null">
     <q-markup-table bordered class="q-mt-md" dense flat>
       <tbody>
-      <tr v-for="(value, key) in appStore.paths" :key="key">
+      <tr v-for="(value, key) in $state.infos" :key="key">
         <td>{{ key }}</td>
         <td>{{ value }}</td>
       </tr>

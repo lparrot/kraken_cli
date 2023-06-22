@@ -2,10 +2,10 @@
 import {QInput} from "quasar";
 import stringcase from "stringcase";
 import deburr from "lodash/deburr";
-import {useAppStore} from "~/store/app";
+import {useStateStore} from "~/store/state";
 
 const $q = useQuasar()
-const appStore = useAppStore()
+const $state = useStateStore()
 
 const form = ref({})
 
@@ -21,7 +21,7 @@ async function submitForm() {
     await useApiFetch('/api/generate/store', {
       method: 'post',
       body: {
-        cwd: appStore.project.path,
+        cwd: $state.project.path,
         name: form.value.name
       }
     })

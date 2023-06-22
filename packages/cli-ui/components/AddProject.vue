@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import {QInput, useDialogPluginComponent} from 'quasar'
 import {isBlank} from "~/utils/string.utils";
+import {useApiStore} from "~/store/api";
 
-const props = defineProps({})
-
-const {validate, setTouched} = useField('path')
+const $api = useApiStore()
 
 defineEmits([
   ...useDialogPluginComponent.emits
@@ -19,13 +18,9 @@ function submitForm() {
 }
 
 async function searchProjectFolder() {
-  const folder = await useApiFetch('/api/fs/folder')
+  const folder = await $api.handleSelectDirectory()
   if (folder != null) {
-    const paths = await useApiFetch('/api/paths', {
-      params: {
-        path: folder
-      }
-    })
+    const paths = await $api.fetchInfos(folder)
 
     if (paths != null) {
       form.value.path = paths.project_path

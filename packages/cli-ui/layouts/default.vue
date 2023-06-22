@@ -3,9 +3,11 @@ import {Dialog} from "quasar";
 import {AddProject} from "#components";
 import {ProjectAttributes} from "@types/kraken";
 import {useEventBus} from "@vueuse/core";
-import {useAppStore} from "~/store/app";
+import {useStateStore} from "~/store/state";
+import {useApiStore} from "~/store/api";
 
-const appStore = useAppStore()
+const $state = useStateStore()
+const $api = useApiStore()
 const storage = useKrakenSessionStorage()
 const router = useRouter()
 const projectsBus = useEventBus('projects')
@@ -13,7 +15,7 @@ const projectsBus = useEventBus('projects')
 const drawer = ref(true)
 
 if (storage.value.selection.project != null) {
-  await appStore.setProject(storage.value.selection.project)
+  await $state.setProject(storage.value.selection.project)
 }
 
 function toggleDrawer() {
@@ -21,32 +23,24 @@ function toggleDrawer() {
 }
 
 async function openSelectedProjectFolder() {
-  await useApiFetch('/api/shell/open_current_project', {
-    query: {
-      path: appStore.project.path
-    }
-  })
+  await $api.handleOpenCurrentProjectDirectory($state.project?.path)
 }
 
 async function openSelectedProjectIdea() {
-  await useApiFetch('/api/shell/open_in_idea', {
-    query: {
-      path: appStore.project.path
-    }
-  })
+  await $api.handleOpenCurrentProjectInIntellij($state.project?.path)
 }
 
 async function deleteSelectedProject() {
   Dialog.create({
     title: 'Confirmation',
-    message: 'Etes vous sûr de vouloir supprimer le projet ' + appStore.project.name + ' ?',
+    message: 'Etes vous sûr de vouloir supprimer le projet ' + $state.project?.name + ' ?',
     cancel: true,
     persistent: true
   }).onOk(async () => {
-    await useApiFetch(`/api/projects/${appStore.project.id}`, {
+    await useApiFetch(`/api/projects/${$state.project.id}`, {
       method: 'delete'
     })
-    await appStore.setProject(null)
+    await $state.setProject(null)
     projectsBus.emit()
   })
 }
@@ -60,19 +54,19 @@ async function openDialogAddProject() {
       body: payload
     })
 
-    await appStore.fetchProjects()
+    await $state.fetchProjects()
   })
 }
 
 async function onSelectProject(param_project: ProjectAttributes) {
   storage.value.selection.project = param_project.id
-  await appStore.setProject(param_project.id)
+  await $state.setProject(param_project.id)
   router.push('/')
 }
 
-projectsBus.on(async () => await appStore.fetchProjects())
+projectsBus.on(async () => await $state.fetchProjects())
 
-await appStore.fetchProjects()
+await $state.fetchProjects()
 </script>
 
 <template>
@@ -82,7 +76,7 @@ await appStore.fetchProjects()
     </template>
 
     <ClientOnly>
-      <q-layout view="lHh Lpr lFf">
+      <q-layout view="hHh Lpr lff">
         <q-header elevated>
           <q-toolbar>
             <q-btn aria-label="Menu" dense flat icon="menu" round @click="toggleDrawer"/>
@@ -94,7 +88,7 @@ await appStore.fetchProjects()
         </q-header>
 
         <q-drawer v-model="drawer" bordered show-if-above>
-          <q-select :model-value="appStore.project" :options="appStore.projects" class="q-ma-md" dense filled label="Projet selectionné" option-label="name" options-dense stack-label @update:model-value="onSelectProject">
+          <q-select :model-value="$state.project" :options="$state.projects" class="q-ma-md" dense filled label="Projet selectionné" option-label="name" options-dense stack-label @update:model-value="onSelectProject">
             <template v-slot:after>
               <q-btn color="green" dense flat icon="add_circle" round @click="openDialogAddProject">
                 <q-tooltip>Ajouter un projet déjà existant</q-tooltip>
@@ -102,7 +96,7 @@ await appStore.fetchProjects()
             </template>
           </q-select>
 
-          <q-item v-if="appStore.project != null" class="text-red-4" dense @click="deleteSelectedProject">
+          <q-item v-if="$state.project != null" class="text-red-4" dense @click="deleteSelectedProject">
             <q-item-section>
               <q-btn-group flat spread>
                 <q-btn color="orange" dense flat icon="folder" @click="openSelectedProjectFolder">
@@ -122,7 +116,7 @@ await appStore.fetchProjects()
           <q-list dense padding>
             <q-item-label header>Général</q-item-label>
 
-            <template v-if="appStore.project != null">
+            <template v-if="$state.project != null">
               <q-item dense exact to="/">
                 <q-item-section avatar>
                   <q-icon color="grey-6" name="space_dashboard"/>
@@ -142,11 +136,11 @@ await appStore.fetchProjects()
               </q-item-section>
             </q-item>
 
-            <template v-if="appStore.project != null">
+            <template v-if="$state.project != null">
 
-              <q-separator dark spaced/>
+              <q-separator spaced/>
 
-              <q-item-label header>Génération côté Back</q-item-label>
+              <q-item-label header>Génération côté serveur</q-item-label>
 
               <q-item dense exact to="/generate/controller">
                 <q-item-section avatar>
@@ -154,11 +148,9 @@ await appStore.fetchProjects()
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Controlleur</q-item-label>
-                  <q-item-label caption>Génération d'un controlleur Rest</q-item-label>
                 </q-item-section>
+                <q-tooltip anchor="center right" self="center start">Génération d'un controlleur Rest et son service associé</q-tooltip>
               </q-item>
-
-              <q-separator inset="item" spaced/>
 
               <q-item dense exact to="/generate/ref">
                 <q-item-section avatar>
@@ -166,25 +158,23 @@ await appStore.fetchProjects()
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Referentiel</q-item-label>
-                  <q-item-label caption>Permet de créer les classes de type referentiel</q-item-label>
                 </q-item-section>
+                <q-tooltip anchor="center right" self="center start">Permet de créer les classes de type referentiel</q-tooltip>
               </q-item>
-
-              <q-separator inset="item" spaced/>
 
               <q-item dense exact to="/generate/timer">
                 <q-item-section avatar>
-                  <q-icon color="grey-6" name="view_list"/>
+                  <q-icon color="grey-6" name="schedule"/>
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Timer</q-item-label>
-                  <q-item-label caption>Crée une classe de timer et le script SQL associé</q-item-label>
                 </q-item-section>
+                <q-tooltip anchor="center right" self="center start">Crée une classe de timer et le script SQL associé</q-tooltip>
               </q-item>
 
-              <q-separator dark spaced/>
+              <q-separator spaced/>
 
-              <q-item-label header>Génération côté Front</q-item-label>
+              <q-item-label header>Génération côté web</q-item-label>
 
               <q-item dense exact to="/generate/page">
                 <q-item-section avatar>
@@ -192,11 +182,9 @@ await appStore.fetchProjects()
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Page</q-item-label>
-                  <q-item-label caption>Génération d'une page .vue</q-item-label>
+                  <q-tooltip anchor="center right" self="center start">Génération d'une page .vue</q-tooltip>
                 </q-item-section>
               </q-item>
-
-              <q-separator inset="item" spaced/>
 
               <q-item dense exact to="/generate/store">
                 <q-item-section avatar>
@@ -204,7 +192,7 @@ await appStore.fetchProjects()
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Store</q-item-label>
-                  <q-item-label caption>Génération d'un store Nuxt</q-item-label>
+                  <q-tooltip anchor="center right" self="center start">Génération d'un store Nuxt</q-tooltip>
                 </q-item-section>
               </q-item>
             </template>

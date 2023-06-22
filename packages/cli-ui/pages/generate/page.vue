@@ -3,7 +3,7 @@ import stringcase, {sentencecase} from "stringcase";
 import kebabCase from "lodash/kebabCase";
 import {QInput} from "quasar";
 import deburr from 'lodash/deburr'
-import {useAppStore} from "~/store/app";
+import {useStateStore} from "~/store/state";
 
 interface Form {
   name: string
@@ -15,7 +15,7 @@ interface ReadOnlyInputs {
 }
 
 const $q = useQuasar()
-const appStore = useAppStore()
+const $state = useStateStore()
 
 const form = ref<Partial<Form>>()
 const readonly_inputs = ref<ReadOnlyInputs>()
@@ -35,7 +35,7 @@ async function submitForm() {
       body: {
         name: form.value.name,
         title: form.value.title,
-        cwd: appStore.project.path
+        cwd: $state.project.path
       }
     })
     if (success) {

@@ -3,7 +3,7 @@ import {QInput} from "quasar";
 import stringcase from 'stringcase'
 import {useKrakenSessionStorage} from "~/composables/useKrakenSessionStorage";
 import {useEventBus} from "@vueuse/core";
-import {useAppStore} from "~/store/app";
+import {useStateStore} from "~/store/state";
 
 interface Form {
   folder?: string
@@ -36,7 +36,7 @@ interface ReadOnlyInputs {
 }
 
 const $q = useQuasar()
-const appStore = useAppStore()
+const $state = useStateStore()
 const projectsBus = useEventBus('projects')
 
 const form = ref<Form>()
@@ -101,7 +101,7 @@ async function submitForm(values, validator) {
         with_create: true
       }
     })
-    await appStore.setProject(project.id)
+    await $state.setProject(project.id)
     init()
     projectsBus.emit()
   } finally {

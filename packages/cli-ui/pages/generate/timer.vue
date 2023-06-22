@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ResponseFsPackages} from "@types/kraken";
-import {useAppStore} from "~/store/app";
+import {useStateStore} from "~/store/state";
 import {useApiStore} from "~/store/api";
 import {convertPathToPackage} from "~/utils/java.utils";
 import deburr from "lodash/deburr";
@@ -13,22 +13,24 @@ interface Form {
 }
 
 const $q = useQuasar()
-const appStore = useAppStore()
+const $state = useStateStore()
 const $api = useApiStore()
 
-const drawer = ref()
+const drawer = ref(false)
 const form = ref<Partial<Form>>({})
 const packages = ref<ResponseFsPackages[]>()
 
-function init() {
-  form.value = {}
+async function init() {
+  form.value = {
+    cwd: await $api.fetchJavaRootDir($state.infos.server_java_path)
+  }
 }
 
-init()
+await init()
 
 const allPackages: ResponseFsPackages[] = await useApiFetch<ResponseFsPackages[]>('/api/fs/packages', {
   query: {
-    path: appStore.project.path
+    path: $state.project.path
   }
 })
 
@@ -46,7 +48,7 @@ async function submitForm() {
         data
       }
     })
-    init()
+    await init()
     $q.notify({
       message: 'Timer créé avec succès',
       color: 'green'
@@ -56,22 +58,25 @@ async function submitForm() {
   }
 }
 
-const packageName = computed(() => {
-  if (form.value.cwd == null) {
-    return null
+const selectedPackage = computed(() => {
+  if (form.value?.cwd != null) {
+    return convertPathToPackage(form.value.cwd)
   }
-  return convertPathToPackage(form.value.cwd)
 })
 </script>
 
 <template>
   <q-layout>
-    <q-drawer ref="drawer" behavior="mobile" bordered overlay side="right">
-      <FolderFetcher v-model="form.cwd" :root="appStore.paths.server_java_path" @select="drawer.hide()"/>
+    <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
+      <div class="row items-center q-ma-sm">
+        <q-space/>
+        <q-btn dense flat icon="close" round @click="drawer = false"/>
+      </div>
+      <FileFetcher v-model="form.cwd" :root="$state.infos.server_java_path"/>
     </q-drawer>
 
     <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
-      <q-btn :color="form.cwd == null ? 'blue' : 'green'" class="full-width" no-caps @click="drawer.show()">
+      <q-btn :color="form.cwd == null ? 'blue' : 'green'" class="full-width" no-caps @click="drawer = true">
         <span v-if="form.cwd == null">Selectionnez un package</span>
         <span v-else>Modifier le package</span>
       </q-btn>
@@ -79,7 +84,7 @@ const packageName = computed(() => {
       <template v-if="form.cwd != null">
         <div class="row items-center q-gutter-xs">
           <q-icon color="orange" name="folder"/>
-          <div class="text-subtitle2">{{ packageName }}</div>
+          <div class="text-subtitle2">{{ selectedPackage }}</div>
         </div>
 
         <q-separator/>

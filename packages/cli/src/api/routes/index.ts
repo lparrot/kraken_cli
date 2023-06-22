@@ -1,10 +1,11 @@
 import {Router} from 'express'
 import {validationResult} from "express-validator";
 import {get_project_paths} from "../../utils/folders.js";
+import {sep} from "path";
 
 const router = Router()
 
-router.get('/paths', (req, res) => {
+router.get('/infos', (req, res) => {
   const result = validationResult(req)
 
   if (result.isEmpty()) {
@@ -15,7 +16,10 @@ router.get('/paths', (req, res) => {
       return res.status(400).json({message: `Le dossier choisi n'est pas un projet Kraken`})
     }
 
-    return res.status(200).json({...project_paths})
+    return res.status(200).json({
+      ...project_paths,
+      separator: sep
+    })
   }
 
   return res.status(400).json({errors: result.array()})

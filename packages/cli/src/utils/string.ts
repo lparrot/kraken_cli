@@ -1,3 +1,6 @@
+import trimStart from "lodash/trimStart.js";
+import trimEnd from "lodash/trimEnd.js";
+
 export function isBlank(str: string) {
   return str == null || str.trim() === ''
 }
@@ -17,4 +20,10 @@ export function stringToBoolean(str: any) {
     return false
   }
   return str.toLowerCase() === 'true'
+}
+
+export function trimBothSide(value: string, character: string = ' ') {
+  value = trimStart(value, character)
+  value = trimEnd(value, character)
+  return value
 }
