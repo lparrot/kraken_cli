@@ -14,10 +14,6 @@ const projectsBus = useEventBus('projects')
 
 const drawer = ref(true)
 
-if (storage.value.selection.project != null) {
-  await $state.setProject(storage.value.selection.project)
-}
-
 function toggleDrawer() {
   drawer.value = !drawer.value
 }
@@ -40,6 +36,7 @@ async function deleteSelectedProject() {
     await useApiFetch(`/api/projects/${$state.project.id}`, {
       method: 'delete'
     })
+    await navigateTo('/')
     await $state.setProject(null)
     projectsBus.emit()
   })
@@ -61,12 +58,10 @@ async function openDialogAddProject() {
 async function onSelectProject(param_project: ProjectAttributes) {
   storage.value.selection.project = param_project.id
   await $state.setProject(param_project.id)
-  router.push('/')
+  navigateTo('/')
 }
 
 projectsBus.on(async () => await $state.fetchProjects())
-
-await $state.fetchProjects()
 </script>
 
 <template>

@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import {useStateStore} from "~/store/state";
 
-const info = ref()
-
 const $state = useStateStore()
 </script>
 
 <template>
-  <div v-if="$state.infos != null">
+  <div v-if="$state.paths != null">
     <q-markup-table bordered class="q-mt-md" dense flat>
       <tbody>
-      <tr v-for="(value, key) in $state.infos" :key="key">
+      <tr v-for="(value, key) in $state.paths" :key="key">
         <td>{{ key }}</td>
         <td>{{ value }}</td>
       </tr>

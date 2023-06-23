@@ -1,7 +1,9 @@
+import {ProjectPaths, ServerInfos} from "kraken";
+
 export const useApiStore = defineStore('api', {
   actions: {
-    async fetchInfos(path: string): Promise<any> {
-      return await useApiFetch('/api/infos', {params: {path}})
+    async fetchInfos(): Promise<ServerInfos> {
+      return await useApiFetch('/api/infos')
     },
 
     async fetchFolders(path: string, config?: { only_current: boolean }): Promise<any[]> {
@@ -9,12 +11,16 @@ export const useApiStore = defineStore('api', {
       return useApiFetch('/api/fs/files', {query: {path, ...config}})
     },
 
-    async fetchJavaFiles(path: string, config?: { directory: boolean }): Promise<string[]> {
-      return useApiFetch('/api/fs/files/java', {query: {path, ...config}})
+    async fetchJavaFiles(path: string): Promise<string[]> {
+      return useApiFetch('/api/fs/files/java', {query: {path}})
     },
 
     async fetchJavaRootDir(path: string): Promise<string> {
       return useApiFetch('/api/fs/rootdir', {query: {path}})
+    },
+
+    async fetchProjectPaths(path: string): Promise<ProjectPaths> {
+      return useApiFetch('/api/paths', {query: {path}})
     },
 
     async fetchPathInfo(path: string, root?: string): Promise<any> {

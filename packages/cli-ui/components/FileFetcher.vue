@@ -3,16 +3,22 @@ import {useStateStore} from "~/store/state";
 import {useApiStore} from "~/store/api";
 
 interface Props {
-  root?: string
+  readonly root?: string
+  readonly defaultDir?: string
+  readonly autoSelect?: boolean
+  readonly showHome?: boolean
 }
 
 const $q = useQuasar()
 const $state = useStateStore()
 const $api = useApiStore()
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  autoSelect: true,
+  showHome: false
+})
 
-const modelValue = defineModel<string>({default: null})
+const modelValue = defineModel<string | null>({default: null})
 
 const emit = defineEmits<{
   select: [data: any]
@@ -20,22 +26,39 @@ const emit = defineEmits<{
 
 const folder_info = ref<any>()
 
-if (modelValue.value == null) {
-  if (props.root == null && $state.project) {
-    modelValue.value = $state.project?.path
-  } else {
-    modelValue.value = props.root!
-  }
-}
+const canGoToParent = computed(() => {
+  return folder_info.value?.parent?.startsWith(rootDir.value)
+})
 
-async function select_folder(folder) {
-  modelValue.value = folder.path
-  emit('select', modelValue.value)
+const rootDir = computed(() => {
+  return props.root != null ? props.root : ''
+})
+
+async function click_folder(path) {
+  if (path === rootDir.value) {
+    return
+  }
+  if (props.autoSelect) {
+    modelValue.value = path
+    emit('select', modelValue.value)
+  }
+  await fetchInfo(path)
 }
 
 async function select_parent() {
-  modelValue.value = folder_info.value.parent
-  emit('select', modelValue.value)
+  if (folder_info.value.path === rootDir.value) {
+    return
+  }
+
+  if (props.autoSelect) {
+    if (folder_info.value.parent === rootDir.value) {
+      modelValue.value = null
+    } else {
+      modelValue.value = folder_info.value.parent
+    }
+    emit('select', modelValue.value)
+  }
+  await fetchInfo(folder_info.value.parent)
 }
 
 function handleNewDirectory() {
@@ -44,32 +67,28 @@ function handleNewDirectory() {
     message: 'Donnez le nom du nouveau dossier',
     prompt: {
       model: '',
-      isValid: val => val.length > 0,
-      type: 'text'
+      isValid: (val) => val.length > 0,
     },
     cancel: true,
     persistent: true,
   }).onOk(async (data: string) => {
     await $api.handleCreateNewDirectory(folder_info.value.path, data)
-    folder_info.value = await $api.fetchPathInfo(folder_info.value.path, props.root)
+    folder_info.value = await $api.fetchPathInfo(folder_info.value.path, rootDir.value)
   })
 }
 
-async function fetchInfo(path: string) {
+async function fetchInfo(path?: string) {
   if (path != null) {
-    folder_info.value = await $api.fetchPathInfo(path, props.root)
+    folder_info.value = await $api.fetchPathInfo(path, rootDir.value)
   }
 }
 
-await fetchInfo(modelValue.value)
+function onSelect() {
+  modelValue.value = folder_info.value.path
+  emit('select', modelValue.value)
+}
 
-watch(modelValue, async (value) => {
-  await fetchInfo(value)
-})
-
-const canGoToParent = computed(() => {
-  return folder_info.value?.parent?.startsWith(props.root + $state.infos.separator)
-})
+await fetchInfo(modelValue.value != null ? modelValue.value! : props.defaultDir || rootDir.value)
 </script>
 
 <template>
@@ -78,14 +97,22 @@ const canGoToParent = computed(() => {
     <q-tr>
       <q-td>
         <div class="row items-center q-gutter-xs">
-          <q-btn v-for="bread in folder_info?.breadcrumb" color="green-3" dense size="sm" unelevated @click="select_folder(bread)">{{ bread.label }}</q-btn>
+          <q-btn v-for="bread in folder_info?.breadcrumb" color="green-3" dense size="sm" unelevated @click="click_folder(bread.path)">{{ bread.label }}</q-btn>
         </div>
       </q-td>
     </q-tr>
     <q-tr>
       <q-td>
         <div class="row items-center q-gutter-xs">
-          <q-btn color="orange" dense icon="add" label="Nouveau dossier" size="sm" unelevated @click="handleNewDirectory"/>
+          <q-btn v-if="!autoSelect" color="blue" dense icon="check" size="sm" unelevated @click="onSelect">
+            <q-tooltip>Selection du dossier actuel</q-tooltip>
+          </q-btn>
+          <q-btn color="green" dense icon="add" size="sm" unelevated @click="handleNewDirectory">
+            <q-tooltip>Création d'un nouveau répertoire</q-tooltip>
+          </q-btn>
+          <q-btn v-if="props.showHome" color="orange" dense icon="home" size="sm" unelevated @click="click_folder($state.infos.home_dir)">
+            <q-tooltip>Déplacement vers le dossier utilisateur</q-tooltip>
+          </q-btn>
         </div>
       </q-td>
     </q-tr>
@@ -97,7 +124,7 @@ const canGoToParent = computed(() => {
         </div>
       </q-td>
     </q-tr>
-    <q-tr v-for="folder in folder_info?.children" class="cursor-pointer" @click="select_folder(folder)">
+    <q-tr v-for="folder in folder_info?.children" class="cursor-pointer" @click="click_folder(folder.path)">
       <q-td auto-width>
         <div class="row items-center q-gutter-sm">
           <q-icon color="orange" name="folder"/>

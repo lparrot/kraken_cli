@@ -4,8 +4,10 @@ import stringcase from 'stringcase'
 import {useKrakenSessionStorage} from "~/composables/useKrakenSessionStorage";
 import {useEventBus} from "@vueuse/core";
 import {useStateStore} from "~/store/state";
+import {useApiStore} from "~/store/api";
 
 interface Form {
+  cwd?: string
   folder?: string
   name?: string | null
   description?: string
@@ -23,7 +25,6 @@ interface Form {
 }
 
 interface ReadOnlyInputs {
-  select_folder: boolean
   group_id: boolean
   artifact_id: boolean
   node_version: boolean
@@ -36,21 +37,20 @@ interface ReadOnlyInputs {
 }
 
 const $q = useQuasar()
+const $api = useApiStore()
 const $state = useStateStore()
 const projectsBus = useEventBus('projects')
 
+const drawer = ref()
 const form = ref<Form>()
 const readonly_inputs = ref<ReadOnlyInputs>()
-const versions = ref()
 const storage = useKrakenSessionStorage()
-
-versions.value = await useApiFetch<any>('/api/generate/init/info')
 
 function init() {
   form.value = {
     group_id: 'fr.intradef.cdadr',
-    node_version: versions.value.node_version,
-    socle_version: versions.value.last_npm_version,
+    node_version: $state.infos.node_version,
+    socle_version: $state.infos.last_npm_version,
     db_host: '127.0.0.1',
     db_port: '3306',
     db_user: 'root',
@@ -60,7 +60,6 @@ function init() {
   }
 
   readonly_inputs.value = {
-    select_folder: false,
     group_id: true,
     artifact_id: true,
     node_version: true,
@@ -76,19 +75,6 @@ function init() {
 init()
 
 const shortName = computed(() => form.value.name ? stringcase.snakecase(form.value.name!) : null)
-const buttonChooseFolderLabel = computed(() => form.value.folder == null ? 'Choisir le dossier' : 'Modifier le dossier')
-
-async function handleSelectFolder() {
-  readonly_inputs.value.select_folder = true
-  try {
-    const folder = await useApiFetch<string>('/api/fs/folder')
-    if (folder != null) {
-      storage.value.init.folder = folder
-    }
-  } finally {
-    readonly_inputs.value.select_folder = false
-  }
-}
 
 async function submitForm(values, validator) {
   $q.loading.show({message: 'Génération du projet en cours'})
@@ -97,7 +83,6 @@ async function submitForm(values, validator) {
       method: 'post',
       body: {
         ...form.value,
-        cwd: storage.value.init.folder,
         with_create: true
       }
     })
@@ -123,17 +108,28 @@ watch(
 </script>
 
 <template>
-  <ClientOnly>
-    <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
-      <q-btn :disable="readonly_inputs.select_folder" :label="buttonChooseFolderLabel" color="blue" icon="folder" @click="handleSelectFolder"/>
+  <q-layout>
+    <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
+      <div class="row items-center q-ma-sm">
+        <q-space/>
+        <q-btn dense flat icon="close" round @click="drawer = false"/>
+      </div>
+      <FileFetcher v-model="form.cwd" :auto-select="false" :default-dir="$state.infos.home_dir" show-home @select="drawer = false"/>
+    </q-drawer>
 
-      <template v-if="storage.init.folder != null">
+    <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
+      <q-btn :color="form.cwd == null ? 'blue' : 'green'" class="full-width" no-caps @click="drawer = true">
+        <span v-if="form.cwd == null">Selectionnez un dossier</span>
+        <span v-else>Modifier le dossier</span>
+      </q-btn>
+
+      <template v-if="form.cwd != null">
         <div>
           <VeeField #default="{errorMessage, meta, field}" label="nom" name="name" rules="required">
             <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du projet" stack-label v-bind="field"/>
           </VeeField>
 
-          <div class="text-grey-7 q-field__bottom">{{ storage.init.folder }}<span class="text-weight-bolder">{{ shortName }}</span></div>
+          <div class="text-grey-7 q-field__bottom">{{ form.cwd }}\ <span class="text-weight-bolder">{{ shortName }}</span></div>
         </div>
 
         <template v-if="form.name != null">
@@ -224,7 +220,7 @@ watch(
         </template>
       </template>
     </VeeForm>
-  </ClientOnly>
+  </q-layout>
 </template>
 
 <style scoped>

@@ -2,7 +2,7 @@ import {Router} from 'express'
 import shell from "shelljs";
 import path from "path";
 import {snakecase} from "stringcase";
-import {get_versions, initializeProject} from "../../../commands/init.js";
+import {initializeProject} from "../../../commands/init.js";
 import {TemplateInitOptions} from "../../../../types/index.js";
 import {Project} from "../../../db/index.js";
 
@@ -29,10 +29,6 @@ router.post('/', async (req, res) => {
   }
 
   return res.json(body)
-})
-
-router.get('/info', async (req, res) => {
-  return res.json(await get_versions())
 })
 
 export default router

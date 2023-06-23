@@ -4,6 +4,10 @@ import stringcase from "stringcase";
 import deburr from "lodash/deburr";
 import {useStateStore} from "~/store/state";
 
+definePageMeta({
+  middleware: ['security']
+})
+
 const $q = useQuasar()
 const $state = useStateStore()
 

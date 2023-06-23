@@ -5,6 +5,10 @@ import {QInput} from "quasar";
 import deburr from 'lodash/deburr'
 import {useStateStore} from "~/store/state";
 
+definePageMeta({
+  middleware: ['security']
+})
+
 interface Form {
   name: string
   title: string

@@ -2,12 +2,12 @@ import {Router} from 'express'
 // @ts-ignore
 import selectFolder from 'win-select-folder'
 import {Path} from 'path-scurry';
-import {basename, dirname, extname, join, sep} from "path";
+import {basename, dirname, extname, join, resolve, sep} from "path";
 import {body} from "express-validator";
 import {get_project_paths} from "../../utils/folders.js";
 import {globSync} from "glob";
 import sortBy from "lodash/sortBy.js";
-import {trimBothSide} from "../../utils/string.js";
+import {isNotBlank} from "../../utils/string.js";
 import {mkdirSync, readdirSync} from "fs";
 
 const router = Router()
@@ -57,7 +57,7 @@ router.get('/files', async (req, res) => {
 
 /**
  * Liste de tous les fichiers en récursif dans le dossier
- * [path]: chemin du dossier racine a rechercher
+ * [path]: {string} chemin du dossier racine a rechercher
  */
 router.get('/files/java', (req, res) => {
   const query = req.query
@@ -82,27 +82,31 @@ router.get('/path/info', (req, res) => {
   function getBreadcrumb() {
     let bread_path = query_path
 
-    if (query_root != null) {
-      bread_path = query_path.replaceAll(query_root, '')
+    if (isNotBlank(query_root)) {
+      bread_path = query_path.replaceAll(query_root!, '')
     } else {
       query_root = ''
     }
-    const splitted_bread = trimBothSide(bread_path, sep).split(sep)
+
+    const splitted_bread = bread_path.split(sep)
     const bread_items = []
     let bread_item_path = query_root
+
     for (let i = 0; i < splitted_bread.length; i++) {
-      bread_item_path = join(bread_item_path, splitted_bread[i])
-      bread_items.push({
-        path: bread_item_path,
-        label: splitted_bread[i]
-      })
+      if (isNotBlank(splitted_bread[i])) {
+        bread_item_path = bread_item_path! + splitted_bread[i] + sep
+        bread_items.push({
+          path: bread_item_path,
+          label: splitted_bread[i]
+        })
+      }
     }
     return bread_items
   }
 
   const result = {
     ...getInfo(query_path),
-    parent: dirname(query_path),
+    parent: query_path === resolve('/') ? undefined : dirname(query_path),
     breadcrumb: getBreadcrumb(),
     children: sortBy(globSync('*', {cwd: query_path, absolute: true, ignore: {ignored: globIgnoreFn}})).map(f => getInfo(f))
   }

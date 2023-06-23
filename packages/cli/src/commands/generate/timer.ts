@@ -58,6 +58,7 @@ export async function generateTimer(options: { cwd?: string, data: { name: strin
   const timer_name = snakecase(data.name)
   const timer_description = data.description
   const timer_class = `${timer_name.includes('timer') ? '' : 'Timer'}${stringcase.pascalcase(timer_name)}`
+  const timer_package = paths.server_current_package
   const flyway_datetime = dayjs().format('YYYYMMDDHHmm')
 
   await generate({
@@ -67,7 +68,7 @@ export async function generateTimer(options: { cwd?: string, data: { name: strin
       data: {
         timer_name,
         timer_class,
-        timer_package: paths.server_current_package
+        timer_package
       }
     }
   )
@@ -81,7 +82,7 @@ export async function generateTimer(options: { cwd?: string, data: { name: strin
       timer_description,
       flyway_datetime,
       timer_class,
-      timer_package: paths.server_current_package
+      timer_package
     }
   })
 }

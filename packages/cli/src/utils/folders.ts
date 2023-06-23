@@ -15,7 +15,7 @@ const WEB_PAGES_PATH = WEB_ROOT_PATH + '/pages'
 export function get_project_paths(cwd?: string): ProjectPath | null {
   let glob_result = []
   let project_path = cwd ? cwd : process.cwd()
-  let root_path = path.parse(process.cwd()).root
+  let root_path = path.parse(cwd ? cwd : process.cwd()).root
 
   let complete = false
 
@@ -46,7 +46,7 @@ export function get_project_paths(cwd?: string): ProjectPath | null {
     }
 
     function get_current_package(dirname: string) {
-      if (paths != null && path.normalize(dirname).startsWith(paths.server_java_path)) {
+      if (paths != null && path.normalize(dirname).startsWith(paths?.server_java_path!)) {
         return path
           .normalize(dirname)
           .replace(path.normalize(paths.server_java_path), '')
@@ -57,7 +57,7 @@ export function get_project_paths(cwd?: string): ProjectPath | null {
     }
 
     paths.get_current_package = get_current_package
-    paths.server_current_package = get_current_package(process.cwd())
+    paths.server_current_package = get_current_package(cwd ? cwd : process.cwd())
   }
 
   return paths

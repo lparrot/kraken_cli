@@ -5,6 +5,10 @@ import {convertPathToPackage} from "~/utils/java.utils";
 import deburr from "lodash/deburr";
 import stringcase from "stringcase";
 
+definePageMeta({
+  middleware: ['security']
+})
+
 interface Form {
   cwd: string
   name: string
@@ -20,7 +24,7 @@ const form = ref<Partial<Form>>({})
 
 async function init() {
   form.value = {
-    cwd: await $api.fetchJavaRootDir($state.infos.server_java_path)
+    cwd: await $api.fetchJavaRootDir($state.paths.server_java_path)
   }
 }
 
@@ -55,7 +59,7 @@ const selectedPackage = computed(() => {
         <q-space/>
         <q-btn dense flat icon="close" round @click="drawer = false"/>
       </div>
-      <FileFetcher v-model="form.cwd" :root="$state.infos.server_java_path"/>
+      <FileFetcher v-model="form.cwd" :root="$state.paths.server_java_path"/>
     </q-drawer>
 
     <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">

@@ -1,11 +1,11 @@
 import trimStart from "lodash/trimStart.js";
 import trimEnd from "lodash/trimEnd.js";
 
-export function isBlank(str: string) {
+export function isBlank(str: string | null) {
   return str == null || str.trim() === ''
 }
 
-export function isNotBlank(str: string) {
+export function isNotBlank(str: string | null) {
   return !isBlank(str)
 }
 

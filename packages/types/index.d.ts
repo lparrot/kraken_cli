@@ -1,4 +1,15 @@
-export interface ProjectServerInfos {
+export interface ServerInfos {
+  home_dir: string
+  separator: string
+  root_dir: string
+  tmp_dir: string
+  is_mvn_installed: boolean
+  is_node_installed: boolean
+  last_npm_version: string
+  node_version: string
+}
+
+export interface ProjectPaths {
   project_path: string
   server_root_path: string
   server_java_path: string
@@ -7,7 +18,6 @@ export interface ProjectServerInfos {
   web_pages_path: string
   server_current_package?: string | undefined
   get_current_package?: (dirname: string) => string | undefined
-  separator: string
 }
 
 export interface ProjectAttributes {
