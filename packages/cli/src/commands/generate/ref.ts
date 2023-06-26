@@ -6,8 +6,9 @@ import pluralize from "pluralize";
 import {snakecase} from "stringcase";
 import inquirer from "inquirer";
 import {generate} from "../../services/template.js";
+import {ProjectPath} from "../../../types/index.js";
 
-interface GenerateReferentielData {
+export interface GenerateReferentielData {
   template: string
   entity_name: string
   url: string
@@ -67,16 +68,16 @@ export default {
   }
 }
 
-export async function generateReferentiel(options: { cwd?: string, data: GenerateReferentielData }, paths?: any) {
+export async function generateReferentiel(options: { cwd?: string, data: GenerateReferentielData }, paths?: ProjectPath | null) {
   const {cwd, data} = options
 
   if (paths == null) {
     paths = get_project_paths(cwd)
   }
 
-  const entity_full_name = convertJavaFilenameToClassFullName(data.entity_name)
+  const entity_full_name = convertJavaFilenameToClassFullName(data.entity_name, paths?.server_java_path)
   const dao_name = convertJavaFilenameToClassSimpleName(data.dao_name)
-  const dao_full_name = convertJavaFilenameToClassFullName(data.dao_name)
+  const dao_full_name = convertJavaFilenameToClassFullName(data.dao_name, paths?.server_java_path)
 
   await generate({
     cwd,
@@ -88,9 +89,9 @@ export async function generateReferentiel(options: { cwd?: string, data: Generat
       entity_full_name,
       dao_name,
       dao_full_name,
-      package_name: paths.server_current_package
+      package_name: paths?.server_current_package
     }
   }, () => {
-    logger('success', `Classes de référentiel créées dans le package ${paths.server_current_package}`)
+    logger('success', `Classes de référentiel créées dans le package ${paths?.server_current_package}`)
   })
 }

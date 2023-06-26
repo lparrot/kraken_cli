@@ -2,6 +2,10 @@
 import {useStateStore} from "~/store/state";
 import {convertPathToPackage} from "~/utils/java.utils";
 import {useApiStore} from "~/store/api";
+import {QInput} from "quasar";
+import stringcase from "stringcase";
+import deburr from "lodash/deburr";
+import PageReferentielAfterCreate from "~/components/dialogs/PageReferentielAfterCreate.vue";
 
 definePageMeta({
   middleware: ['security']
@@ -23,11 +27,15 @@ const $state = useStateStore()
 const templateOptions = [{label: 'Consultation', value: 'simple'}, {label: 'Consultation/Modification', value: 'crud'}]
 const java_files = (await $api.fetchJavaFiles($state.paths.server_java_path)).map(path => ({value: path, label: convertPathToPackage(path)}))
 const entity_options = ref(java_files)
+const dao_options = ref(java_files)
 
 const form = ref<Partial<Form>>()
 
 async function init() {
-  form.value = {}
+  form.value = {
+    url: '/api/referentiels/',
+    id_type: 'Long'
+  }
 }
 
 await init()
@@ -36,20 +44,36 @@ async function submitForm() {
   $q.loading.show({message: 'Création du référentiel en cours ...'})
 
   try {
-
+    await $api.handleGenerateReferentiel(form.value)
+    $q.dialog({
+      component: PageReferentielAfterCreate,
+      componentProps: {
+        referentiel: form.value
+      }
+    })
     await init()
+    $q.notify({
+      message: 'Référentiel créé avec succès',
+      color: 'green'
+    })
   } finally {
     $q.loading.hide()
   }
 }
 
-function filterEntityFn(val: string, update, abort) {
+function filterEntityFn(val: string, update: any, abort: any) {
   update(() => {
     entity_options.value = java_files.filter(it => it.label.toLowerCase().indexOf(val.toLowerCase()) > -1)
   })
 }
 
-const defaultSelectedPackage = ref(await $api.fetchJavaRootDir($state.paths.server_java_path))
+function filterDaoFn(val: string, update: any, abort: any) {
+  update(() => {
+    dao_options.value = java_files.filter(it => it.label.toLowerCase().indexOf(val.toLowerCase()) > -1)
+  })
+}
+
+const defaultSelectedPackage = ref(await $api.fetchJavaRootDir($state.paths?.server_java_path))
 
 const selectedPackage = computed(() => {
   if (form.value?.cwd != null) {
@@ -65,16 +89,16 @@ const selectedPackage = computed(() => {
         <q-space/>
         <q-btn dense flat icon="close" round @click="drawer = false"/>
       </div>
-      <FileFetcher v-model="form.cwd" :default-dir="defaultSelectedPackage" :root="$state.paths.server_java_path"/>
+      <FileFetcher v-model="form.cwd" :default-dir="defaultSelectedPackage" :root="$state.paths?.server_java_path"/>
     </q-drawer>
 
     <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
-      <q-btn :color="form.cwd == null ? 'blue' : 'green'" class="full-width" no-caps @click="drawer = true">
-        <span v-if="form.cwd == null">Selectionnez un package</span>
+      <q-btn :color="form?.cwd == null ? 'blue' : 'green'" class="full-width" no-caps @click="drawer = true">
+        <span v-if="form?.cwd == null">Selectionnez un package</span>
         <span v-else>Modifier le package</span>
       </q-btn>
 
-      <template v-if="form.cwd != null">
+      <template v-if="form?.cwd != null">
         <div class="row items-center q-gutter-xs">
           <q-icon color="orange" name="folder"/>
           <div class="text-subtitle2">{{ selectedPackage }}</div>
@@ -83,27 +107,28 @@ const selectedPackage = computed(() => {
         <q-separator/>
 
         <VeeField #default="{errorMessage, meta, field}" label="template" name="template" rules="required">
-          <q-select v-model="form.template" :error="!meta.valid" :error-message="errorMessage" :options="templateOptions" dense emit-value filled hide-bottom-space label="Type de réferentiel" options-dense stack-label v-bind="field"/>
+          <q-select v-model="form.template" :error="!meta.valid" :error-message="errorMessage" :options="templateOptions" dense emit-value filled hide-bottom-space label="Type de réferentiel" map-options options-dense stack-label v-bind="field"/>
         </VeeField>
 
-        <VeeField #default="{errorMessage, meta, field}" label="entité" name="entity_name" rules="required">
-          <q-select v-model="form.entity_name" :error="!meta.valid" :error-message="errorMessage" :options="entity_options" dense fill-input filled hide-bottom-space hide-selected input-debounce="400" label="Classe de l'entité ?" options-dense stack-label use-input v-bind="field" @filter="filterEntityFn">
-            <template #selected>
-              {{ form.entity_name?.label }}
-            </template>
-
-            <template #no-option>
-              <q-item dense>
-                <q-item-section class="text-grey">
-                  Aucun résultat
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
+        <VeeField v-model="form.entity_name" #default="{errorMessage, meta, field, value, handleChange}" label="classe de l'entité" name="entity_name" rules="required">
+          <q-select :error="!meta.valid" :error-message="errorMessage" :model-value="value" :options="entity_options" clearable dense emit-value fill-input filled hide-bottom-space hide-selected input-debounce="400" label="Classe de l'entité ?" map-options options-dense stack-label use-input @filter="filterEntityFn" @update:model-value="handleChange"/>
         </VeeField>
+
+        <VeeField v-model="form.dao_name" #default="{errorMessage, meta, field, value, handleChange}" emit-value label="class de la dao" name="dao_name" rules="required">
+          <q-select :error="!meta.valid" :error-message="errorMessage" :model-value="value" :options="dao_options" clearable dense emit-value fill-input filled hide-bottom-space hide-selected input-debounce="400" label="Classe de la DAO ?" map-options options-dense stack-label use-input @filter="filterDaoFn" @update:model-value="handleChange"/>
+        </VeeField>
+
+        <VeeField #default="{errorMessage, meta, field}" label="url" name="url" rules="required">
+          <q-input v-model="form.url" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Url du webservice" stack-label v-bind="field" @update:model-value="form.url = deburr(stringcase.pathcase($event))"/>
+        </VeeField>
+
+        <VeeField #default="{errorMessage, meta, field}" label="type de propriété @Id" name="id_type" rules="required">
+          <q-input v-model="form.id_type" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Type de la propriété @Id" stack-label v-bind="field"/>
+        </VeeField>
+
+        <q-btn color="primary" icon="add_circle" label="Créer le référentiel" type="submit"/>
       </template>
     </VeeForm>
-    <pre>{{ form }}</pre>
   </q-layout>
 </template>
 

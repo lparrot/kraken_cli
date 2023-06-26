@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import stringcase, {sentencecase} from "stringcase";
+import {sentencecase} from "stringcase";
 import kebabCase from "lodash/kebabCase";
 import {QInput} from "quasar";
-import deburr from 'lodash/deburr'
 import {useStateStore} from "~/store/state";
 
 definePageMeta({

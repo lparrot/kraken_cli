@@ -5,7 +5,7 @@ import {logger} from './logger.js'
 
 export function convertJavaFilenameToClassFullName(file: string, cwd?: string) {
   if (cwd == null) {
-    const paths = get_project_paths()
+    const paths = get_project_paths(cwd)
 
     if (paths == null) {
       logger('error', `Vous n'êtes pas dans un projet kraken`)

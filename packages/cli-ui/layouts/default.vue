@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import {Dialog} from "quasar";
-import {AddProject} from "#components";
 import {ProjectAttributes} from "@types/kraken";
 import {useEventBus} from "@vueuse/core";
 import {useStateStore} from "~/store/state";
 import {useApiStore} from "~/store/api";
+import AddProject from "~/components/dialogs/AddProject.vue";
 
 const $state = useStateStore()
 const $api = useApiStore()

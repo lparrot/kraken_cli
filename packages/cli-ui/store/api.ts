@@ -35,6 +35,10 @@ export const useApiStore = defineStore('api', {
       return useApiFetch('/api/generate/controller', {method: 'post', body: data})
     },
 
+    async handleGenerateReferentiel(data: any) {
+      return useApiFetch('/api/generate/ref', {method: 'post', body: data})
+    },
+
     async handleOpenCurrentProjectDirectory(path: string) {
       return useApiFetch('/api/shell/open_current_project', {query: {path}})
     },

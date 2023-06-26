@@ -13,6 +13,8 @@ export default defineNuxtConfig(<NuxtConfig>{
   },
 
   css: [
+    'prismjs/themes/prism.css',
+    'prismjs/plugins/toolbar/prism-toolbar.css',
     '@/assets/app.scss'
   ],
 

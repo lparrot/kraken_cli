@@ -13,6 +13,7 @@ const $q = useQuasar()
 const $state = useStateStore()
 const $api = useApiStore()
 
+//@ts-ignore
 const props = withDefaults(defineProps<Props>(), {
   autoSelect: true,
   showHome: false
