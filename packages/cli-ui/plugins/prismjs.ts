@@ -14,6 +14,4 @@ export default defineNuxtPlugin(nuxt => {
     'tabs-to-spaces': 4,
     'spaces-to-tabs': 4
   })
-
-  console.log(Prism.plugins);
 })

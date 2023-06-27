@@ -6,6 +6,7 @@ import {QInput} from "quasar";
 import stringcase from "stringcase";
 import deburr from "lodash/deburr";
 import PageReferentielAfterCreate from "~/components/dialogs/PageReferentielAfterCreate.vue";
+import sortBy from "lodash/sortBy";
 
 definePageMeta({
   middleware: ['security']
@@ -25,7 +26,8 @@ const $q = useQuasar()
 const $api = useApiStore()
 const $state = useStateStore()
 const templateOptions = [{label: 'Consultation', value: 'simple'}, {label: 'Consultation/Modification', value: 'crud'}]
-const java_files = (await $api.fetchJavaFiles($state.paths.server_java_path)).map(path => ({value: path, label: convertPathToPackage(path)}))
+const java_files: any[] = sortBy((await $api.fetchJavaFiles($state.paths.server_java_path)).map(path => ({value: path, label: convertPathToPackage(path)})), 'label')
+
 const entity_options = ref(java_files)
 const dao_options = ref(java_files)
 
