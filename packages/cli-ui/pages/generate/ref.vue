@@ -20,6 +20,7 @@ interface Form {
   id_type: string
   template: string
   url: string
+  fields: any[]
 }
 
 const drawer = ref(false)
@@ -27,6 +28,7 @@ const $q = useQuasar()
 const $api = useApiStore()
 const $state = useStateStore()
 const templateOptions = [{label: 'Consultation', value: 'simple'}, {label: 'Consultation/Modification', value: 'crud'}]
+const selected_entity = ref<ProjectAppDataEntity>()
 
 let entity_files: any[] = []
 let dao_files: any[] = []
@@ -48,7 +50,8 @@ const form = ref<Partial<Form>>()
 async function init() {
   form.value = {
     url: '/api/referentiels/',
-    id_type: 'Long'
+    id_type: 'Long',
+    fields: []
   }
 }
 
@@ -88,13 +91,12 @@ function filterDaoFn(val: string, update: any, abort: any) {
 }
 
 function onSelectEntity(entity, handleChange) {
-  const entity_finded: ProjectAppDataEntity | undefined = $state.appdata.entities.find(it => it.type === entity.label)
-
-  form.value.dao_name = entity_finded?.dao?.filePath!
-  form.value.url = `/api/referentiels/${entity_finded?.name.toLowerCase()}`
-  form.value.id_type = entity_finded?.attributes!.find(it => it.id === true)?.type!
-
   handleChange(entity.value)
+  selected_entity.value = $state.appdata.entities.find(it => it.type === entity.label)!
+
+  form.value.dao_name = selected_entity.value?.dao?.filePath!
+  form.value.url = `/api/referentiels/${selected_entity.value?.name.toLowerCase()}`
+  form.value.id_type = selected_entity.value?.attributes!.find(it => it.id === true)?.type!
 }
 
 const defaultSelectedPackage = ref(await $api.fetchJavaRootDir($state.paths?.server_java_path))
@@ -103,6 +105,10 @@ const selectedPackage = computed(() => {
   if (form.value?.cwd != null) {
     return convertPathToPackage(form.value.cwd)
   }
+})
+
+const selected_entity_attributes_options = computed(() => {
+  return selected_entity.value?.attributes?.filter(it => it.id == null).map(att => ({label: att.name, value: att}))
 })
 </script>
 
@@ -150,6 +156,9 @@ const selectedPackage = computed(() => {
           <VeeField #default="{errorMessage, meta, field}" label="type de propriété @Id" name="id_type" rules="required">
             <q-input v-model="form.id_type" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Type de la propriété @Id" stack-label v-bind="field"/>
           </VeeField>
+
+          <div class="text-subtitle2">Ajouter des champs:</div>
+          <q-option-group v-model="form.fields" :options="selected_entity_attributes_options!" type="checkbox"></q-option-group>
 
           <q-btn color="primary" icon="add_circle" label="Créer le référentiel" type="submit"/>
         </template>
