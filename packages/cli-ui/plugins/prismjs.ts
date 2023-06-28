@@ -1,10 +1,14 @@
 import Prism from "prismjs";
 
-import 'prismjs/plugins/toolbar/prism-toolbar'
-import 'prismjs/plugins/normalize-whitespace/prism-normalize-whitespace'
-import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard'
+export default defineNuxtPlugin(async nuxt => {
 
-export default defineNuxtPlugin(nuxt => {
+  // @ts-ignore
+  await import('prismjs/plugins/toolbar/prism-toolbar')
+  // @ts-ignore
+  await import('prismjs/plugins/normalize-whitespace/prism-normalize-whitespace')
+  // @ts-ignore
+  await import('prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard')
+
   Prism.plugins.NormalizeWhitespace.setDefaults({
     'remove-trailing': true,
     'remove-indent': true,

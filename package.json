@@ -5,7 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "publish:cli": "npm run build && pnpm --filter \"@kraken/cli\" --force publish"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "tag": "1.0.0",
+    "registry": "https://git.mobile-dev.fr/api/v4/projects/48/packages/npm/"
   },
   "keywords": [],
   "author": "",

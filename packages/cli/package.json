@@ -1,7 +1,7 @@
 {
-  "private": true,
   "name": "@kraken/cli",
-  "description": "",
+  "description": "CLI pour les applications Kraken",
+  "version": "1.0.0",
   "type": "module",
   "types": "types/index.d.ts",
   "main": "dist/exported.js",
@@ -13,8 +13,7 @@
     "build": "npm run clean:dist && npm run templates:build && tsc",
     "api:watch": "cross-env NODE_ENV=development nodemon --exec \"node dist/express-api.js\"",
     "templates:build": "shx cp -r src/templates dist/templates",
-    "clean:dist": "shx rm -rf dist && shx mkdir -p dist",
-    "prepublishOnly": "npm run build"
+    "clean:dist": "shx rm -rf dist && shx mkdir -p dist"
   },
   "keywords": [],
   "author": "",

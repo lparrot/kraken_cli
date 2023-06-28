@@ -4,7 +4,7 @@
   "scripts": {
     "build": "nuxt build && shx rm -rf ../cli/dist/www && shx mkdir -p ../cli/dist/www && shx cp -r .output/* ../cli/dist/www",
     "dev": "nuxt prepare && nuxt dev --port=3001",
-    "generate": "nuxt generate && shx mv dist ../cli/dist/www",
+    "generate": "nuxt generate && shx mv .output ../cli/dist/www",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
