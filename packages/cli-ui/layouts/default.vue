@@ -6,6 +6,7 @@ import {useStateStore} from "~/store/state";
 import {useApiStore} from "~/store/api";
 import AddProject from "~/components/dialogs/AddProject.vue";
 
+const $q = useQuasar()
 const $state = useStateStore()
 const $api = useApiStore()
 const storage = useKrakenSessionStorage()
@@ -59,6 +60,7 @@ async function onSelectProject(param_project: ProjectAttributes) {
   storage.value.selection.project = param_project.id
   await $state.setProject(param_project.id)
   navigateTo('/')
+  await $state.getOrUpdateAppData()
 }
 
 projectsBus.on(async () => await $state.fetchProjects())

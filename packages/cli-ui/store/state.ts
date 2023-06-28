@@ -1,4 +1,4 @@
-import {ProjectAttributes, ProjectPaths, ServerInfos} from "kraken";
+import {ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from "kraken";
 import {useApiStore} from "~/store/api";
 
 interface State {
@@ -6,6 +6,7 @@ interface State {
   projects: ProjectAttributes[]
   paths?: ProjectPaths
   infos?: ServerInfos
+  appdata?: ProjectAppData
 }
 
 export const useStateStore = defineStore('app', {
@@ -13,10 +14,15 @@ export const useStateStore = defineStore('app', {
     project: undefined,
     projects: [],
     paths: undefined,
-    infos: undefined
+    infos: undefined,
+    appdata: undefined
   }),
 
   actions: {
+    async fetchAppData() {
+      this.appdata = await useApiStore().fetchAppData()
+    },
+
     async fetchProjects() {
       this.projects = await useApiFetch<ProjectAttributes[]>('/api/projects')
     },
@@ -36,6 +42,19 @@ export const useStateStore = defineStore('app', {
       }
 
       return this.project
+    },
+
+    async getOrUpdateAppData() {
+      await this.fetchAppData()
+
+      if (this.appdata == null) {
+        Loading.show({message: 'Génération du fichier appdata'})
+        try {
+          this.appdata = await useApiStore().handleRefreshAppData()
+        } finally {
+          Loading.hide()
+        }
+      }
     }
   }
 })

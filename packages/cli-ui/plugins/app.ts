@@ -15,6 +15,8 @@ export default defineNuxtPlugin(async nuxt => {
       await $state.setProject(storage.value.selection.project)
     }
 
+    await $state.getOrUpdateAppData()
+
     nuxt.hook('vue:error', (..._args) => {
       // if (process.client) {
       //   console.log(..._args)

@@ -68,15 +68,15 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
   app.use('/api/generate/ref', (await import('./routes/generate/ref.js')).default)
 
   /**
-   * Pour toutes les autres routes non définies, on retourne une erreur
-   */
-  app.all('*', UnknownRoutesHandler)
-
-  /**
    * Gestion des erreurs
    * /!\ Cela doit être le dernier `app.use`
    */
   app.use(ExceptionsHandler)
+
+  /**
+   * Pour toutes les autres routes non définies, on retourne une erreur
+   */
+  app.all('*', UnknownRoutesHandler)
 
   const server = app.listen(options.port, () => {
     logger('success', `API : http://localhost:${options.port}`)

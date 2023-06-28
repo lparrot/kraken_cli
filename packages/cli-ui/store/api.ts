@@ -1,9 +1,18 @@
-import {ProjectPaths, ServerInfos} from "kraken";
+import {ProjectAppData, ProjectPaths, ServerInfos} from "kraken";
+import {useStateStore} from "~/store/state";
 
 export const useApiStore = defineStore('api', {
   actions: {
+    async fetchAppData(path?: string): Promise<ProjectAppData | undefined> {
+      if (path == null) {
+        const $state = useStateStore()
+        path = $state.paths?.project_path
+      }
+      return useApiFetch('/api/appdata', {params: {cwd: path}})
+    },
+
     async fetchInfos(): Promise<ServerInfos> {
-      return await useApiFetch('/api/infos')
+      return useApiFetch('/api/infos')
     },
 
     async fetchFolders(path: string, config?: { only_current: boolean }): Promise<any[]> {
@@ -45,6 +54,14 @@ export const useApiStore = defineStore('api', {
 
     async handleOpenCurrentProjectInIntellij(path: string) {
       return useApiFetch('/api/shell/open_in_idea', {query: {path}})
+    },
+
+    async handleRefreshAppData(path?: string): Promise<any> {
+      if (path == null) {
+        const $state = useStateStore()
+        path = $state.paths?.project_path
+      }
+      return useApiFetch('/api/appdata', {method: 'post', body: {cwd: path}})
     },
 
     async handleSelectDirectory(): Promise<string> {

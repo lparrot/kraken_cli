@@ -20,6 +20,30 @@ export interface ProjectPaths {
   get_current_package?: (dirname: string) => string | undefined
 }
 
+export interface ProjectAppData {
+  entities: ProjectAppDataEntity[]
+}
+
+export interface ProjectAppDataEntity {
+  attributes: ProjectAppDataAttribute[];
+  dao?: ProjectAppDataDao
+  filePath: string
+  name: string
+  type: string
+}
+
+export interface ProjectAppDataDao {
+  filePath: string;
+  name: string
+  type: string
+}
+
+export interface ProjectAppDataAttribute {
+  id?: boolean
+  name: string,
+  type: string
+}
+
 export interface ProjectAttributes {
   id: number
   name: string

@@ -7,6 +7,7 @@ import stringcase from "stringcase";
 import deburr from "lodash/deburr";
 import PageReferentielAfterCreate from "~/components/dialogs/PageReferentielAfterCreate.vue";
 import sortBy from "lodash/sortBy";
+import {ProjectAppDataEntity} from "@types/kraken";
 
 definePageMeta({
   middleware: ['security']
@@ -14,8 +15,8 @@ definePageMeta({
 
 interface Form {
   cwd: string
-  dao_name: { value: string, label: string }
-  entity_name: { value: string, label: string }
+  dao_name: string
+  entity_name: string
   id_type: string
   template: string
   url: string
@@ -26,10 +27,21 @@ const $q = useQuasar()
 const $api = useApiStore()
 const $state = useStateStore()
 const templateOptions = [{label: 'Consultation', value: 'simple'}, {label: 'Consultation/Modification', value: 'crud'}]
-const java_files: any[] = sortBy((await $api.fetchJavaFiles($state.paths.server_java_path)).map(path => ({value: path, label: convertPathToPackage(path)})), 'label')
 
-const entity_options = ref(java_files)
-const dao_options = ref(java_files)
+let entity_files: any[] = []
+let dao_files: any[] = []
+
+if ($state.appdata?.entities != null) {
+  entity_files = $state.appdata.entities.map(entity => ({value: entity.filePath, label: entity.type}))
+  dao_files = $state.appdata.entities.map(entity => ({value: entity.dao?.filePath, label: entity.dao?.type}))
+} else {
+  entity_files = sortBy((await $api.fetchJavaFiles($state.paths.server_java_path)).map(path => ({value: path, label: convertPathToPackage(path)})), 'label')
+  dao_files = entity_files
+}
+
+
+const entity_options = ref(entity_files)
+const dao_options = ref(dao_files)
 
 const form = ref<Partial<Form>>()
 
@@ -65,14 +77,24 @@ async function submitForm() {
 
 function filterEntityFn(val: string, update: any, abort: any) {
   update(() => {
-    entity_options.value = java_files.filter(it => it.label.toLowerCase().indexOf(val.toLowerCase()) > -1)
+    entity_options.value = entity_files.filter(it => it.label.toLowerCase().indexOf(val.toLowerCase()) > -1)
   })
 }
 
 function filterDaoFn(val: string, update: any, abort: any) {
   update(() => {
-    dao_options.value = java_files.filter(it => it.label.toLowerCase().indexOf(val.toLowerCase()) > -1)
+    dao_options.value = dao_files.filter(it => it.label.toLowerCase().indexOf(val.toLowerCase()) > -1)
   })
+}
+
+function onSelectEntity(entity, handleChange) {
+  const entity_finded: ProjectAppDataEntity | undefined = $state.appdata.entities.find(it => it.type === entity.label)
+
+  form.value.dao_name = entity_finded?.dao?.filePath
+  form.value.url = `/api/referentiels/${entity_finded?.name.toLowerCase()}`
+  form.value.id_type = entity_finded?.attributes!.find(it => it.id === true)?.type
+
+  handleChange(entity.value)
 }
 
 const defaultSelectedPackage = ref(await $api.fetchJavaRootDir($state.paths?.server_java_path))
@@ -113,22 +135,25 @@ const selectedPackage = computed(() => {
         </VeeField>
 
         <VeeField v-model="form.entity_name" #default="{errorMessage, meta, field, value, handleChange}" label="classe de l'entité" name="entity_name" rules="required">
-          <q-select :error="!meta.valid" :error-message="errorMessage" :model-value="value" :options="entity_options" clearable dense emit-value fill-input filled hide-bottom-space hide-selected input-debounce="400" label="Classe de l'entité ?" map-options options-dense stack-label use-input @filter="filterEntityFn" @update:model-value="handleChange"/>
+          <q-select :error="!meta.valid" :error-message="errorMessage" :model-value="value" :options="entity_options" clearable dense fill-input filled hide-bottom-space hide-selected input-debounce="400" label="Classe de l'entité ?" map-options options-dense stack-label use-input @filter="filterEntityFn" @update:model-value="onSelectEntity($event, handleChange)"/>
         </VeeField>
 
-        <VeeField v-model="form.dao_name" #default="{errorMessage, meta, field, value, handleChange}" emit-value label="class de la dao" name="dao_name" rules="required">
-          <q-select :error="!meta.valid" :error-message="errorMessage" :model-value="value" :options="dao_options" clearable dense emit-value fill-input filled hide-bottom-space hide-selected input-debounce="400" label="Classe de la DAO ?" map-options options-dense stack-label use-input @filter="filterDaoFn" @update:model-value="handleChange"/>
-        </VeeField>
+        <template v-if="form.entity_name">
+          <VeeField v-model="form.dao_name" #default="{errorMessage, meta, field, value, handleChange}" emit-value label="class de la dao" name="dao_name" rules="required">
+            <q-select :error="!meta.valid" :error-message="errorMessage" :model-value="value" :options="dao_options" clearable dense emit-value fill-input filled hide-bottom-space hide-selected input-debounce="400" label="Classe de la DAO ?" map-options options-dense stack-label use-input @filter="filterDaoFn" @update:model-value="handleChange"/>
+          </VeeField>
 
-        <VeeField #default="{errorMessage, meta, field}" label="url" name="url" rules="required">
-          <q-input v-model="form.url" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Url du webservice" stack-label v-bind="field" @update:model-value="form.url = deburr(stringcase.pathcase($event))"/>
-        </VeeField>
+          <VeeField #default="{errorMessage, meta, field}" label="url" name="url" rules="required">
+            <q-input v-model="form.url" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Url du webservice" stack-label v-bind="field" @update:model-value="form.url = deburr(stringcase.pathcase($event))"/>
+          </VeeField>
 
-        <VeeField #default="{errorMessage, meta, field}" label="type de propriété @Id" name="id_type" rules="required">
-          <q-input v-model="form.id_type" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Type de la propriété @Id" stack-label v-bind="field"/>
-        </VeeField>
+          <VeeField #default="{errorMessage, meta, field}" label="type de propriété @Id" name="id_type" rules="required">
+            <q-input v-model="form.id_type" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Type de la propriété @Id" stack-label v-bind="field"/>
+          </VeeField>
 
-        <q-btn color="primary" icon="add_circle" label="Créer le référentiel" type="submit"/>
+          <q-btn color="primary" icon="add_circle" label="Créer le référentiel" type="submit"/>
+        </template>
+
       </template>
     </VeeForm>
   </q-layout>

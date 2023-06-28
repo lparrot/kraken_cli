@@ -4,6 +4,8 @@ import {isBlank} from "../utils/string.js";
 import {get_project_paths} from "../utils/folders.js";
 import {render} from "ejs";
 import {fileURLToPath} from "url";
+import shell from "shelljs";
+import {logger} from "../utils/logger.js";
 
 export const SKIP_FILES = ['node_modules', '.template.json']
 export const SKIP_RENDER_EXTENSIONS = ['.png', '.gif', '.jpg', '.jpeg']
@@ -59,4 +61,44 @@ export function createDirectoryContents(templatePath: string, targetPath: string
       renameFileOrDirectoryByTemplateVariable(path.join(targetPath, file), data)
     }
   });
+}
+
+export async function refreshAppData(cwd?: string) {
+  const paths = get_project_paths(cwd)
+
+  if (paths == null) {
+    logger('error', `Vous n'êtes pas dans un projet kraken.`)
+    return
+  }
+
+  const res = await shell.exec("mvn clean spring-boot:run -q -D\"spring-boot.run.arguments\"=\"--app.generate-appdata=true --server.port=55555 --spring.main.log-startup-info=false --logging.level.ROOT=off\"", {cwd: paths?.server_root_path, silent: true})
+  logger('success', 'Fichier appdata.json généré dans le dossier ' + path.join(paths?.server_root_path!, "target"))
+
+  if (res.code > 0) {
+    logger('error', 'Erreur survenue lors du lancement du projet et de la génération du fichier')
+    throw new Error('Erreur survenue lors du lancement du projet et de la génération du fichier')
+  }
+
+  return getAppdata(paths?.server_root_path)
+}
+
+export async function getAppdata(cwd?: string) {
+  const paths = get_project_paths(cwd)
+
+  if (paths == null) {
+    logger('error', `Vous n'êtes pas dans un projet kraken.`)
+    return
+  }
+
+  try {
+    const file_path = path.join(paths.server_root_path, "target", "appdata.json")
+    if (!fs.existsSync(file_path)) {
+      return null
+    }
+    const file_content = fs.readFileSync(file_path)
+    return JSON.parse(file_content.toString())
+  } catch (err) {
+    console.log(err);
+    logger('error', 'Erreur survenue lors de la lecture du fichier')
+  }
 }
