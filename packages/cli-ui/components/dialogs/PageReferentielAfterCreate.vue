@@ -45,7 +45,7 @@ const content_crud = computed(() => {
       <referentiel state-id="ref_${stringcase.snakecase(kebabCase(referentiel.url))}" state-provider="localstorage" url="${referentiel.url}">
 
         <template #modal-edit="{selected}">
-          <validation-provider #default="{errors, valid}" rules="required">
+          <validation-provider #default="{errors, valid}" name="" rules="required">
               <b-form-group :invalid-feedback="errors[0]" :state="valid" label="">
                 <b-form-input v-model="selected." :state="valid"/>
               </b-form-group>

@@ -77,22 +77,22 @@ async function submitForm() {
 
 function filterEntityFn(val: string, update: any, abort: any) {
   update(() => {
-    entity_options.value = entity_files.filter(it => it.label.toLowerCase().indexOf(val.toLowerCase()) > -1)
+    entity_options.value = entity_files.filter(it => it.label?.toLowerCase().indexOf(val.toLowerCase()) > -1)
   })
 }
 
 function filterDaoFn(val: string, update: any, abort: any) {
   update(() => {
-    dao_options.value = dao_files.filter(it => it.label.toLowerCase().indexOf(val.toLowerCase()) > -1)
+    dao_options.value = dao_files.filter(it => it.label?.toLowerCase().indexOf(val.toLowerCase()) > -1)
   })
 }
 
 function onSelectEntity(entity, handleChange) {
   const entity_finded: ProjectAppDataEntity | undefined = $state.appdata.entities.find(it => it.type === entity.label)
 
-  form.value.dao_name = entity_finded?.dao?.filePath
+  form.value.dao_name = entity_finded?.dao?.filePath!
   form.value.url = `/api/referentiels/${entity_finded?.name.toLowerCase()}`
-  form.value.id_type = entity_finded?.attributes!.find(it => it.id === true)?.type
+  form.value.id_type = entity_finded?.attributes!.find(it => it.id === true)?.type!
 
   handleChange(entity.value)
 }

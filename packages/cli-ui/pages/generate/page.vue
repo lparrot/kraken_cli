@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import {sentencecase} from "stringcase";
 import kebabCase from "lodash/kebabCase";
 import {QInput} from "quasar";
 import {useStateStore} from "~/store/state";
+import stringcase from "stringcase";
+import deburr from "lodash/deburr";
 
 definePageMeta({
   middleware: ['security']
@@ -57,7 +58,7 @@ watch(
   () => form.value.name,
   () => {
     if (readonly_inputs.value.title) {
-      form.value.title = sentencecase(kebabCase(form.value.name!))
+      form.value.title = stringcase.sentencecase(kebabCase(form.value.name!))
     }
   }
 )
