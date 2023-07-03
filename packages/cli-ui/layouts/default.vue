@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {Dialog} from "quasar";
-import {ProjectAttributes} from "@types/kraken";
+import {ProjectAttributes} from "@kraken/types";
 import {useEventBus} from "@vueuse/core";
 import {useStateStore} from "~/store/state";
 import {useApiStore} from "~/store/api";

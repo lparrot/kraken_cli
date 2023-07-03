@@ -29,11 +29,7 @@ export default defineNuxtConfig(<NuxtConfig>{
   ],
 
   typescript: {
-    tsConfig: {
-      compilerOptions: {
-        types: ['@types/kraken']
-      }
-    }
+    tsConfig: {}
   },
 
   nitro: {

@@ -7,6 +7,7 @@ importers:
 
   packages/cli:
     specifiers:
+      '@kraken/types': workspace:*
       '@types/cors': ^2.8.13
       '@types/ejs': ^3.1.2
       '@types/express': ^4.17.17
@@ -68,6 +69,7 @@ importers:
       win-select-folder: 1.0.1
       yargs: 17.7.2
     devDependencies:
+      '@kraken/types': link:../types
       '@types/cors': 2.8.13
       '@types/ejs': 3.1.2
       '@types/express': 4.17.17
@@ -88,9 +90,9 @@ importers:
 
   packages/cli-ui:
     specifiers:
+      '@kraken/types': workspace:*
       '@pinia/nuxt': ^0.4.11
       '@quasar/extras': ^1.16.4
-      '@types/kraken': workspace:*
       '@types/lodash': ^4.14.195
       '@types/node': ^18
       '@types/prismjs': ^1.26.0
@@ -125,7 +127,7 @@ importers:
       stringcase: 4.3.1
       vee-validate: 4.9.6
     devDependencies:
-      '@types/kraken': link:../types
+      '@kraken/types': link:../types
       '@types/lodash': 4.14.195
       '@types/node': 18.16.16
       '@types/prismjs': 1.26.0

@@ -7,7 +7,7 @@ import stringcase from "stringcase";
 import deburr from "lodash/deburr";
 import PageReferentielAfterCreate from "~/components/dialogs/PageReferentielAfterCreate.vue";
 import sortBy from "lodash/sortBy";
-import {ProjectAppDataEntity} from "@types/kraken";
+import {ProjectAppDataEntity} from "@kraken/types";
 
 definePageMeta({
   middleware: ['security']

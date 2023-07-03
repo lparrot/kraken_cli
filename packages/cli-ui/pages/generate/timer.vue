@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ResponseFsPackages} from "@types/kraken";
+import {ResponseFsPackages} from "@kraken/types";
 import {useStateStore} from "~/store/state";
 import {useApiStore} from "~/store/api";
 import {convertPathToPackage} from "~/utils/java.utils";

@@ -54,3 +54,5 @@ export interface ResponseFsPackages {
   folder: string
   fullpath: string
 }
+
+export {}
