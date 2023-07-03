@@ -11,6 +11,7 @@ import {NextFunction, Request, Response} from 'express'
  * @see https://expressjs.com/en/guide/error-handling.html
  */
 export const ExceptionsHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+
   /**
    * Voir "The default error handler" dans la doc officielle indiquée plus haut
    */
@@ -22,6 +23,6 @@ export const ExceptionsHandler = (err: any, req: Request, res: Response, next: N
    * Dans les autres cas, on retourne une 500
    */
   return res
-    .status(err.status)
-    .json({error: err.message})
+    .status(err.status || 500)
+    .json({error: err})
 }

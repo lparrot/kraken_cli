@@ -7,8 +7,15 @@ import {ExceptionsHandler} from "./middlewares/exceptions.handler.js";
 import {logger} from "../utils/logger.js";
 import {config} from '../config.js'
 import {db} from "../db/index.js";
+import * as http from "http";
+import {Server, Socket} from "socket.io";
+import {ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData} from "@kraken/types";
+
+import 'express-async-errors'
 
 const www = path.resolve(dirname(fileURLToPath(import.meta.url)), '..', 'www')
+export let io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>
+export let socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>
 
 interface ServerOptions {
   port: number
@@ -78,7 +85,19 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
    */
   app.all('*', UnknownRoutesHandler)
 
-  const server = app.listen(options.port, () => {
+
+  const server = http.createServer(app)
+  io = new Server(server, {cors: {origin: '*'},})
+
+  io.on('connection', (args: Socket) => {
+    // connect
+    socket = args
+    socket.on('disconnect', () => {
+      // disconnect
+    })
+  });
+
+  server.listen(options.port, () => {
     logger('success', `API : http://localhost:${options.port}`)
   })
 

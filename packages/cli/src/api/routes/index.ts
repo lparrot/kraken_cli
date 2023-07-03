@@ -8,7 +8,7 @@ import {getAppdata, refreshAppData} from "../../services/app.js";
 
 const router = Router()
 
-router.get('/paths', (req, res) => {
+router.get('/paths', async (req, res) => {
   const result = validationResult(req)
 
   if (result.isEmpty()) {

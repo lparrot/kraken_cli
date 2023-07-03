@@ -1,4 +1,4 @@
-import {ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from "kraken";
+import {ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from "@kraken/types";
 import {useApiStore} from "~/store/api";
 
 interface State {

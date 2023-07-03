@@ -1,3 +1,5 @@
+export type LoggerLevel = 'success' | 'info' | 'warn' | 'error'
+
 export interface ServerInfos {
   home_dir: string
   separator: string
@@ -53,6 +55,29 @@ export interface ProjectAttributes {
 export interface ResponseFsPackages {
   folder: string
   fullpath: string
+}
+
+export interface SocketMessage {
+  level: LoggerLevel
+  message: string
+}
+
+export interface ServerToClientEvents {
+  'logger:message': (message: SocketMessage) => void
+  'loader:show': (message: string) => void
+  'loader:hide': () => void
+}
+
+export interface ClientToServerEvents {
+
+}
+
+export interface InterServerEvents {
+
+}
+
+export interface SocketData {
+
 }
 
 export {}

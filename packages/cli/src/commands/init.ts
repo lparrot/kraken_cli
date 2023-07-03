@@ -6,6 +6,10 @@ import path from "path";
 import {logger} from "../utils/logger.js";
 import {removeAllAccents} from "../utils/string.js";
 import inquirer from "inquirer";
+import {io} from "../api/index.js";
+import {gitAdd, gitCommit, gitInit, installMavenLibraries, installNpmLibraries} from "../services/shell_commands.js";
+
+let GIT_ERROR_MESSAGE = `Erreur lors de l'initialisation du dépôt Git`
 
 export default {
   command: 'init',
@@ -85,6 +89,7 @@ export async function get_versions() {
 }
 
 export async function initializeProject(templateType: string, data: TemplateInitOptions) {
+
   const short_name = snakecase(data.name)
   const group_id = dotcase(data.group_id)
   const classname = pascalcase(short_name)
@@ -104,53 +109,45 @@ export async function initializeProject(templateType: string, data: TemplateInit
         package_folder: `${pathcase(group_id)}/${short_name}`
       }
     },
-    ({targetPath}) => {
-      let result
-
-      if (data.install_librairies) {
-        logger('info', '... Installation des dépendances Java')
-
-        result = shell.exec('mvn dependency:resolve', {silent: true, cwd: path.resolve(cwd, targetPath, 'server')})
-
-        if (result.code !== 0) {
-          return logger('error', `Erreur lors de l'installation des dépendances Java`)
-        }
-
-        logger('info', '... Installation des dépendances Node')
-
-        result = shell.exec('npm install', {silent: true, cwd: path.resolve(cwd, targetPath, 'web')})
-
-        if (result.code !== 0) {
-          return logger('error', `Erreur lors de l'installation des dépendances node`)
-        }
-      }
-
-
-      if (data.create_git_repo) {
-        let gitErrorMessage = `Erreur lors de l'initialisation du dépôt Git`
-
-        logger('info', `... Initialisation d'un dépôt Git`)
-
-        result = shell.exec('git init', {silent: true, cwd: path.resolve(cwd, targetPath)})
-
-        if (result.code !== 0) {
-          return logger('error', gitErrorMessage)
-        }
-
-        result = shell.exec('git add -A', {silent: true, cwd: path.resolve(cwd, targetPath)})
-
-        if (result.code !== 0) {
-          return logger('error', gitErrorMessage)
-        }
-
-        result = shell.exec('git commit -m "commit initial"', {silent: true, cwd: path.resolve(cwd, targetPath)})
-
-        if (result.code !== 0) {
-          return logger('error', gitErrorMessage)
-        }
-      }
-
-      logger('success', `Projet créé avec succès dans le dossier ${path.resolve(cwd, targetPath)}`)
-    }
   )
+
+  try {
+    if (data.install_librairies) {
+      logger('info', 'Installation des dépendances Java')
+      io.emit('loader:show', 'Installation des dépendances Java')
+
+      try {
+        await installMavenLibraries(path.resolve(cwd, data.artifact_id, 'server'))
+      } catch (err) {
+        return logger('error', `Erreur lors de l'installation des dépendances Java`)
+      }
+
+      logger('info', 'Installation des dépendances Node')
+      io.emit('loader:show', 'Installation des dépendances Node')
+
+      try {
+        await installNpmLibraries(path.resolve(cwd, data.artifact_id, 'web'))
+      } catch (err) {
+        return logger('error', `Erreur lors de l'installation des dépendances node`)
+      }
+    }
+
+    const project_folder = path.resolve(cwd, data.artifact_id);
+    if (data.create_git_repo) {
+      logger('info', `Initialisation d'un dépôt Git`)
+      io.emit('loader:show', `Initialisation d'un dépôt Git`)
+
+      try {
+        await gitInit(project_folder)
+        await gitAdd(project_folder)
+        await gitCommit(project_folder, "commit initial")
+      } catch (err) {
+        return logger('error', `Erreur lors de l'initialisation du dépôt Git`)
+      }
+    }
+
+    logger('success', `Projet créé avec succès dans le dossier ${project_folder}`)
+  } finally {
+    io.emit('loader:hide')
+  }
 }

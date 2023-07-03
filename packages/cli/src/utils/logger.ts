@@ -1,6 +1,10 @@
 import chalk from 'chalk'
+import {io} from "../api/index.js";
+import {LoggerLevel} from "@kraken/types";
 
-export function logger(level: 'success' | 'info' | 'warn' | 'error', ...message: unknown[]) {
+export function logger(level: LoggerLevel, message: string) {
+  io.emit('logger:message', {level, message})
+
   switch (level) {
     case 'success':
       console.log(chalk.greenBright(message))

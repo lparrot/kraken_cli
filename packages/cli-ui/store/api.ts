@@ -1,4 +1,4 @@
-import {ProjectAppData, ProjectPaths, ServerInfos} from "kraken";
+import {ProjectAppData, ProjectPaths, ServerInfos} from "@kraken/types";
 import {useStateStore} from "~/store/state";
 
 export const useApiStore = defineStore('api', {

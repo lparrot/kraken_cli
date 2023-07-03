@@ -1,10 +1,62 @@
 import {useStateStore} from "~/store/state";
-import {useApiStore} from "~/store/api";
+import {io, Socket} from "socket.io-client";
+import {ClientToServerEvents, ServerToClientEvents, SocketMessage} from "@kraken/types";
+import {Loading} from "quasar";
+
+function getColorByLevel(message: SocketMessage) {
+  switch (message.level) {
+    case 'info':
+      return 'info'
+    case 'warn':
+      return 'warning'
+    case 'error':
+      return 'negative'
+    case 'success':
+      return 'positive'
+    default:
+      return ''
+  }
+}
+
+let appLoader: any = null
 
 export default defineNuxtPlugin(async nuxt => {
+
+  const config = useRuntimeConfig();
+  let $io = null
+
   if (process.client) {
+    $io = io(`ws://localhost:${config.public.API_PORT}`) as Socket<ServerToClientEvents, ClientToServerEvents>
+
+    $io.on('logger:message', (message: SocketMessage) => {
+      Notify.create({
+        color: getColorByLevel(message),
+        message: message.message,
+      })
+    })
+
+    $io.on('loader:show', (message: string) => {
+      if (appLoader == null) {
+        console.log('create')
+        appLoader = Loading.show({
+          group: 'app-loader',
+          message
+        })
+      } else {
+        console.log('update')
+        appLoader({
+          message
+        })
+      }
+    })
+
+    $io.on('loader:hide', () => {
+      console.log('hide loader')
+      appLoader()
+      appLoader = null
+    })
+
     const $state = useStateStore()
-    const $api = useApiStore()
 
     await $state.fetchServerInfos()
     await $state.fetchProjects()
@@ -38,7 +90,34 @@ export default defineNuxtPlugin(async nuxt => {
 
   return {
     provide: {
-      log: console.log
+      log: console.log,
+      io: $io
     }
   }
 })
+
+declare module '#app' {
+  interface NuxtApp {
+    $io: Socket
+
+    $log(msg: string): string
+  }
+}
+
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    $io: Socket
+
+    $log(msg: string): string
+  }
+}
+
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $io: Socket
+
+    $log(msg: string): string
+  }
+}
+
+export {}

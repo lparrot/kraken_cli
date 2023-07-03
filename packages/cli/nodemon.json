@@ -1,0 +1,12 @@
+{
+  "exec": "node dist/express-api.js",
+  "watch": [
+    "src/express-api.ts",
+    "src/api"
+  ],
+  "ext": "*",
+  "exitcrash": false,
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

@@ -25,7 +25,7 @@ export async function generate(options: TemplateGeneratorOptions, postProcess?: 
     }
   }
 
-  logger('info', `... Copie des fichiers du template ${options.templatePath} vers le dossier ${targetPathAbsolute}`)
+  logger('info', `Copie des fichiers du template ${options.templatePath} vers le dossier ${targetPathAbsolute}`)
 
   // Copie du contenu du template dans le dossier du projet
   createDirectoryContents(templatePath, targetPathAbsolute, options.data)

@@ -6,7 +6,6 @@ import {useStateStore} from "~/store/state";
 import {useApiStore} from "~/store/api";
 import AddProject from "~/components/dialogs/AddProject.vue";
 
-const $q = useQuasar()
 const $state = useStateStore()
 const $api = useApiStore()
 const storage = useKrakenSessionStorage()
@@ -86,6 +85,11 @@ projectsBus.on(async () => await $state.fetchProjects())
 
         <q-drawer v-model="drawer" bordered show-if-above>
           <q-select :model-value="$state.project" :options="$state.projects" class="q-ma-md" dense filled label="Projet selectionné" option-label="name" options-dense stack-label @update:model-value="onSelectProject">
+            <template #no-option>
+              <q-item>
+                <q-item-section class="text-grey-7">Aucun projet</q-item-section>
+              </q-item>
+            </template>
             <template v-slot:after>
               <q-btn color="green" dense flat icon="add_circle" round @click="openDialogAddProject">
                 <q-tooltip>Ajouter un projet déjà existant</q-tooltip>
@@ -198,7 +202,7 @@ projectsBus.on(async () => await $state.fetchProjects())
 
         <q-page-container>
           <q-page padding>
-            <nuxt-page/>
+            <slot></slot>
           </q-page>
         </q-page-container>
       </q-layout>

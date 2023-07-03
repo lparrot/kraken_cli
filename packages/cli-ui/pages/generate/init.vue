@@ -77,21 +77,16 @@ init()
 const shortName = computed(() => form.value.name ? stringcase.snakecase(form.value.name!) : null)
 
 async function submitForm(values, validator) {
-  $q.loading.show({message: 'Génération du projet en cours'})
-  try {
-    const project = await useApiFetch('/api/generate/init', {
-      method: 'post',
-      body: {
-        ...form.value,
-        with_create: true
-      }
-    })
-    await $state.setProject(project.id)
-    init()
-    projectsBus.emit()
-  } finally {
-    $q.loading.hide()
-  }
+  const project = await useApiFetch('/api/generate/init', {
+    method: 'post',
+    body: {
+      ...form.value,
+      with_create: true
+    }
+  })
+  await $state.setProject(project.id)
+  init()
+  projectsBus.emit()
 }
 
 watch(
@@ -114,7 +109,7 @@ watch(
         <q-space/>
         <q-btn dense flat icon="close" round @click="drawer = false"/>
       </div>
-      <FileFetcher v-model="form.cwd" :auto-select="false" :default-dir="$state.infos.home_dir" show-home @select="drawer = false"/>
+      <FileFetcher v-model="form.cwd" :default-dir="$state.infos.home_dir" show-home/>
     </q-drawer>
 
     <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
@@ -216,7 +211,7 @@ watch(
             <q-toggle v-model="form.create_git_repo" dense label="Initialiser un dépôt Git ?"/>
           </div>
 
-          <q-btn :loading="isSubmitting" color="green" icon="settings" label="Créer le projet" type="submit"/>
+          <q-btn color="green" icon="settings" label="Créer le projet" type="submit"/>
         </template>
       </template>
     </VeeForm>
