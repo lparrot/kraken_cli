@@ -12,5 +12,6 @@ import lombok.Setter;
 public class Ref<%= entity_name %>Resource implements IIdentifiableEntity<<%= id_type %>> {
 
     private <%= id_type %> id;
-
+    <% fields.forEach(function(field){ %>private <%= field.type %> <%= field.name %>;
+    <% }); %>
 }

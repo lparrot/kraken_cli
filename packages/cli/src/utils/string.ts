@@ -9,10 +9,11 @@ export function isNotBlank(str: string | null) {
   return !isBlank(str)
 }
 
-export function removeAllAccents(str: any) {
-  if (typeof str === 'string') {
-    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+export function removeAllAccents(data: any) {
+  if (typeof data === 'string') {
+    return data.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   }
+  return data
 }
 
 export function stringToBoolean(str: any) {

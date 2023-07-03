@@ -14,6 +14,7 @@ export interface GenerateReferentielData {
   url: string
   id_type: string
   dao_name: string
+  fields: any[]
 }
 
 export default {
@@ -61,7 +62,8 @@ export default {
       entity_name: answers['entity_name'],
       dao_name: answers['dao_name'],
       url: answers['url'],
-      id_type: answers['id_type']
+      id_type: answers['id_type'],
+      fields: []
     }
 
     await generateReferentiel({data}, paths)

@@ -17,8 +17,8 @@ public class Ref<%= entity_name %>Controller extends AbstractCrudReferentielCont
   @Override
 	public TableDto table() {
 		return TableDto.builder()
-			// .field(TableFieldDto.builder().field("").label("").sortable(true).searchable(RechercheFieldTypeEnum.STRING).build())
-			.build();
+		  <% fields.forEach(function(field){ %>.field(TableFieldDto.builder().field("<%= field.name %>").sortable(true).searchable(RechercheFieldTypeEnum.STRING).build())
+		  <% }); %>.build();
 	}
 
 }
