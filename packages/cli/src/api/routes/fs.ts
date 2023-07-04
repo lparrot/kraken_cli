@@ -2,7 +2,7 @@ import {Router} from 'express'
 // @ts-ignore
 import selectFolder from 'win-select-folder'
 import {Path} from 'path-scurry';
-import {basename, dirname, extname, join, resolve, sep} from "path";
+import {basename, dirname, extname, join, normalize, resolve, sep} from "path";
 import {body} from "express-validator";
 import {get_project_paths} from "../../utils/folders.js";
 import {globSync} from "glob";
@@ -69,8 +69,8 @@ router.get('/files/java', (req, res) => {
 router.get('/path/info', (req, res) => {
   const query = req.query as unknown as { path: string, root: string | null }
 
-  let query_path = query.path
-  let query_root = query.root
+  let query_path = normalize(query.path)
+  let query_root = normalize(query.root!)
 
   function getInfo(dirpath: string) {
     return {
@@ -94,9 +94,9 @@ router.get('/path/info', (req, res) => {
 
     for (let i = 0; i < splitted_bread.length; i++) {
       if (isNotBlank(splitted_bread[i])) {
-        bread_item_path = bread_item_path! + splitted_bread[i] + sep
+        bread_item_path = join(bread_item_path!, splitted_bread[i])
         bread_items.push({
-          path: bread_item_path,
+          path: bread_item_path + sep,
           label: splitted_bread[i]
         })
       }
@@ -124,7 +124,7 @@ router.get('/rootdir', (req, res) => {
 
   const javaFiles = globSync('**/*.java', {cwd: path, absolute: true})
 
-  return res.json(dirname(javaFiles[0]))
+  return res.json({path: dirname(javaFiles[0])})
 })
 
 router.put('/cwd', body('path').notEmpty({ignore_whitespace: true}), async (req, res) => {

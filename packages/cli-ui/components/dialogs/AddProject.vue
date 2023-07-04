@@ -22,7 +22,7 @@ function submitForm() {
   onDialogOK(form.value)
 }
 
-async function onFolderSelect(folder) {
+async function onFolderSelect(folder: string) {
   const paths = await $api.fetchProjectPaths(folder)
 
   if (paths != null) {
@@ -34,7 +34,7 @@ async function onFolderSelect(folder) {
       })
     } else {
       form.value.path = paths.project_path
-      drawer.value = false
+      return true
     }
   } else {
     form.value.path = undefined
@@ -50,11 +50,7 @@ async function onFolderSelect(folder) {
         <q-dialog ref="dialogRef" @hide="onDialogHide">
           <q-card class="q-dialog-plugin" style="min-width: 50vw">
             <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
-              <div class="row items-center q-ma-sm">
-                <q-space/>
-                <q-btn dense flat icon="close" round @click="drawer = false"/>
-              </div>
-              <FileFetcher :auto-select="false" :default-dir="$state.infos.home_dir" :model-value="form.path" show-home @update:model-value="onFolderSelect"/>
+              <FileFetcher v-model="form.path" :check="onFolderSelect" :default-dir="$state.infos.home_dir" show-home/>
             </q-drawer>
 
             <q-card-section class="row items-center">

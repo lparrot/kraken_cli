@@ -115,10 +115,6 @@ const selected_entity_attributes_options = computed(() => {
 <template>
   <q-layout>
     <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
-      <div class="row items-center q-ma-sm">
-        <q-space/>
-        <q-btn dense flat icon="close" round @click="drawer = false"/>
-      </div>
       <FileFetcher v-model="form.cwd" :default-dir="defaultSelectedPackage" :root="$state.paths?.server_java_path"/>
     </q-drawer>
 

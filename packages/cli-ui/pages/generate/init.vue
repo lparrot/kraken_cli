@@ -105,10 +105,6 @@ watch(
 <template>
   <q-layout>
     <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
-      <div class="row items-center q-ma-sm">
-        <q-space/>
-        <q-btn dense flat icon="close" round @click="drawer = false"/>
-      </div>
       <FileFetcher v-model="form.cwd" :default-dir="$state.infos.home_dir" show-home/>
     </q-drawer>
 

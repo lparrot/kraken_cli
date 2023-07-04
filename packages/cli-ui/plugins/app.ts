@@ -37,13 +37,11 @@ export default defineNuxtPlugin(async nuxt => {
 
     $io.on('loader:show', (message: string) => {
       if (appLoader == null) {
-        console.log('create')
         appLoader = Loading.show({
           group: 'app-loader',
           message
         })
       } else {
-        console.log('update')
         appLoader({
           message
         })
@@ -51,7 +49,6 @@ export default defineNuxtPlugin(async nuxt => {
     })
 
     $io.on('loader:hide', () => {
-      console.log('hide loader')
       appLoader()
       appLoader = null
     })

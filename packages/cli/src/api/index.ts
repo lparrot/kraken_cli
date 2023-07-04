@@ -73,6 +73,7 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
   app.use('/api/generate/timer', (await import('./routes/generate/timer.js')).default)
   app.use('/api/generate/controller', (await import('./routes/generate/controller.js')).default)
   app.use('/api/generate/ref', (await import('./routes/generate/ref.js')).default)
+  app.use('/api/utils', (await import('./routes/utils.js')).default)
 
   /**
    * Gestion des erreurs

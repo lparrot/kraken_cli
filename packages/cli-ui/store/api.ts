@@ -24,16 +24,17 @@ export const useApiStore = defineStore('api', {
       return useApiFetch('/api/fs/files/java', {query: {path}})
     },
 
-    async fetchJavaRootDir(path: string): Promise<string> {
-      return useApiFetch('/api/fs/rootdir', {query: {path}})
+    async fetchJavaRootDir(cwd: string): Promise<string> {
+      const {path} = await useApiFetch<{ path: string }>('/api/fs/rootdir', {query: {path: cwd}})
+      return path
     },
 
     async fetchProjectPaths(path: string): Promise<ProjectPaths> {
       return useApiFetch('/api/paths', {query: {path}})
     },
 
-    async fetchPathInfo(path: string, root?: string): Promise<any> {
-      return useApiFetch('/api/fs/path/info', {query: {path, root}})
+    async fetchPathInfo(cwd: string, root?: string): Promise<any> {
+      return useApiFetch('/api/fs/path/info', {query: {path: cwd, root}})
     },
 
     async handleCreateNewDirectory(path: string, name: string) {
@@ -66,6 +67,10 @@ export const useApiStore = defineStore('api', {
 
     async handleSelectDirectory(): Promise<string> {
       return useApiFetch('/api/fs/folder')
+    },
+
+    async fetchUtilsPathNormalize(path: string): Promise<string> {
+      return useApiFetch('/api/utils/path/normalize', {query: {path}})
     }
   }
 })
