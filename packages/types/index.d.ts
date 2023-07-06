@@ -23,6 +23,7 @@ export interface ProjectPaths {
 }
 
 export interface ProjectAppData {
+  socle_version: string
   entities: ProjectAppDataEntity[]
 }
 

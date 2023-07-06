@@ -2,6 +2,7 @@
 import {useStateStore} from "~/store/state";
 import {useApiStore} from "~/store/api";
 import {Loading} from "quasar";
+import CardDashboard from "~/components/CardDashboard.vue";
 
 const $state = useStateStore()
 const $api = useApiStore()
@@ -17,17 +18,44 @@ async function generateAppData() {
 </script>
 
 <template>
-  <div v-if="$state.paths != null">
-    <q-btn color="blue" size="sm" @click="generateAppData">Regénérer fichier appdata</q-btn>
-    <q-markup-table bordered class="q-mt-md" dense flat>
-      <tbody>
-      <tr v-for="(value, key) in $state.paths" :key="key">
-        <td>{{ key }}</td>
-        <td>{{ value }}</td>
-      </tr>
-      </tbody>
-    </q-markup-table>
-  </div>
+  <template v-if="$state.project != null">
+    <div class="column q-col-gutter-sm">
+      <div>
+        <q-btn color="blue" size="sm" @click="generateAppData">Regénérer fichier appdata</q-btn>
+      </div>
+
+      <div v-if="$state.appdata != null" class="row q-col-gutter-sm">
+        <div class="col-12 col-md-6 col-lg-4">
+          <card-dashboard :item="{title: 'Version du socle', icon: 'mdi-numeric', value: $state.appdata?.socle_version, color1: 'deep-purple-5', color2: 'deep-purple-7' }"/>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+          <card-dashboard :item="{title: 'Entités', icon: 'mdi-database', value: $state.appdata?.entities.length, color1: 'orange-5', color2: 'orange-7' }"/>
+        </div>
+      </div>
+
+      <div class="row q-col-gutter-sm">
+        <div class="col-12 col-lg-6">
+          <q-card v-if="$state.paths != null">
+            <q-card-section>
+              <div class="text-h6">Liste des chemins du projet</div>
+            </q-card-section>
+
+            <q-card-section>
+              <q-markup-table class="q-mt-md" dense flat>
+                <tbody>
+                <tr v-for="(value, key) in $state.paths" :key="key">
+                  <td>{{ key }}</td>
+                  <td>{{ value }}</td>
+                </tr>
+                </tbody>
+              </q-markup-table>
+            </q-card-section>
+          </q-card>
+        </div>
+      </div>
+    </div>
+
+  </template>
 
   <div v-else>Aucun projet selectionné. Veuillez selectionner un projet dans la liste, importez en un ou créez en un nouveau.</div>
 </template>
