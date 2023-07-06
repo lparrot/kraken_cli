@@ -45,7 +45,7 @@ export function createDirectoryContents(templatePath: string, targetPath: string
       let contents = fs.readFileSync(origFilePath, 'binary');
 
       // render template with ejs
-      contents = render(contents, {...data, ...paths, directory_path: targetPath}, {views: [path.join(dirname(fileURLToPath(import.meta.url)), '..', 'templates', 'partials')]})
+      contents = render(contents, {...data, ...paths, directory_path: targetPath}, {rmWhitespace: true, compileDebug: true, views: [path.join(dirname(fileURLToPath(import.meta.url)), '..', 'templates', 'partials')]})
 
       // write file to destination folder
       const writePath = path.join(targetPath, file);

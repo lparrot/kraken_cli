@@ -27,23 +27,30 @@ export interface ProjectAppData {
 }
 
 export interface ProjectAppDataEntity {
-  attributes: ProjectAppDataAttribute[];
-  dao?: ProjectAppDataDao
-  filePath: string
   name: string
   type: string
+  type_simple: string
+  file_path: string
+  dao?: ProjectAppDataDao
+  attributes: ProjectAppDataAttribute[];
 }
 
 export interface ProjectAppDataDao {
-  filePath: string;
   name: string
   type: string
+  type_simple: string
+  file_path: string;
 }
 
 export interface ProjectAppDataAttribute {
   id?: boolean
+  collection?: boolean
   name: string,
   type: string
+  type_simple: string
+  bind_type: string
+  bind_type_simple: string
+  persistent_type?: string
 }
 
 export interface ProjectAttributes {

@@ -126,7 +126,7 @@ export async function initializeProject(templateType: string, data: TemplateInit
       io.emit('loader:show', 'Installation des dépendances Node')
 
       try {
-        await installNpmLibraries(path.resolve(cwd, data.artifact_id, 'web'))
+        installNpmLibraries(path.resolve(cwd, data.artifact_id, 'web'))
       } catch (err) {
         return logger('error', `Erreur lors de l'installation des dépendances node`)
       }

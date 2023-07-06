@@ -47,9 +47,11 @@ export default defineNuxtConfig(<NuxtConfig>{
 
   quasar: {
     lang: 'fr',
+    iconSet: 'material-icons',
     extras: {
       fontIcons: [
-        'material-icons'
+        'material-icons',
+        'mdi-v7'
       ]
     },
     plugins: [

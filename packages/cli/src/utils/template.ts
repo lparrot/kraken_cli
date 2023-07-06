@@ -14,7 +14,7 @@ export function convertJavaFilenameToClassFullName(file: string, cwd?: string) {
 
     cwd = paths.server_java_path
   }
-	return path.normalize(file).replace(path.normalize(cwd) + path.sep, '').replaceAll(path.sep, '.').replace('.java', '')
+	return path.normalize(file).replaceAll(path.normalize(cwd) + path.sep, '').replaceAll(path.sep, '.').replaceAll('.java', '')
 }
 
 export function convertJavaFilenameToClassSimpleName(file: string) {

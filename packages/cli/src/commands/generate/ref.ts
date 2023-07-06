@@ -3,10 +3,11 @@ import {get_project_paths} from "../../utils/folders.js";
 import {logger} from "../../utils/logger.js";
 import {convertJavaFilenameToClassFullName, convertJavaFilenameToClassSimpleName, get_file_by_basename} from "../../utils/template.js";
 import pluralize from "pluralize";
-import {snakecase} from "stringcase";
+import stringcase, {snakecase} from "stringcase";
 import inquirer from "inquirer";
 import {generate} from "../../services/template.js";
 import {ProjectPath} from "../../../types/index.js";
+import kebabCase from "lodash/kebabCase.js";
 
 export interface GenerateReferentielData {
   template: string
@@ -15,6 +16,9 @@ export interface GenerateReferentielData {
   id_type: string
   dao_name: string
   fields: any[]
+  with_page: boolean
+  page_name?: string
+  page_title?: string
 }
 
 export default {
@@ -63,7 +67,8 @@ export default {
       dao_name: answers['dao_name'],
       url: answers['url'],
       id_type: answers['id_type'],
-      fields: []
+      fields: [],
+      with_page: false
     }
 
     await generateReferentiel({data}, paths)
@@ -96,4 +101,19 @@ export async function generateReferentiel(options: { cwd?: string, data: Generat
   }, () => {
     logger('success', `Classes de référentiel créées dans le package ${paths?.server_current_package}`)
   })
+
+  if (data.with_page) {
+    await generate({
+      cwd,
+      templatePath: `referentiel/page`,
+      targetPath: paths?.web_pages_path!,
+      data: {
+        ...data,
+        ref_state_name: `ref_${stringcase.snakecase(kebabCase(data.url))}`,
+        fields: data.fields.map(it => ({...it, label: stringcase.sentencecase(it.name)}))
+      }
+    }, () => {
+      logger('success', `Génération de la page ${data.page_name} dans le dossier ${paths?.web_pages_path}`)
+    })
+  }
 }

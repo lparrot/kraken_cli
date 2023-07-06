@@ -1,5 +1,6 @@
 import {ProjectAppData, ProjectPaths, ServerInfos} from "@kraken/types";
 import {useStateStore} from "~/store/state";
+import {omit} from "lodash";
 
 export const useApiStore = defineStore('api', {
   actions: {
@@ -46,7 +47,7 @@ export const useApiStore = defineStore('api', {
     },
 
     async handleGenerateReferentiel(data: any) {
-      return useApiFetch('/api/generate/ref', {method: 'post', body: data})
+      return useApiFetch('/api/generate/ref', {method: 'post', body: omit(data, ['entity', 'dao'])})
     },
 
     async handleOpenCurrentProjectDirectory(path: string) {

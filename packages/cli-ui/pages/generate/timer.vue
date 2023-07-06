@@ -70,39 +70,35 @@ const selectedPackage = computed(() => {
 </script>
 
 <template>
-  <q-layout>
-    <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
-      <FileFetcher v-model="form.cwd" :root="$state.paths.server_java_path"/>
-    </q-drawer>
+  <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
+    <FileFetcher v-model="form.cwd" :root="$state.paths.server_java_path"/>
+  </q-drawer>
 
-    <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
-      <q-btn :color="form.cwd == null ? 'blue' : 'green'" class="full-width" no-caps @click="drawer = true">
-        <span v-if="form.cwd == null">Selectionnez un package</span>
-        <span v-else>Modifier le package</span>
-      </q-btn>
+  <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
+    <q-btn :color="form.cwd == null ? 'blue' : 'green'" class="full-width" no-caps @click="drawer = true">
+      <span v-if="form.cwd == null">Selectionnez un package</span>
+      <span v-else>Modifier le package</span>
+    </q-btn>
 
-      <template v-if="form.cwd != null">
-        <div class="row items-center q-gutter-xs">
-          <q-icon color="orange" name="folder"/>
-          <div class="text-subtitle2">{{ selectedPackage }}</div>
-        </div>
+    <template v-if="form.cwd != null">
+      <div class="row items-center q-gutter-xs">
+        <q-icon color="orange" name="folder"/>
+        <div class="text-subtitle2">{{ selectedPackage }}</div>
+      </div>
 
-        <q-separator/>
+      <q-separator/>
 
-        <VeeField #default="{errorMessage, meta, field}" label="nom" name="name" rules="required">
-          <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du timer" stack-label v-bind="field" @update:model-value="form.name = deburr(stringcase.snakecase($event))"/>
-        </VeeField>
+      <VeeField #default="{errorMessage, meta, field}" label="nom" name="name" rules="required">
+        <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du timer" stack-label v-bind="field" @update:model-value="form.name = deburr(stringcase.snakecase($event))"/>
+      </VeeField>
 
-        <VeeField #default="{errorMessage, meta, field}" label="description" name="description" rules="required">
-          <q-input v-model="form.description" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Description du timer" stack-label v-bind="field"/>
-        </VeeField>
+      <VeeField #default="{errorMessage, meta, field}" label="description" name="description" rules="required">
+        <q-input v-model="form.description" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Description du timer" stack-label v-bind="field"/>
+      </VeeField>
 
-        <q-btn color="primary" icon="add_circle" label="Créer le timer" type="submit"/>
-      </template>
-    </VeeForm>
-  </q-layout>
-
-  {{ form }}
+      <q-btn color="primary" icon="add_circle" label="Créer le timer" type="submit"/>
+    </template>
+  </VeeForm>
 </template>
 
 <style scoped>

@@ -53,38 +53,35 @@ const selectedPackage = computed(() => {
 </script>
 
 <template>
-  <q-layout>
-    <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
-      <FileFetcher v-model="form.cwd" :root="$state.paths.server_java_path"/>
-    </q-drawer>
+  <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
+    <FileFetcher v-model="form.cwd" :root="$state.paths.server_java_path"/>
+  </q-drawer>
 
-    <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
-      <q-btn :color="form.cwd == null ? 'blue' : 'green'" class="full-width" no-caps @click="drawer = true">
-        <span v-if="form.cwd == null">Selectionnez un package</span>
-        <span v-else>Modifier le package</span>
-      </q-btn>
+  <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
+    <q-btn :color="form.cwd == null ? 'blue' : 'green'" class="full-width" no-caps @click="drawer = true">
+      <span v-if="form.cwd == null">Selectionnez un package</span>
+      <span v-else>Modifier le package</span>
+    </q-btn>
 
-      <template v-if="form.cwd != null">
+    <template v-if="form.cwd != null">
 
-        <div class="row items-center q-gutter-xs">
-          <q-icon color="orange" name="folder"/>
-          <div class="text-subtitle2">{{ selectedPackage }}</div>
-        </div>
+      <div class="row items-center q-gutter-xs">
+        <q-icon color="orange" name="folder"/>
+        <div class="text-subtitle2">{{ selectedPackage }}</div>
+      </div>
 
-        <VeeField #default="{errorMessage, meta, field}" label="nom" name="name" rules="required">
-          <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du controller (sans suffixe)" stack-label v-bind="field" @update:model-value="form.name = deburr(stringcase.pascalcase($event))"/>
-        </VeeField>
+      <VeeField #default="{errorMessage, meta, field}" label="nom" name="name" rules="required">
+        <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du controller (sans suffixe)" stack-label v-bind="field" @update:model-value="form.name = deburr(stringcase.pascalcase($event))"/>
+      </VeeField>
 
-        <VeeField #default="{errorMessage, meta, field}" label="url" name="url" rules="required">
-          <q-input v-model="form.url" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Url du webservice" stack-label v-bind="field" @update:model-value="form.url = deburr(stringcase.lowercase($event))"/>
-        </VeeField>
+      <VeeField #default="{errorMessage, meta, field}" label="url" name="url" rules="required">
+        <q-input v-model="form.url" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Url du webservice" stack-label v-bind="field" @update:model-value="form.url = deburr(stringcase.lowercase($event))"/>
+      </VeeField>
 
-      </template>
+    </template>
 
-      <q-btn color="primary" icon="add_circle" label="Créer le controlleur" type="submit"/>
-    </VeeForm>
-  </q-layout>
-
+    <q-btn color="primary" icon="add_circle" label="Créer le controlleur" type="submit"/>
+  </VeeForm>
 </template>
 
 <style scoped>

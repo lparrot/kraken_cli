@@ -1,0 +1,13 @@
+<% if (field.sql_type != null) { -%>
+<% if (['INTEGER', 'BIGINT', 'FLOAT', 'REAL', 'DOUBLE', 'NUMERIC', 'DECIMAL'].indexOf(field.sql_type) > -1) { -%>
+.field(TableFieldDto.builder().field("<%= field.name %>").sortable(true).searchable(RechercheFieldTypeEnum.INTEGER).build())
+<% } else if (['BIT', 'BOOLEAN'].indexOf(field.sql_type) > -1) { -%>
+.field(TableFieldDto.builder().field("<%= field.name -%>").sortable(true).searchable(RechercheFieldTypeEnum.BOOLEAN).build())
+<% } else if (['DATE'].indexOf(field.sql_type) > -1) { -%>
+.field(TableFieldDto.builder().field("<%= field.name %>").sortable(true).searchable(RechercheFieldTypeEnum.DATE).build())
+<% } else if (['TIMESTAMP', 'TIME'].indexOf(field.sql_type) > -1) { -%>
+.field(TableFieldDto.builder().field("<%= field.name %>").sortable(true).searchable(RechercheFieldTypeEnum.DATETIME).build())
+<% } else { -%>
+.field(TableFieldDto.builder().field("<%= field.name %>").sortable(true).searchable(RechercheFieldTypeEnum.STRING).build())
+<% } -%>
+<% } -%>

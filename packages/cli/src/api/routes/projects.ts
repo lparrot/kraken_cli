@@ -1,6 +1,8 @@
 import {Router} from "express";
 import {normalize} from "path";
 import {Project} from "../../db/index.js";
+// @ts-ignore
+import cloc from "node-cloc";
 
 const router = Router()
 

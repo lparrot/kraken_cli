@@ -24,5 +24,11 @@ export const ExceptionsHandler = (err: any, req: Request, res: Response, next: N
    */
   return res
     .status(err.status || 500)
-    .json({error: err})
+    .json({
+      error: {
+        code: err.code,
+        message: err.message,
+        trace: err.stack.split('\n').map((it: string) => it.trim())
+      }
+    })
 }

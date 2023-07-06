@@ -2,15 +2,15 @@
 import {useApiStore} from "~/store/api";
 import {useStateStore} from "~/store/state";
 import {useDialogPluginComponent} from "quasar";
-import stringcase from "stringcase";
-import kebabCase from "lodash/kebabCase";
+import {sentencecase} from "stringcase";
+import {trim} from "lodash";
 
 const $q = useQuasar()
 const $api = useApiStore()
 const $state = useStateStore()
 
-const {referentiel} = defineProps<{
-  referentiel: any
+const {data} = defineProps<{
+  data: any
 }>()
 
 defineEmits([
@@ -19,70 +19,10 @@ defineEmits([
 
 const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent()
 
-const content_read = computed(() => {
-  return `
-    <template>
-      <referentiel state-id="ref_${stringcase.snakecase(kebabCase(referentiel.url))}" state-provider="localstorage" url="${referentiel.url}">
-
-      </referentiel>
-    </template>
-
-    <script>
-      import { Referentiel } from '@socle/ui/bootstrap'
-
-      export default {
-        components: {
-          Referentiel
-        }
-      }
-    <\/script>
-  `
-})
-
-const content_crud = computed(() => {
-  return `
-    <template>
-      <referentiel state-id="ref_${stringcase.snakecase(kebabCase(referentiel.url))}" state-provider="localstorage" url="${referentiel.url}">
-
-        <template #modal-edit="{selected}">
-          ${referentiel.fields.map(field => `
-          <validation-provider #default="{errors, valid}" name="${field.name}" rules="required">
-              <b-form-group :invalid-feedback="errors[0]" :state="valid" label="${stringcase.capitalcase(field.name)}">
-                <b-form-input v-model="selected.${field.name}" :state="valid"/>
-              </b-form-group>
-          </validation-provider>
-          `).join('')}
-        </template>
-
-      </referentiel>
-    </template>
-
-    <script>
-    import { Referentiel } from '@socle/ui/bootstrap'
-
-    export default {
-      head: {
-        title: 'Referentiel'
-      },
-
-      components: {
-        Referentiel
-      },
-
-      data() {
-          return {}
-      },
-
-      async fetch() {
-
-      },
-
-      methods: {
-
-      }
-    }
-    <\/script>
-  `
+const code_content = computed(() => {
+  const url = `/${trim(data.page_name, '/\\')}`
+  const title = sentencecase(data.page_title)
+  return `new MenuItem({ label: '${title}', url: '${url}', access: [] }),`
 })
 </script>
 
@@ -90,12 +30,12 @@ const content_crud = computed(() => {
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="q-dialog-plugin" style="min-width: 75vw">
       <q-card-section>
-        <div class="text-subtitle2">Copier ce code dans une page <code class="text-italic text-blue-5">.vue</code> pour ajouter le composant, puis modifiez et complétez les éléments de la modale d'édition dans le template <code class="text-italic text-blue-5">#modal-edit</code></div>
+        <div class="text-subtitle2">Copier ce code dans le fichier <code class="text-italic text-blue-5">kraken.config.js</code> (ou tout autre fichier qui vous sert de configuration du menu du socle) au niveau de l'attribut menu de la configuration.</div>
         <div class="row items-end q-gutter-sm text-orange-5">
           <q-icon name="warning" size="sm"></q-icon>
-          <div>N'oubliez pas de modifier le controlleur et la projection puis relancer votre serveur afin que le webservice soit disponible</div>
+          <div>N'oubliez pas de relancer votre serveur afin que les modifications côté serveur soient prises en compte.</div>
         </div>
-        <Highlight :content="referentiel.template === 'crud' ? content_crud : content_read" lang="markup"/>
+        <Highlight :content="code_content" lang="javascript"/>
       </q-card-section>
 
       <q-card-actions align="right">

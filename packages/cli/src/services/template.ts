@@ -6,6 +6,7 @@ import {globSync} from 'glob'
 import fs_extra from "fs-extra";
 import {fileURLToPath} from "url";
 import {TemplateGeneratorOptions} from "../../types/index.js";
+import {gitAdd} from "./shell_commands.js";
 
 export async function generate(options: TemplateGeneratorOptions, postProcess?: (options: TemplateGeneratorOptions) => void) {
   const templatePath = path.join(dirname(fileURLToPath(import.meta.url)), '..', 'templates', options.templatePath)
@@ -55,6 +56,8 @@ export async function generate(options: TemplateGeneratorOptions, postProcess?: 
 
     fs_extra.moveSync(file, newFileName)
   })
+
+  await gitAdd(targetPathAbsolute, true)
 
   if (postProcess != null) {
     await postProcess(options)

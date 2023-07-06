@@ -1,24 +1,34 @@
 import shell from "shelljs";
 import {ChildProcess} from "child_process";
 
-export function gitInit(cwd: string) {
-  return executeCommand('git init', cwd)
+export async function gitInit(cwd: string, check = false) {
+  if (!check || shell.which("git") != null) {
+    return executeCommand('git init', cwd)
+  }
 }
 
-export function gitAdd(cwd: string) {
-  return executeCommand('git add -A', cwd)
+export async function gitAdd(cwd: string, check = false) {
+  if (!check || shell.which("git") != null) {
+    return executeCommand('git add -A', cwd)
+  }
 }
 
-export function gitCommit(cwd: string, message: string = "commit") {
-  return executeCommand(`git commit -m "${message}`, cwd)
+export async function gitCommit(cwd: string, message: string = "commit", check = false) {
+  if (!check || shell.which("git") != null) {
+    return executeCommand(`git commit -m "${message}`, cwd)
+  }
 }
 
-export async function installMavenLibraries(cwd: string) {
-  return executeCommand('mvn dependency:resolve', cwd)
+export async function installMavenLibraries(cwd: string, check = false) {
+  if (!check || shell.which("mvn") != null) {
+    return executeCommand('mvn dependency:resolve', cwd)
+  }
 }
 
-export async function installNpmLibraries(cwd: string) {
-  return executeCommand('npm install', cwd)
+export async function installNpmLibraries(cwd: string, check = false) {
+  if (!check || shell.which("npm") != null) {
+    return executeCommand('npm install', cwd)
+  }
 }
 
 export function executeCommand(command: string, cwd: string) {

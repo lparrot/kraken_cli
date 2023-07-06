@@ -38,7 +38,8 @@ export const useStateStore = defineStore('app', {
       }
       this.project = await useApiFetch<ProjectAttributes>(`/api/projects/${id}`)
       if (this.project != null) {
-        this.paths = await useApiStore().fetchProjectPaths(this.project.path)
+        const $api = useApiStore();
+        this.paths = await $api.fetchProjectPaths(this.project.path)
       }
 
       return this.project

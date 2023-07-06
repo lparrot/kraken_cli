@@ -1,8 +1,10 @@
 package <%= package_name %>;
 
+import fr.intradef.cdadr.socle.ui.recherche.RechercheFieldTypeEnum;
 import fr.intradef.cdadr.socle.ui.referentiel.AbstractCrudReferentielController;
 import fr.intradef.cdadr.socle.ui.referentiel.Referentiel;
 import fr.intradef.cdadr.socle.ui.referentiel.TableDto;
+import fr.intradef.cdadr.socle.ui.referentiel.TableFieldDto;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,8 +19,10 @@ public class Ref<%= entity_name %>Controller extends AbstractCrudReferentielCont
   @Override
 	public TableDto table() {
 		return TableDto.builder()
-		  <% fields.forEach(function(field){ %>.field(TableFieldDto.builder().field("<%= field.name %>").sortable(true).searchable(RechercheFieldTypeEnum.STRING).build())
-		  <% }); %>.build();
+<% fields.forEach(function(field){ -%>
+          <%- include('ref_controller_field', {field: field}) -%>
+<% }) -%>
+          .build();
 	}
 
 }

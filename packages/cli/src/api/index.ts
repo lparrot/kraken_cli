@@ -76,16 +76,15 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
   app.use('/api/utils', (await import('./routes/utils.js')).default)
 
   /**
-   * Gestion des erreurs
-   * /!\ Cela doit être le dernier `app.use`
-   */
-  app.use(ExceptionsHandler)
-
-  /**
    * Pour toutes les autres routes non définies, on retourne une erreur
    */
   app.all('*', UnknownRoutesHandler)
 
+  /**
+   * Gestion des erreurs
+   * /!\ Cela doit être le dernier `app.use`
+   */
+  app.use(ExceptionsHandler)
 
   const server = http.createServer(app)
   io = new Server(server, {cors: {origin: '*'},})

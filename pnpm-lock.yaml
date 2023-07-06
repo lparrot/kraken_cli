@@ -110,6 +110,7 @@ importers:
       nuxt: ^3.6.1
       nuxt-quasar-ui: ^1.7.4
       pinia: ^2.1.4
+      pluralize: ^8.0.0
       prismjs: ^1.29.0
       quasar: ^2.12.2
       sass: ^1.63.6
@@ -126,6 +127,7 @@ importers:
       clipboard: 2.0.11
       lodash: 4.17.21
       pinia: 2.1.4_vue@3.3.4
+      pluralize: 8.0.0
       prismjs: 1.29.0
       quasar: 2.12.2
       sass: 1.63.6
