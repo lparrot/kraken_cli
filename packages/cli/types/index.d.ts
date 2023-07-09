@@ -4,6 +4,7 @@ export interface TemplateGeneratorOptions {
   cwd?: string
   errorIfFolderAlreadyExists?: boolean
   data: any
+  add_to_git?: boolean
 }
 
 export interface ProjectPath {

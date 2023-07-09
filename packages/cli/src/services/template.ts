@@ -57,7 +57,9 @@ export async function generate(options: TemplateGeneratorOptions, postProcess?: 
     fs_extra.moveSync(file, newFileName)
   })
 
-  await gitAdd(targetPathAbsolute, true)
+  if (options.add_to_git) {
+    await gitAdd(targetPathAbsolute, true)
+  }
 
   if (postProcess != null) {
     await postProcess(options)

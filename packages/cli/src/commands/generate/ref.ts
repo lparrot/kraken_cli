@@ -90,6 +90,7 @@ export async function generateReferentiel(options: { cwd?: string, data: Generat
     cwd,
     templatePath: `referentiel/${data.template}`,
     targetPath: '.',
+    add_to_git: true,
     data: {
       ...data,
       entity_name: convertJavaFilenameToClassSimpleName(data.entity_name),
@@ -107,6 +108,7 @@ export async function generateReferentiel(options: { cwd?: string, data: Generat
       cwd,
       templatePath: `referentiel/page`,
       targetPath: paths?.web_pages_path!,
+      add_to_git: true,
       data: {
         ...data,
         ref_state_name: `ref_${stringcase.snakecase(kebabCase(data.url))}`,

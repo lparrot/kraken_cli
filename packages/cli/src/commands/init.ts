@@ -8,6 +8,7 @@ import {removeAllAccents} from "../utils/string.js";
 import inquirer from "inquirer";
 import {io} from "../api/index.js";
 import {gitAdd, gitCommit, gitInit, installMavenLibraries, installNpmLibraries} from "../services/shell_commands.js";
+import {getAppdata} from "../services/app.js";
 
 let GIT_ERROR_MESSAGE = `Erreur lors de l'initialisation du dépôt Git`
 
@@ -126,7 +127,7 @@ export async function initializeProject(templateType: string, data: TemplateInit
       io.emit('loader:show', 'Installation des dépendances Node')
 
       try {
-        installNpmLibraries(path.resolve(cwd, data.artifact_id, 'web'))
+        await installNpmLibraries(path.resolve(cwd, data.artifact_id, 'web'))
       } catch (err) {
         return logger('error', `Erreur lors de l'installation des dépendances node`)
       }
@@ -147,6 +148,8 @@ export async function initializeProject(templateType: string, data: TemplateInit
     }
 
     logger('success', `Projet créé avec succès dans le dossier ${project_folder}`)
+
+    await getAppdata(path.resolve(cwd, data.artifact_id))
   } finally {
     io.emit('loader:hide')
   }

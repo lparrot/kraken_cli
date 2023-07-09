@@ -19,22 +19,22 @@ async function generateAppData() {
 
 <template>
   <template v-if="$state.project != null">
-    <div class="column q-col-gutter-sm">
+    <div class="column items-stretch q-col-gutter-sm">
       <div>
         <q-btn color="blue" size="sm" @click="generateAppData">Regénérer fichier appdata</q-btn>
       </div>
 
       <div v-if="$state.appdata != null" class="row q-col-gutter-sm">
-        <div class="col-12 col-md-6 col-lg-4">
+        <div v-if="$state.appdata.socle_version" class="col">
           <card-dashboard :item="{title: 'Version du socle', icon: 'mdi-numeric', value: $state.appdata?.socle_version, color1: 'deep-purple-5', color2: 'deep-purple-7' }"/>
         </div>
-        <div class="col-12 col-md-6 col-lg-4">
+        <div class="col">
           <card-dashboard :item="{title: 'Entités', icon: 'mdi-database', value: $state.appdata?.entities.length, color1: 'orange-5', color2: 'orange-7' }"/>
         </div>
       </div>
 
       <div class="row q-col-gutter-sm">
-        <div class="col-12 col-lg-6">
+        <div class="col">
           <q-card v-if="$state.paths != null">
             <q-card-section>
               <div class="text-h6">Liste des chemins du projet</div>

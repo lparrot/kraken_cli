@@ -40,7 +40,7 @@ export function executeCommand(command: string, cwd: string) {
         if (code === 0) {
           return resolve(stdout)
         } else {
-          return reject(`Erreur lors de l'execution de la commande ${command}`)
+          return reject(`Erreur lors de l'execution de la commande ${command}: ${stderr}`)
         }
       });
     } catch (err) {
