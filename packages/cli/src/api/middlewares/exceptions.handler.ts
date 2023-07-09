@@ -19,16 +19,22 @@ export const ExceptionsHandler = (err: any, req: Request, res: Response, next: N
     return next(err)
   }
 
+  let error
+
+  if (typeof err === 'string') {
+    error = {message: err}
+  } else {
+    error = {
+      code: err.code,
+      message: err.message,
+      trace: err.stack
+    }
+  }
+
   /**
    * Dans les autres cas, on retourne une 500
    */
   return res
     .status(err.status || 500)
-    .json({
-      error: {
-        code: err.code,
-        message: err.message,
-        trace: err.stack.split('\n').map((it: string) => it.trim())
-      }
-    })
+    .json({error})
 }
