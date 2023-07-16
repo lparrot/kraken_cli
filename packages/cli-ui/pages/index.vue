@@ -3,9 +3,11 @@ import {useStateStore} from "~/store/state";
 import {useApiStore} from "~/store/api";
 import {Loading} from "quasar";
 import CardDashboard from "~/components/CardDashboard.vue";
+import {ThreadMessage} from "@kraken/types";
 
 const $state = useStateStore()
 const $api = useApiStore()
+const {$io} = useNuxtApp()
 
 async function generateAppData() {
   Loading.show({message: 'Génération du fichier appdata'})
@@ -15,13 +17,22 @@ async function generateAppData() {
     Loading.hide()
   }
 }
+
+async function runJavaApplication() {
+  await $api.handleRunJavaApplication($state.project?.path)
+}
+
+$io.on('thread', (message: ThreadMessage) => {
+  console.log(message)
+})
 </script>
 
 <template>
   <template v-if="$state.project != null">
     <div class="column items-stretch q-col-gutter-sm">
-      <div>
+      <div class="row q-gutter-sm">
         <q-btn color="blue" size="sm" @click="generateAppData">Regénérer fichier appdata</q-btn>
+        <q-btn color="blue" size="sm" @click="runJavaApplication">Démarrer l'application Java</q-btn>
       </div>
 
       <div v-if="$state.appdata != null" class="row q-col-gutter-sm">

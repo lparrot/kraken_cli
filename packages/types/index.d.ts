@@ -23,7 +23,10 @@ export interface ProjectPaths {
 }
 
 export interface ProjectAppData {
-  socle_version: string
+  application_host: string;
+  application_pid: string;
+  application_current_log_file: string;
+  socle_version: string;
   entities: ProjectAppDataEntity[]
 }
 
@@ -33,7 +36,7 @@ export interface ProjectAppDataEntity {
   type_simple: string
   file_path: string
   dao?: ProjectAppDataDao
-  attributes: ProjectAppDataAttribute[];
+  attributes?: ProjectAppDataAttribute[];
 }
 
 export interface ProjectAppDataDao {
@@ -70,10 +73,18 @@ export interface SocketMessage {
   message: string
 }
 
+export interface ThreadMessage {
+  name: string
+  stdout: string[]
+  stderr: string[]
+  state: boolean
+}
+
 export interface ServerToClientEvents {
   'logger:message': (message: SocketMessage) => void
   'loader:show': (message: string) => void
   'loader:hide': () => void
+  'thread': (thread?: ThreadMessage) => void
 }
 
 export interface ClientToServerEvents {

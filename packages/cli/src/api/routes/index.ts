@@ -12,10 +12,10 @@ router.get('/paths', async (req, res) => {
   const result = validationResult(req)
 
   if (result.isEmpty()) {
-    const path = req.query.path as string
-    const project_paths = get_project_paths(path);
+    const cwd = req.query.cwd as string
+    const project_paths = get_project_paths(cwd);
 
-    if (path != null && project_paths == null) {
+    if (cwd != null && project_paths == null) {
       return res.status(400).json({message: `Le dossier choisi n'est pas un projet Kraken`})
     }
 

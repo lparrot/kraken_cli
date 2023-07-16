@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "types": "types/index.d.ts",
-  "main": "dist/exported.js",
+  "main": "dist/index.js",
   "bin": {
     "kn": "dist/index.js"
   },
@@ -35,6 +35,7 @@
     "inquirer-fuzzy-path": "^2.3.0",
     "lodash": "^4.17.21",
     "pluralize": "^8.0.0",
+    "ps-list": "^8.1.1",
     "sequelize": "^6.32.1",
     "shelljs": "^0.8.5",
     "socket.io": "^4.7.1",
@@ -54,6 +55,7 @@
     "@types/inquirer-fuzzy-path": "^2.3.6",
     "@types/lodash": "^4.14.195",
     "@types/node": "^20.3.3",
+    "@types/nodemon": "^1.19.2",
     "@types/pluralize": "^0.0.29",
     "@types/shelljs": "^0.8.12",
     "@types/validator": "^13.7.17",

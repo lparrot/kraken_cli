@@ -1,3 +1,5 @@
+import 'express-async-errors'
+
 import cors from 'cors'
 import express from 'express'
 import path, {dirname} from "path";
@@ -6,16 +8,22 @@ import {UnknownRoutesHandler} from "./middlewares/unknownRoutes.handler.js";
 import {ExceptionsHandler} from "./middlewares/exceptions.handler.js";
 import {logger} from "../utils/logger.js";
 import {config} from '../config.js'
-import {db} from "../db/index.js";
 import * as http from "http";
 import {Server, Socket} from "socket.io";
 import {ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData} from "@kraken/types";
-
-import 'express-async-errors'
+import {ChildProcess} from "child_process";
+import {initDb} from "../db/index.js";
 
 const www = path.resolve(dirname(fileURLToPath(import.meta.url)), '..', 'www')
 export let io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>
 export let socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>
+
+export let thread: ChildProcess | undefined = undefined
+
+
+export function setThread(_thread?: ChildProcess) {
+  thread = _thread
+}
 
 interface ServerOptions {
   port: number
@@ -24,11 +32,7 @@ interface ServerOptions {
 }
 
 export async function createServer(options: Partial<ServerOptions> = {}) {
-  try {
-    await db.authenticate()
-  } catch (error) {
-    console.error('Impossible de se connecter à la base de données:', error);
-  }
+  await initDb()
 
   options = Object.assign({}, {port: config.API_PORT, web: true}, options)
 
@@ -64,16 +68,17 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
   app.options('*', cors())
 
   app.use('/api', (await import('./routes/index.js')).default)
-  app.use('/api/shell', (await import('./routes/shell.js')).default)
-  app.use('/api/projects', (await import('./routes/projects.js')).default)
-  app.use('/api/fs', (await import('./routes/fs.js')).default)
-  app.use('/api/generate/init', (await import('./routes/generate/init.js')).default)
-  app.use('/api/generate/page', (await import('./routes/generate/page.js')).default)
-  app.use('/api/generate/store', (await import('./routes/generate/store.js')).default)
-  app.use('/api/generate/timer', (await import('./routes/generate/timer.js')).default)
-  app.use('/api/generate/controller', (await import('./routes/generate/controller.js')).default)
-  app.use('/api/generate/ref', (await import('./routes/generate/ref.js')).default)
-  app.use('/api/utils', (await import('./routes/utils.js')).default)
+  app.use('/api/shell', (await import('./routes/shell.api.js')).default)
+  app.use('/api/projects', (await import('./routes/projects.api.js')).default)
+  app.use('/api/fs', (await import('./routes/fs.api.js')).default)
+  app.use('/api/generate/init', (await import('./routes/generate/generate-init.api.js')).default)
+  app.use('/api/generate/page', (await import('./routes/generate/generate-page.api.js')).default)
+  app.use('/api/generate/store', (await import('./routes/generate/generate-store.api.js')).default)
+  app.use('/api/generate/timer', (await import('./routes/generate/generate-timer.api.js')).default)
+  app.use('/api/generate/controller', (await import('./routes/generate/generate-controller.api.js')).default)
+  app.use('/api/generate/ref', (await import('./routes/generate/generate-ref.api.js')).default)
+  app.use('/api/utils', (await import('./routes/utils.api.js')).default)
+  app.use('/api/threads', (await import('./routes/threads.api.js')).default)
 
   /**
    * Pour toutes les autres routes non définies, on retourne une erreur

@@ -6,6 +6,7 @@ import {render} from "ejs";
 import {fileURLToPath} from "url";
 import shell from "shelljs";
 import {logger} from "../utils/logger.js";
+import {ProjectAppData} from "@kraken/types";
 
 export const SKIP_FILES = ['node_modules', '.template.json']
 export const SKIP_RENDER_EXTENSIONS = ['.png', '.gif', '.jpg', '.jpeg']
@@ -71,7 +72,7 @@ export async function refreshAppData(cwd?: string) {
     return
   }
 
-  const res = await shell.exec("mvn clean spring-boot:run -q -D\"spring-boot.run.arguments\"=\"--app.generate-appdata=true --server.port=55555 --spring.main.log-startup-info=false --logging.level.ROOT=off\"", {cwd: paths?.server_root_path, silent: true})
+  const res = await shell.exec("mvn clean spring-boot:run -q -D\"spring-boot.run.arguments\"=\"--socle.core.appdata.close-on-startup=true --socle.core.appdata.api.enabled=true --server.port=55555 --spring.main.log-startup-info=false --logging.level.ROOT=off\"", {cwd: paths?.server_root_path, silent: true})
   logger('success', 'Fichier appdata.json généré dans le dossier ' + path.join(paths?.server_root_path!, "target"))
 
   if (res.code > 0) {
@@ -82,7 +83,7 @@ export async function refreshAppData(cwd?: string) {
   return getAppdata(paths?.server_root_path)
 }
 
-export async function getAppdata(cwd?: string) {
+export async function getAppdata(cwd?: string): Promise<ProjectAppData | undefined> {
   const paths = get_project_paths(cwd)
 
   if (paths == null) {
@@ -93,7 +94,7 @@ export async function getAppdata(cwd?: string) {
   try {
     const file_path = path.join(paths.server_root_path, "target", "appdata.json")
     if (!fs.existsSync(file_path)) {
-      return null
+      return undefined
     }
     const file_content = fs.readFileSync(file_path)
     return JSON.parse(file_content.toString())

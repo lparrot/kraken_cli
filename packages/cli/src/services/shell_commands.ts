@@ -1,5 +1,8 @@
 import shell from "shelljs";
 import {ChildProcess} from "child_process";
+import {get_project_paths} from "../utils/folders.js";
+import {getAppdata} from "./app.js";
+import psList from 'ps-list'
 
 export async function gitInit(cwd: string, check = false) {
   if (!check || shell.which("git") != null) {
@@ -28,6 +31,37 @@ export async function installMavenLibraries(cwd: string, check = false) {
 export async function installNpmLibraries(cwd: string, check = false) {
   if (!check || shell.which("npm") != null) {
     return executeCommand('npm install', cwd)
+  }
+}
+
+export async function runApplication(cwd: string, check = false) {
+  if (!check || (shell.which("mvn") != null && shell.which("npm") != null)) {
+    const paths = get_project_paths(cwd)
+    const appdata = await getAppdata(cwd)
+
+    if (appdata?.application_pid != null) {
+      // const index = threads.findIndex(it => it.thread.pid === parseInt(appdata?.application_pid))
+      // if (index > -1) {
+      //   threads.splice(index, 1)
+      // }
+      const processes = await psList({all: false})
+      const appPid = parseInt(appdata?.application_pid!)
+      if (processes.findIndex(it => it.pid === appPid)) {
+        try {
+          process.kill(appPid)
+        } catch (err) {
+          //
+        }
+      }
+    }
+
+    let result: ChildProcess | undefined
+
+    result = shell.exec('mvn spring-boot:run', {silent: true, cwd: paths?.server_root_path!, async: true})
+
+    await executeCommand('mvn spring-boot:run', paths?.server_root_path!)
+
+    // threads.push(new Thread('run-application', result))
   }
 }
 
