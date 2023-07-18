@@ -7,6 +7,7 @@ import {fileURLToPath} from "url";
 import shell from "shelljs";
 import {logger} from "../utils/logger.js";
 import {ProjectAppData} from "@kraken/types";
+import axios from "axios";
 
 export const SKIP_FILES = ['node_modules', '.template.json']
 export const SKIP_RENDER_EXTENSIONS = ['.png', '.gif', '.jpg', '.jpeg']
@@ -72,7 +73,7 @@ export async function refreshAppData(cwd?: string) {
     return
   }
 
-  const res = await shell.exec("mvn clean spring-boot:run -q -D\"spring-boot.run.arguments\"=\"--socle.core.appdata.close-on-startup=true --socle.core.appdata.api.enabled=true --server.port=55555 --spring.main.log-startup-info=false --logging.level.ROOT=off\"", {cwd: paths?.server_root_path, silent: true})
+  const res = await shell.exec("mvn clean spring-boot:run -q -D\"spring-boot.run.arguments\"=\"--socle.core.appdata.close-on-startup=true --server.port=55555 --spring.main.log-startup-info=false --logging.level.ROOT=off\"", {cwd: paths?.server_root_path, silent: true})
   logger('success', 'Fichier appdata.json généré dans le dossier ' + path.join(paths?.server_root_path!, "target"))
 
   if (res.code > 0) {
@@ -101,5 +102,38 @@ export async function getAppdata(cwd?: string): Promise<ProjectAppData | undefin
   } catch (err) {
     console.log(err);
     logger('error', 'Erreur survenue lors de la lecture du fichier')
+  }
+}
+
+export async function api_ping(cwd?: string) {
+  const appdata = await getAppdata(cwd);
+
+  try {
+    const res = await axios.get(appdata?.api_host + '/socle/cli_ui/ping', {headers: {'Authorization_cli': appdata?.security_key}})
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
+export async function api_logs(cwd?: string) {
+  const appdata = await getAppdata(cwd);
+
+  try {
+    const res = await axios.get(appdata?.api_host + '/socle/cli_ui/logs', {headers: {'Authorization_cli': appdata?.security_key}})
+    return res.data.data
+  } catch (err) {
+    return false
+  }
+}
+
+export async function api_stopApplication(cwd: string) {
+  const appdata = await getAppdata(cwd)
+
+  try {
+    const res = await axios.get(appdata?.api_host + '/socle/cli_ui/exit', {headers: {'Authorization_cli': appdata?.security_key}})
+    return res.data.success
+  } catch (err) {
+    return false
   }
 }

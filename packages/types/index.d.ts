@@ -24,8 +24,11 @@ export interface ProjectPaths {
 
 export interface ProjectAppData {
   application_host: string;
+  api_host: string;
   application_pid: string;
-  application_current_log_file: string;
+  application_log_file: string;
+  security_key: string;
+  application_main_class: string;
   socle_version: string;
   entities: ProjectAppDataEntity[]
 }

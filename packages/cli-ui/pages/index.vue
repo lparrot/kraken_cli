@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {useStateStore} from "~/store/state";
 import {useApiStore} from "~/store/api";
-import {Loading} from "quasar";
+import {Dialog, Loading} from "quasar";
 import CardDashboard from "~/components/CardDashboard.vue";
 import {ThreadMessage} from "@kraken/types";
+import ShowLogs from "~/components/dialogs/ShowLogs.vue";
 
 const $state = useStateStore()
 const $api = useApiStore()
@@ -19,12 +20,39 @@ async function generateAppData() {
 }
 
 async function runJavaApplication() {
-  await $api.handleRunJavaApplication($state.project?.path)
+  Loading.show({message: 'Démarrage en cours ...'})
+  try {
+    await $api.handleRunJavaApplication($state.project?.path)
+  } finally {
+    Loading.hide()
+  }
+}
+
+async function stopJavaApplication() {
+  Loading.show({message: 'Arrêt en cours ...'})
+  try {
+    await $api.handleProjectApiStopJavaApplication()
+    await $state.fetchPing()
+  } finally {
+    Loading.hide()
+  }
+}
+
+async function showLogDialog() {
+  const logs = await $api.handleProjectApiLogs()
+  Dialog.create({
+    component: ShowLogs,
+    componentProps: {
+      logs
+    }
+  })
 }
 
 $io.on('thread', (message: ThreadMessage) => {
   console.log(message)
 })
+
+await $state.fetchPing()
 </script>
 
 <template>
@@ -32,15 +60,27 @@ $io.on('thread', (message: ThreadMessage) => {
     <div class="column items-stretch q-col-gutter-sm">
       <div class="row q-gutter-sm">
         <q-btn color="blue" size="sm" @click="generateAppData">Regénérer fichier appdata</q-btn>
-        <q-btn color="blue" size="sm" @click="runJavaApplication">Démarrer l'application Java</q-btn>
+
+        <template v-if="$state.projectPing">
+          <q-btn color="blue" size="sm" @click="stopJavaApplication">Arrêter l'application Java</q-btn>
+          <q-btn color="blue" size="sm" @click="showLogDialog">Voir les logs</q-btn>
+
+        </template>
+
+        <template v-else>
+          <q-btn color="blue" size="sm" @click="runJavaApplication">Démarrer l'application Java</q-btn>
+        </template>
       </div>
 
       <div v-if="$state.appdata != null" class="row q-col-gutter-sm">
         <div v-if="$state.appdata.socle_version" class="col">
+          <card-dashboard :item="{title: 'Statut du serveur Tomcat', icon: 'troubleshoot', value: $state.projectPing ? 'Démarré' : 'Arrêté', color1: 'green-5', color2: 'green-7' }"/>
+        </div>
+        <div v-if="$state.appdata.socle_version" class="col">
           <card-dashboard :item="{title: 'Version du socle', icon: 'mdi-numeric', value: $state.appdata?.socle_version, color1: 'deep-purple-5', color2: 'deep-purple-7' }"/>
         </div>
         <div class="col">
-          <card-dashboard :item="{title: 'Entités', icon: 'mdi-database', value: $state.appdata?.entities.length, color1: 'orange-5', color2: 'orange-7' }"/>
+          <card-dashboard :item="{title: 'Entités', icon: 'mdi-database', value: $state.appdata?.entities?.length, color1: 'orange-5', color2: 'orange-7' }"/>
         </div>
       </div>
 

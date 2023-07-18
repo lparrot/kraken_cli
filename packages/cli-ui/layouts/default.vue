@@ -43,6 +43,7 @@ async function deleteSelectedProject() {
 }
 
 async function openDialogAddProject() {
+
   Dialog.create({
     component: AddProject
   }).onOk(async payload => {

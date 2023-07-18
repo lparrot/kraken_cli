@@ -1,6 +1,7 @@
 import {ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from "@kraken/types";
 import {useStateStore} from "~/store/state";
 import omit from "lodash/omit";
+import {promiseTimeout} from "@vueuse/core";
 
 export const useApiStore = defineStore('api', {
   actions: {
@@ -82,12 +83,68 @@ export const useApiStore = defineStore('api', {
       return useApiFetch<any>('/api/appdata', {method: 'post', body: {cwd: path}})
     },
 
-    async handleRunJavaApplication(cwd: string) {
-      return useApiFetch<any>('/api/shell/run/java', {query: {cwd}})
+    async handleRunJavaApplication(cwd: string, timeout = 60) {
+      return new Promise(async (resolve, reject) => {
+        const $state = useStateStore()
+        await $state.fetchPing()
+
+        await useApiFetch<any>('/api/shell/run/java', {query: {cwd}})
+        let count = 0;
+        while (count < timeout && !$state.projectPing) {
+          await $state.fetchPing()
+          if (!$state.projectPing) {
+            await promiseTimeout(2000)
+          }
+          count++;
+        }
+        if (count >= timeout) {
+          return resolve(false)
+        }
+        return resolve(true)
+      })
     },
 
     async handleSelectDirectory() {
       return useApiFetch<string>('/api/fs/folder')
+    },
+
+    async handleProjectApiPing(id?: number) {
+      if (id == null) {
+        id = useStateStore().project?.id
+      }
+
+      const res = await useApiFetch<{ success: boolean }>(`/api/projects/${id}/ping`)
+
+      return res.success
+    },
+
+    async handleProjectApiLogs(id?: number) {
+      if (id == null) {
+        id = useStateStore().project?.id
+      }
+
+      return useApiFetch<string[]>(`/api/projects/${id}/logs`)
+    },
+
+    async handleProjectApiStopJavaApplication(id?: number) {
+      if (id == null) {
+        id = useStateStore().project?.id
+      }
+
+      const res = await useApiFetch<{ success: boolean }>(`/api/projects/${id}/exit`)
+
+      return res.success
+    },
+
+    async handleProjectApiRestartJavaApplication(id?: number) {
+      const $state = useStateStore();
+
+      if (id == null) {
+        id = $state.project?.id
+      }
+
+      await this.handleProjectApiStopJavaApplication(id)
+      await this.handleRunJavaApplication($state.project?.path!)
     }
   }
 })

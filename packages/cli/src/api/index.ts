@@ -13,6 +13,7 @@ import {Server, Socket} from "socket.io";
 import {ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData} from "@kraken/types";
 import {ChildProcess} from "child_process";
 import {initDb} from "../db/index.js";
+import {initState} from "../state.js";
 
 const www = path.resolve(dirname(fileURLToPath(import.meta.url)), '..', 'www')
 export let io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>
@@ -33,6 +34,7 @@ interface ServerOptions {
 
 export async function createServer(options: Partial<ServerOptions> = {}) {
   await initDb()
+  await initState()
 
   options = Object.assign({}, {port: config.API_PORT, web: true}, options)
 
@@ -49,6 +51,13 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
    * On créé une nouvelle "application" express
    */
   const app = express()
+
+  app.use(function (req, res, next) {
+    if (/.*\.js/.test(req.path)) {
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    }
+    next();
+  });
 
   if (options.web) {
     app.use(express.static(www))
@@ -78,7 +87,6 @@ export async function createServer(options: Partial<ServerOptions> = {}) {
   app.use('/api/generate/controller', (await import('./routes/generate/generate-controller.api.js')).default)
   app.use('/api/generate/ref', (await import('./routes/generate/generate-ref.api.js')).default)
   app.use('/api/utils', (await import('./routes/utils.api.js')).default)
-  app.use('/api/threads', (await import('./routes/threads.api.js')).default)
 
   /**
    * Pour toutes les autres routes non définies, on retourne une erreur

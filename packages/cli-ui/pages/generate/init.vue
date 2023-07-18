@@ -119,7 +119,7 @@ watch(
           <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du projet" stack-label v-bind="field"/>
         </VeeField>
 
-        <div class="text-grey-7 q-field__bottom">{{ form.cwd }}\ <span class="text-weight-bolder">{{ shortName }}</span></div>
+        <div class="text-grey-7 q-field__bottom">{{ form.cwd }}\ <span class="text-weight-bolder">{{ form.artifact_id }}</span></div>
       </div>
 
       <template v-if="form.name != null">

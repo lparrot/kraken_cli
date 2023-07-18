@@ -1,4 +1,5 @@
 import shell from "shelljs";
+import * as child_process from "child_process";
 import {ChildProcess} from "child_process";
 import {get_project_paths} from "../utils/folders.js";
 import {getAppdata} from "./app.js";
@@ -40,28 +41,18 @@ export async function runApplication(cwd: string, check = false) {
     const appdata = await getAppdata(cwd)
 
     if (appdata?.application_pid != null) {
-      // const index = threads.findIndex(it => it.thread.pid === parseInt(appdata?.application_pid))
-      // if (index > -1) {
-      //   threads.splice(index, 1)
-      // }
       const processes = await psList({all: false})
       const appPid = parseInt(appdata?.application_pid!)
       if (processes.findIndex(it => it.pid === appPid)) {
         try {
-          process.kill(appPid)
+          process.kill(appPid, 0)
         } catch (err) {
           //
         }
       }
     }
 
-    let result: ChildProcess | undefined
-
-    result = shell.exec('mvn spring-boot:run', {silent: true, cwd: paths?.server_root_path!, async: true})
-
-    await executeCommand('mvn spring-boot:run', paths?.server_root_path!)
-
-    // threads.push(new Thread('run-application', result))
+    child_process.spawn('mvn clean spring-boot:run -q -D\"spring-boot.run.arguments\"=\"--spring.profiles.active=dev\"', {cwd: paths?.server_root_path!, shell: true, detached: true})
   }
 }
 

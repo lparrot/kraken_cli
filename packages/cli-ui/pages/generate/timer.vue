@@ -52,6 +52,7 @@ async function submitForm() {
         data
       }
     })
+    await $api.handleProjectApiRestartJavaApplication()
     await init()
     $q.notify({
       message: 'Timer créé avec succès',
