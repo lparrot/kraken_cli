@@ -17,6 +17,7 @@ export class UiCommand extends CommandRunner {
 
     const app = await NestFactory.create(AppModule);
     app.setGlobalPrefix('/api')
+    app.enableCors()
     await app.listen(port, () => console.log(`Listening on port ${port}`));
   }
 

@@ -1,5 +1,5 @@
 {
-  "name": "@kraken/cli",
+  "name": "@kraken/cli_old",
   "description": "CLI pour les applications Kraken",
   "version": "1.0.0",
   "type": "module",
@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "npm run clean:dist && npm run templates:build && tsc --watch",
-    "build": "npm run clean:dist && npm run templates:build && tsc",
+    "build:old": "npm run clean:dist && npm run templates:build && tsc",
     "api:watch": "nodemon",
     "templates:build": "shx cp -r src/templates dist/templates",
     "clean:dist": "shx rm -rf dist && shx mkdir -p dist"
