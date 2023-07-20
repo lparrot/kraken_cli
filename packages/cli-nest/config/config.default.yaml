@@ -1,0 +1,6 @@
+app:
+  port: 9998
+
+db:
+  log: false
+  drop_schema: false

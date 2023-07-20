@@ -1,0 +1,17 @@
+<%_ if (field.sql_type != null) { -%>
+<validation-provider #default="{errors, valid}" name="<%= field.label.toLowerCase() %>" rules="">
+          <b-form-group :invalid-feedback="errors[0]" :state="valid" label="<%= field.label %>">
+          <%_ if (['INTEGER', 'BIGINT', 'FLOAT', 'REAL', 'DOUBLE', 'NUMERIC', 'DECIMAL'].indexOf(field.sql_type) > -1) { -%>
+            <b-form-input v-model="selected.<%= field.name %>" :state="valid" type="number"/>
+          <%_ } else if (['BIT', 'BOOLEAN'].indexOf(field.sql_type) > -1) { -%>
+            <b-form-checkbox v-model="selected.<%= field.name %>" :state="valid"/>
+          <%_ } else if (['DATE'].indexOf(field.sql_type) > -1) { -%>
+            <date-picker v-model="selected.<%= field.name %>" :config="{format: 'DD/MM/YYYY'}" :state="valid"></date-picker>
+          <%_ } else if (['TIMESTAMP', 'TIME'].indexOf(field.sql_type) > -1) { -%>
+            <date-picker v-model="selected.<%= field.name %>" :config="{format: 'DD/MM/YYYY HH:mm'}" :state="valid"></date-picker>
+          <%_ } else { -%>
+            <b-form-input v-model="selected.<%= field.name %>" :state="valid"/>
+          <%_ } -%>
+          </b-form-group>
+        </validation-provider>
+<%_ } -%>

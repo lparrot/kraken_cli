@@ -1,5 +1,31 @@
 export type LoggerLevel = 'success' | 'info' | 'warn' | 'error'
 
+export interface TemplateGeneratorOptions {
+  templatePath: string
+  targetPath: string
+  cwd?: string
+  errorIfFolderAlreadyExists?: boolean
+  data: any
+  add_to_git?: boolean
+}
+
+export interface TemplateInitOptions {
+  cwd?: string
+  name: string
+  description: string
+  group_id: string
+  artifact_id: string
+  socle_version: string
+  node_version: string
+  db_host: string
+  db_port: string
+  db_name: string
+  db_user: string
+  db_password: string
+  install_librairies: boolean
+  create_git_repo: boolean
+}
+
 export interface ServerInfos {
   home_dir: string
   separator: string
@@ -25,6 +51,7 @@ export interface ProjectPaths {
 export interface ProjectAppData {
   application_host: string;
   api_host: string;
+  port: number;
   application_pid: string;
   application_log_file: string;
   security_key: string;
@@ -72,8 +99,8 @@ export interface ResponseFsPackages {
 }
 
 export interface SocketMessage {
-  level: LoggerLevel
-  message: string
+  level?: LoggerLevel
+  data?: any
 }
 
 export interface ThreadMessage {
@@ -84,7 +111,7 @@ export interface ThreadMessage {
 }
 
 export interface ServerToClientEvents {
-  'logger:message': (message: SocketMessage) => void
+  'log:message': (message: SocketMessage) => void
   'loader:show': (message: string) => void
   'loader:hide': () => void
   'thread': (thread?: ThreadMessage) => void

@@ -7,7 +7,8 @@ interface State {
   paths?: ProjectPaths
   infos?: ServerInfos
   appdata?: ProjectAppData
-  projectPing: boolean
+  projectPing: boolean,
+  logs: string[]
 }
 
 export const useStateStore = defineStore('app', {
@@ -17,12 +18,17 @@ export const useStateStore = defineStore('app', {
     paths: undefined,
     infos: undefined,
     appdata: undefined,
-    projectPing: false
+    projectPing: false,
+    logs: []
   }),
 
   actions: {
     async fetchPing() {
-      this.projectPing = await useApiStore().handleProjectApiPing()
+      await useApiStore().handleProjectApiPing()
+    },
+
+    async fetchLogs() {
+      this.logs = await useApiStore().handleProjectApiLogs(this.project?.id)
     },
 
     async fetchAppData() {

@@ -1,0 +1,23 @@
+# Files
+.DS_Store
+.env.local
+.env.*.local
+*.pid
+*.port
+*.log
+*.iml
+.flattened-pom.xml
+
+# Folders
+.idea
+.out
+.nuxt
+target
+node_modules
+dist
+dist_electron
+logs
+node
+
+application-*.properties
+*.versionsBackup

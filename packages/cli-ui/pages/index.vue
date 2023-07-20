@@ -3,7 +3,6 @@ import {useStateStore} from "~/store/state";
 import {useApiStore} from "~/store/api";
 import {Dialog, Loading} from "quasar";
 import CardDashboard from "~/components/CardDashboard.vue";
-import {ThreadMessage} from "@kraken/types";
 import ShowLogs from "~/components/dialogs/ShowLogs.vue";
 
 const $state = useStateStore()
@@ -20,37 +19,38 @@ async function generateAppData() {
 }
 
 async function runJavaApplication() {
-  Loading.show({message: 'Démarrage en cours ...'})
   try {
+    // Loading.show({message: 'Démarrage en cours ...'})
+    Dialog.create({
+      component: ShowLogs
+    })
     await $api.handleRunJavaApplication($state.project?.path)
   } finally {
-    Loading.hide()
+    // Loading.hide()
   }
 }
 
 async function stopJavaApplication() {
   Loading.show({message: 'Arrêt en cours ...'})
   try {
-    await $api.handleProjectApiStopJavaApplication()
-    await $state.fetchPing()
+    const success = await $api.handleProjectApiStopJavaApplication()
+    if (success) {
+      $state.projectPing = false
+    }
   } finally {
     Loading.hide()
   }
 }
 
 async function showLogDialog() {
-  const logs = await $api.handleProjectApiLogs()
   Dialog.create({
-    component: ShowLogs,
-    componentProps: {
-      logs
-    }
+    component: ShowLogs
   })
 }
 
-$io.on('thread', (message: ThreadMessage) => {
-  console.log(message)
-})
+// $io.on('thread', (message: ThreadMessage) => {
+//   console.log(message)
+// })
 
 await $state.fetchPing()
 </script>

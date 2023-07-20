@@ -1,7 +1,6 @@
 import {useStateStore} from "~/store/state";
 import {io, Socket} from "socket.io-client";
 import {ClientToServerEvents, ServerToClientEvents, SocketMessage} from "@kraken/types";
-import {Loading} from "quasar";
 
 function getColorByLevel(message: SocketMessage) {
   switch (message.level) {
@@ -26,34 +25,34 @@ export default defineNuxtPlugin(async nuxt => {
   let $io = null
 
   if (process.client) {
-    $io = io(`ws://localhost:${config.public.API_PORT}`) as Socket<ServerToClientEvents, ClientToServerEvents>
-
-    $io.on('logger:message', (message: SocketMessage) => {
-      Notify.create({
-        color: getColorByLevel(message),
-        message: message.message,
-      })
-    })
-
-    $io.on('loader:show', (message: string) => {
-      if (appLoader == null) {
-        appLoader = Loading.show({
-          group: 'app-loader',
-          message
-        })
-      } else {
-        appLoader({
-          message
-        })
-      }
-    })
-
-    $io.on('loader:hide', () => {
-      appLoader()
-      appLoader = null
-    })
-
     const $state = useStateStore()
+
+    $io = io(`http://localhost:${config.public.API_PORT}`) as Socket<ServerToClientEvents, ClientToServerEvents>
+    //
+    // $io.on('logger:message', (message: SocketMessage) => {
+    //   Notify.create({
+    //     color: getColorByLevel(message),
+    //     message: message.message,
+    //   })
+    // })
+    //
+    // $io.on('loader:show', (message: string) => {
+    //   if (appLoader == null) {
+    //     appLoader = Loading.show({
+    //       group: 'app-loader',
+    //       message
+    //     })
+    //   } else {
+    //     appLoader({
+    //       message
+    //     })
+    //   }
+    // })
+    //
+    // $io.on('loader:hide', () => {
+    //   appLoader()
+    //   appLoader = null
+    // })
 
     await $state.fetchServerInfos()
     await $state.fetchProjects()

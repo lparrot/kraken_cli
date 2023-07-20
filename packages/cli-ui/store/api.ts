@@ -10,11 +10,11 @@ export const useApiStore = defineStore('api', {
         const $state = useStateStore()
         path = $state.paths?.project_path
       }
-      return useApiFetch('/api/appdata', {params: {cwd: path}})
+      return useApiFetch('/api/projects/appdata', {params: {cwd: path}})
     },
 
     async fetchInfos() {
-      return useApiFetch<ServerInfos>('/api/infos')
+      return useApiFetch<ServerInfos>('/api/os/infos')
     },
 
     async fetchFolders(path: string, config?: { only_current: boolean }) {
@@ -32,7 +32,9 @@ export const useApiStore = defineStore('api', {
     },
 
     async fetchProjectPaths(cwd: string) {
-      return useApiFetch<ProjectPaths>('/api/paths', {query: {cwd}})
+      let {data: paths} = await useApiFetch<{ data: ProjectPaths }>('/api/projects/paths', {query: {cwd}})
+
+      return paths
     },
 
     async fetchProject(id: number) {
@@ -48,7 +50,7 @@ export const useApiStore = defineStore('api', {
     },
 
     async fetchPathInfo(cwd: string, root?: string) {
-      return useApiFetch<any>('/api/fs/path/info', {query: {path: cwd, root}})
+      return useApiFetch<any>('/api/os/path/info', {query: {path: cwd, root}})
     },
 
     async fetchThreads() {
@@ -80,7 +82,7 @@ export const useApiStore = defineStore('api', {
         const $state = useStateStore()
         path = $state.paths?.project_path
       }
-      return useApiFetch<any>('/api/appdata', {method: 'post', body: {cwd: path}})
+      return useApiFetch<any>('/api/projects/appdata', {method: 'post', body: {cwd: path}})
     },
 
     async handleRunJavaApplication(cwd: string, timeout = 60) {
@@ -88,7 +90,7 @@ export const useApiStore = defineStore('api', {
         const $state = useStateStore()
         await $state.fetchPing()
 
-        await useApiFetch<any>('/api/shell/run/java', {query: {cwd}})
+        await useApiFetch<any>('/api/projects/run', {query: {cwd}})
         let count = 0;
         while (count < timeout && !$state.projectPing) {
           await $state.fetchPing()
@@ -109,12 +111,18 @@ export const useApiStore = defineStore('api', {
     },
 
     async handleProjectApiPing(id?: number) {
+      const $state = useStateStore();
       if (id == null) {
-        id = useStateStore().project?.id
+        id = $state.project?.id
+      }
+
+      if (id == null) {
+        return false
       }
 
       const res = await useApiFetch<{ success: boolean }>(`/api/projects/${id}/ping`)
 
+      $state.projectPing = res.success
       return res.success
     },
 

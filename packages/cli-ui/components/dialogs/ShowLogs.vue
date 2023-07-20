@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {scroll, useDialogPluginComponent} from "quasar";
 import {useApiStore} from "~/store/api";
+import {useStateStore} from "~/store/state";
 import getScrollTarget = scroll.getScrollTarget;
 import setVerticalScrollPosition = scroll.setVerticalScrollPosition;
 
@@ -8,20 +9,26 @@ defineEmits([
   ...useDialogPluginComponent.emits
 ])
 
-const props = defineProps<{ logs?: string[] }>()
+const {$io} = useNuxtApp()
 
-const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent()
+const {dialogRef, onDialogHide} = useDialogPluginComponent()
 
 const $api = useApiStore()
+const $state = useStateStore()
 
 const divEnd = ref(null)
 
-onMounted(() => {
+onMounted(async () => {
+  await $state.fetchLogs()
+  scrollToElement(divEnd.value)
+})
+
+$io.on('log:message', async () => {
+  await $state.fetchLogs()
   scrollToElement(divEnd.value)
 })
 
 function scrollToElement(el) {
-  console.log(el)
   if (el == null) {
     return
   }
@@ -40,8 +47,8 @@ function scrollToElement(el) {
         <q-btn v-close-popup dense flat icon="close"/>
       </q-bar>
 
-      <q-card-section class="scroll" style="max-height: 80vh">
-        <div v-for="log in props.logs">{{ log }}</div>
+      <q-card-section class="scroll" style="height: 80vh">
+        <div v-for="log in $state.logs" v-html="log"></div>
         <div ref="divEnd"></div>
       </q-card-section>
     </q-card>

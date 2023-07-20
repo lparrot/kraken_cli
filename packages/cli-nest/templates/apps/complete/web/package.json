@@ -1,0 +1,24 @@
+{
+  "name": "<%= artifact_id %>-web",
+  "version": "1.0.0",
+  "description": "<% if (locals.description) { %><%= description %><% } %>",
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@socle/admin": "<%= socle_version %>",
+    "@socle/core": "<%= socle_version %>",
+    "@socle/security": "<%= socle_version %>",
+    "@socle/ui": "<%= socle_version %>",
+    "bootstrap": "4.6.2",
+    "bootstrap-vue": "2.23.1",
+    "nuxt": "2.17.1"
+  },
+  "devDependencies": {
+    "@nuxt/types": "2.17.1",
+    "vue-template-babel-compiler": "2.0.0"
+  }
+}

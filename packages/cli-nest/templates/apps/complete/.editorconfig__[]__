@@ -1,0 +1,28 @@
+# editorconfig.org
+root = true
+
+[*]
+indent_style = tab
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = 300
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.properties]
+ij_properties_keep_blank_lines = true
+ij_any_keep_indents_on_empty_lines = true
+ij_any_keep_line_breaks = true
+
+[{*.js, *.ts, *.vue}]
+ij_javascript_force_quote_style = true
+ij_javascript_use_double_quotes = false
+ij_javascript_use_semicolon_after_statement = false
+ij_javascript_spaces_within_imports = true
+ij_javascript_spaces_within_interpolation_expressions = false
+ij_javascript_spaces_within_object_literal_braces = true
+ij_javascript_spaces_within_object_type_braces = true
