@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {QInput} from "quasar";
+import {Loading, QInput} from "quasar";
 import stringcase from 'stringcase'
 import {useKrakenSessionStorage} from "~/composables/useKrakenSessionStorage";
 import {useEventBus} from "@vueuse/core";
@@ -77,16 +77,21 @@ init()
 const shortName = computed(() => form.value.name ? stringcase.snakecase(form.value.name!) : null)
 
 async function submitForm(values, validator) {
-  const project = await useApiFetch('/api/generate/init', {
-    method: 'post',
-    body: {
-      ...form.value,
-      with_create: true
-    }
-  })
-  await $state.setProject(project.id)
-  init()
-  projectsBus.emit()
+  Loading.show({message: 'Création du projet en cours'})
+  try {
+    const project = await useApiFetch('/api/generate/init', {
+      method: 'post',
+      body: {
+        ...form.value,
+        with_create: true
+      }
+    })
+    await $state.setProject(project.id)
+    init()
+    projectsBus.emit()
+  } finally {
+    Loading.hide()
+  }
 }
 
 watch(

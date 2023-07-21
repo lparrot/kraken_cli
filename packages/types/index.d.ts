@@ -24,6 +24,7 @@ export interface TemplateInitOptions {
   db_password: string
   install_librairies: boolean
   create_git_repo: boolean
+  with_create: boolean
 }
 
 export interface ServerInfos {
