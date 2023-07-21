@@ -1,0 +1,10 @@
+/.editorconfig
+/.gitignore
+/.idea
+
+/.env
+/.npmrc
+/.nuxt
+
+/src
+/types

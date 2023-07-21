@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "pnpm -r build",
-    "publish:cli": "npm run build && pnpm --filter \"@kraken/cli\" --force publish"
+    "build:cli": "pnpm --filter \"@kraken/cli\" run build && pnpm --filter \"@kraken/devtools\" run generate",
+    "publish:cli": "pnpm run build:cli && pnpm --filter \"@kraken/cli\" publish --force"
   },
   "publishConfig": {
     "access": "restricted",

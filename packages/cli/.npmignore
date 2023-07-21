@@ -1,10 +1,11 @@
-/.editorconfig
 /.gitignore
+/.nest-cli.json
+/tsconfig.build.json
+/tsconfig.json
+
 /.idea
 
-/.env
-/.npmrc
-/.nuxt
-
+/config
 /src
-/types
+/templates
+/test

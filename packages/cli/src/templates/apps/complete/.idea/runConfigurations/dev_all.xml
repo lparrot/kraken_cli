@@ -1,7 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="dev:all" type="CompoundRunConfigurationType">
-    <toRun name="dev:web" type="js.build_tools.npm" />
-    <toRun name="dev:server" type="SpringBootApplicationConfigurationType" />
-    <method v="2" />
-  </configuration>
-</component>
