@@ -10,7 +10,7 @@ export interface TemplateGeneratorOptions {
 }
 
 export interface TemplateInitOptions {
-  cwd?: string
+  cwd: string
   name: string
   description: string
   group_id: string

@@ -2,8 +2,6 @@ import {Notify} from "quasar";
 import {NitroFetchOptions} from "nitropack";
 
 export const useApiFetch = <T>(input: string, opts?: NitroFetchOptions<any>): Promise<T> => {
-  const config = useRuntimeConfig()
-
   return $fetch<T>(input.toString(), {
     retry: false,
 
@@ -26,7 +24,7 @@ export const useApiFetch = <T>(input: string, opts?: NitroFetchOptions<any>): Pr
         if (response.status === 500) {
           Notify.create({
             color: 'red',
-            message: response._data.error?.message
+              message: response._data.message
           })
         }
         if (response.status === 400) {

@@ -37,6 +37,10 @@ function scrollToElement(el) {
   const duration = 1000
   setVerticalScrollPosition(target, offset, duration)
 }
+
+onBeforeUnmount(() => {
+  $io.off('log:message')
+})
 </script>
 
 <template>

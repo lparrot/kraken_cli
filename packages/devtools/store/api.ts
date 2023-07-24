@@ -1,7 +1,7 @@
-import {ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from "@kraken/types";
-import {useStateStore} from "~/store/state";
-import omit from "lodash/omit";
-import {promiseTimeout} from "@vueuse/core";
+import {ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from '@kraken/types'
+import {useStateStore} from '~/store/state'
+import omit from 'lodash/omit'
+import {promiseTimeout} from '@vueuse/core'
 
 export const useApiStore = defineStore('api', {
   actions: {
@@ -120,10 +120,9 @@ export const useApiStore = defineStore('api', {
         return false
       }
 
-      const res = await useApiFetch<{ success: boolean }>(`/api/projects/${id}/ping`)
+        $state.projectPing = await useApiFetch<boolean>(`/api/projects/${id}/ping`)
 
-      $state.projectPing = res.success
-      return res.success
+        return $state.projectPing
     },
 
     async handleProjectApiLogs(id?: number) {
@@ -139,9 +138,7 @@ export const useApiStore = defineStore('api', {
         id = useStateStore().project?.id
       }
 
-      const res = await useApiFetch<{ success: boolean }>(`/api/projects/${id}/exit`)
-
-      return res.success
+        return useApiFetch<boolean>(`/api/projects/${id}/exit`)
     },
 
     async handleProjectApiRestartJavaApplication(id?: number) {

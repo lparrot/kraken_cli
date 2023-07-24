@@ -93,27 +93,27 @@ export default defineNuxtPlugin(async nuxt => {
 })
 
 declare module '#app' {
-  interface NuxtApp {
-    $io: Socket
+    interface NuxtApp {
+        $io: Socket<ServerToClientEvents, ClientToServerEvents>
 
-    $log(msg: string): string
-  }
+        $log(msg: string): string
+    }
 }
 
 declare module 'vue' {
-  interface ComponentCustomProperties {
-    $io: Socket
+    interface ComponentCustomProperties {
+        $io: Socket<ServerToClientEvents, ClientToServerEvents>
 
-    $log(msg: string): string
-  }
+        $log(msg: string): string
+    }
 }
 
 declare module '@vue/runtime-core' {
-  interface ComponentCustomProperties {
-    $io: Socket
+    interface ComponentCustomProperties {
+        $io: Socket<ServerToClientEvents, ClientToServerEvents>
 
-    $log(msg: string): string
-  }
+        $log(msg: string): string
+    }
 }
 
 export {}
