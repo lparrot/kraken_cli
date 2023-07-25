@@ -1,7 +1,7 @@
-import {ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from '@kraken/types'
-import {useStateStore} from '~/store/state'
+import { ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos } from '@kraken/types'
+import { useStateStore } from '~/store/state'
 import omit from 'lodash/omit'
-import {promiseTimeout} from '@vueuse/core'
+import { promiseTimeout } from '@vueuse/core'
 
 export const useApiStore = defineStore('api', {
   actions: {
@@ -10,7 +10,7 @@ export const useApiStore = defineStore('api', {
         const $state = useStateStore()
         path = $state.paths?.project_path
       }
-      return useApiFetch('/api/projects/appdata', {params: {cwd: path}})
+      return useApiFetch('/api/projects/appdata', { params: { cwd: path } })
     },
 
     async fetchInfos() {
@@ -18,21 +18,21 @@ export const useApiStore = defineStore('api', {
     },
 
     async fetchFolders(path: string, config?: { only_current: boolean }) {
-      config = Object.assign({}, {only_current: false}, config)
-      return useApiFetch<any[]>('/api/fs/files', {query: {path, ...config}})
+      config = Object.assign({}, { only_current: false }, config)
+      return useApiFetch<any[]>('/api/fs/files', { query: { path, ...config } })
     },
 
     async fetchJavaFiles(path: string) {
-      return useApiFetch<string[]>('/api/fs/files/java', {query: {path}})
+      return useApiFetch<string[]>('/api/fs/files/java', { query: { path } })
     },
 
     async fetchJavaRootDir(cwd: string) {
-      const {path} = await useApiFetch<{ path: string }>('/api/fs/rootdir', {query: {path: cwd}})
+      const { path } = await useApiFetch<{ path: string }>('/api/projects/rootdir', { query: { cwd } })
       return path
     },
 
     async fetchProjectPaths(cwd: string) {
-      let {data: paths} = await useApiFetch<{ data: ProjectPaths }>('/api/projects/paths', {query: {cwd}})
+      let { data: paths } = await useApiFetch<{ data: ProjectPaths }>('/api/projects/paths', { query: { cwd } })
 
       return paths
     },
@@ -46,11 +46,11 @@ export const useApiStore = defineStore('api', {
     },
 
     async fetchUtilsPathNormalize(path: string) {
-      return useApiFetch<string>('/api/utils/path/normalize', {query: {path}})
+      return useApiFetch<string>('/api/utils/path/normalize', { query: { path } })
     },
 
     async fetchPathInfo(cwd: string, root?: string) {
-      return useApiFetch<any>('/api/os/path/info', {query: {path: cwd, root}})
+      return useApiFetch<any>('/api/os/path/info', { query: { path: cwd, root } })
     },
 
     async fetchThreads() {
@@ -58,23 +58,23 @@ export const useApiStore = defineStore('api', {
     },
 
     async handleCreateNewDirectory(path: string, name: string) {
-      return useApiFetch('/api/fs/dir', {method: 'post', body: {path, name}})
+      return useApiFetch('/api/fs/dir', { method: 'post', body: { path, name } })
     },
 
     async handleGenerateController(data: any) {
-      return useApiFetch('/api/generate/controller', {method: 'post', body: data})
+      return useApiFetch('/api/generate/controller', { method: 'post', body: data })
     },
 
     async handleGenerateReferentiel(data: any) {
-      return useApiFetch('/api/generate/ref', {method: 'post', body: omit(data, ['entity', 'dao'])})
+      return useApiFetch('/api/generate/ref', { method: 'post', body: omit(data, ['entity', 'dao']) })
     },
 
     async handleOpenCurrentProjectDirectory(path: string) {
-      return useApiFetch('/api/shell/open_current_project', {query: {path}})
+      return useApiFetch('/api/shell/open_current_project', { query: { path } })
     },
 
     async handleOpenCurrentProjectInIntellij(path: string) {
-      return useApiFetch('/api/shell/open_in_idea', {query: {path}})
+      return useApiFetch('/api/shell/open_in_idea', { query: { path } })
     },
 
     async handleRefreshAppData(path?: string) {
@@ -82,7 +82,7 @@ export const useApiStore = defineStore('api', {
         const $state = useStateStore()
         path = $state.paths?.project_path
       }
-      return useApiFetch<ProjectAppData>('/api/projects/appdata', {method: 'post', body: {cwd: path}})
+      return useApiFetch<ProjectAppData>('/api/projects/appdata', { method: 'post', body: { cwd: path } })
     },
 
     async handleRunJavaApplication(cwd: string, timeout = 60) {
@@ -90,14 +90,14 @@ export const useApiStore = defineStore('api', {
         const $state = useStateStore()
         await $state.fetchPing()
 
-        await useApiFetch<any>('/api/projects/run', {query: {cwd}})
-        let count = 0;
+        await useApiFetch<any>('/api/projects/run', { query: { cwd } })
+        let count = 0
         while (count < timeout && !$state.projectPing) {
           await $state.fetchPing()
           if (!$state.projectPing) {
             await promiseTimeout(2000)
           }
-          count++;
+          count++
         }
         if (count >= timeout) {
           return resolve(false)
@@ -111,7 +111,7 @@ export const useApiStore = defineStore('api', {
     },
 
     async handleProjectApiPing(id?: number) {
-      const $state = useStateStore();
+      const $state = useStateStore()
       if (id == null) {
         id = $state.project?.id
       }
@@ -120,9 +120,9 @@ export const useApiStore = defineStore('api', {
         return false
       }
 
-        $state.projectPing = await useApiFetch<boolean>(`/api/projects/${id}/ping`)
+      $state.projectPing = await useApiFetch<boolean>(`/api/projects/${id}/ping`)
 
-        return $state.projectPing
+      return $state.projectPing
     },
 
     async handleProjectApiLogs(id?: number) {
@@ -138,11 +138,11 @@ export const useApiStore = defineStore('api', {
         id = useStateStore().project?.id
       }
 
-        return useApiFetch<boolean>(`/api/projects/${id}/exit`)
+      return useApiFetch<boolean>(`/api/projects/${id}/exit`)
     },
 
     async handleProjectApiRestartJavaApplication(id?: number) {
-      const $state = useStateStore();
+      const $state = useStateStore()
 
       if (id == null) {
         id = $state.project?.id

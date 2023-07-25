@@ -6,6 +6,7 @@ import { ProjectProvider } from 'src/services/project.provider'
 import { AppProvider } from 'src/app/app.provider'
 import { ProjectAttributes } from '@kraken/types'
 import * as path from 'path'
+import { globSync } from 'glob'
 
 @Controller('projects')
 export class ProjectController {
@@ -54,6 +55,14 @@ export class ProjectController {
   @Get('appdata')
   getAppData(@Query('cwd') cwd: string) {
     return this.projectProvider.getAppdata(cwd)
+  }
+
+  @Get('rootdir')
+  async getRootDir(@Query('cwd') cwd: string) {
+    console.log(cwd)
+    const javaFiles = globSync('**/*.java', { cwd, absolute: true })
+
+    return { dirname: javaFiles != null && javaFiles.length > -1 ? javaFiles[0] : null }
   }
 
   @Get()
