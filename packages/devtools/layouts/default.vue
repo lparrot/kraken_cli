@@ -1,15 +1,14 @@
 <script lang="ts" setup>
-import {Dialog} from "quasar";
-import {ProjectAttributes} from "@kraken/types";
-import {useEventBus} from "@vueuse/core";
-import {useStateStore} from "~/store/state";
-import {useApiStore} from "~/store/api";
-import AddProject from "~/components/dialogs/AddProject.vue";
+import { Dialog } from 'quasar'
+import { ProjectAttributes } from '@kraken/types'
+import { useEventBus } from '@vueuse/core'
+import { useStateStore } from '~/store/state'
+import { useApiStore } from '~/store/api'
+import AddProject from '~/components/dialogs/AddProject.vue'
 
 const $state = useStateStore()
 const $api = useApiStore()
 const storage = useKrakenSessionStorage()
-const router = useRouter()
 const projectsBus = useEventBus('projects')
 
 const drawer = ref(true)
@@ -19,11 +18,11 @@ function toggleDrawer() {
 }
 
 async function openSelectedProjectFolder() {
-  await $api.handleOpenCurrentProjectDirectory($state.project?.path)
+  await $api.handleOpenCurrentProjectDirectory($state.project?.path!)
 }
 
 async function openSelectedProjectIdea() {
-  await $api.handleOpenCurrentProjectInIntellij($state.project?.path)
+  await $api.handleOpenCurrentProjectInIntellij($state.project?.path!)
 }
 
 async function deleteSelectedProject() {
@@ -33,12 +32,14 @@ async function deleteSelectedProject() {
     cancel: true,
     persistent: true
   }).onOk(async () => {
-    await useApiFetch(`/api/projects/${$state.project.id}`, {
+    await useApiFetch(`/api/projects/${$state.project?.id}`, {
       method: 'delete'
     })
+
     await navigateTo('/')
-    await $state.setProject(null)
+    await $state.setProject(undefined)
     projectsBus.emit()
+
   })
 }
 
@@ -47,12 +48,14 @@ async function openDialogAddProject() {
   Dialog.create({
     component: AddProject
   }).onOk(async payload => {
-    await useApiFetch('/api/projects', {
+    const project = await useApiFetch<ProjectAttributes>('/api/projects', {
       method: 'post',
       body: payload
     })
 
     await $state.fetchProjects()
+
+    await $state.setProject(project.id)
   })
 }
 
@@ -63,7 +66,12 @@ async function onSelectProject(param_project: ProjectAttributes) {
   await $state.getOrUpdateAppData()
 }
 
-projectsBus.on(async () => await $state.fetchProjects())
+projectsBus.on(async () => {
+  await $state.fetchProjects()
+  if ($state.project == null && ($state.projects != null && $state.projects.length > 0)) {
+    await $state.setProject($state.projects[0].id)
+  }
+})
 </script>
 
 <template>
