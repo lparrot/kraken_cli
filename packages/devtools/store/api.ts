@@ -1,7 +1,7 @@
-import { ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos } from '@kraken/types'
-import { useStateStore } from '~/store/state'
+import {ProjectAppData, ProjectAttributes, ProjectPaths, ProjectRunApplicationOptions, ServerInfos} from '@kraken/types'
+import {useStateStore} from '~/store/state'
 import omit from 'lodash/omit'
-import { promiseTimeout } from '@vueuse/core'
+import {promiseTimeout} from '@vueuse/core'
 
 export const useApiStore = defineStore('api', {
   actions: {
@@ -85,21 +85,22 @@ export const useApiStore = defineStore('api', {
       return useApiFetch<ProjectAppData>('/api/projects/appdata', { method: 'post', body: { cwd: path } })
     },
 
-    async handleRunJavaApplication(cwd: string, timeout = 60) {
+    async handleRunApplication(cwd: string, options?: ProjectRunApplicationOptions) {
+      options = Object.assign({}, {profile: 'default', timeout: 60}, options)
       return new Promise(async (resolve, reject) => {
         const $state = useStateStore()
         await $state.fetchPing()
 
-        await useApiFetch<any>('/api/projects/run', { query: { cwd } })
+        await useApiFetch<any>('/api/projects/run', {query: {cwd, profile: options?.profile}})
         let count = 0
-        while (count < timeout && !$state.projectPing) {
+        while (count < options?.timeout! && !$state.projectPing) {
           await $state.fetchPing()
           if (!$state.projectPing) {
             await promiseTimeout(2000)
           }
           count++
         }
-        if (count >= timeout) {
+        if (count >= options?.timeout!) {
           return resolve(false)
         }
         return resolve(true)
@@ -149,7 +150,7 @@ export const useApiStore = defineStore('api', {
       }
 
       await this.handleProjectApiStopJavaApplication(id)
-      await this.handleRunJavaApplication($state.project?.path!)
+      await this.handleRunApplication($state.project?.path!)
     }
   }
 })

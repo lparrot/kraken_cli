@@ -4,10 +4,11 @@ import {useApiStore} from "~/store/api";
 import {Dialog, Loading} from "quasar";
 import CardDashboard from "~/components/CardDashboard.vue";
 import ShowLogs from "~/components/dialogs/ShowLogs.vue";
+import {useApiFetch} from "~/composables/apiFetch";
+import {ProjectRunApplicationOptions} from "@kraken/types";
 
 const $state = useStateStore()
 const $api = useApiStore()
-const {$io} = useNuxtApp()
 
 async function generateAppData() {
   Loading.show({message: 'Génération du fichier appdata'})
@@ -18,13 +19,42 @@ async function generateAppData() {
   }
 }
 
-async function runJavaApplication() {
+async function selectProfileBeforeExecuteApplication() {
+  let env_profiles = await useApiFetch<string[]>(`/api/projects/${$state.project?.id}/env_profiles`)
+
+  if (env_profiles == null) {
+    env_profiles = $state.appdata?.environments!
+  }
+
+  if (env_profiles == null || env_profiles.length! <= 1) {
+    await executeApplication({profile: 'default'})
+    return
+  }
+
+  Dialog.create({
+    title: 'Sélection du profil',
+    message: `Choisissez un profil ci-dessous avant de lancer l'application`,
+    options: {
+      type: 'radio',
+      model: 'default',
+      items: env_profiles?.map(profile => ({label: profile, value: profile}))
+    },
+
+    cancel: true,
+    persistent: true
+  })
+      .onOk(async val => {
+        await executeApplication({profile: val})
+      })
+}
+
+async function executeApplication(options: ProjectRunApplicationOptions) {
   try {
     // Loading.show({message: 'Démarrage en cours ...'})
     Dialog.create({
       component: ShowLogs
     })
-    await $api.handleRunJavaApplication($state.project?.path)
+    await $api.handleRunApplication($state.project?.path!, options)
   } finally {
     // Loading.hide()
   }
@@ -48,10 +78,6 @@ async function showLogDialog() {
   })
 }
 
-// $io.on('thread', (message: ThreadMessage) => {
-//   console.log(message)
-// })
-
 await $state.fetchPing()
 </script>
 
@@ -68,19 +94,23 @@ await $state.fetchPing()
         </template>
 
         <template v-else>
-          <q-btn color="blue" size="sm" @click="runJavaApplication">Démarrer l'application Java</q-btn>
+          <q-btn color="blue" size="sm" @click="selectProfileBeforeExecuteApplication">Démarrer l'application Java
+          </q-btn>
         </template>
       </div>
 
       <div v-if="$state.appdata != null" class="row q-col-gutter-sm">
         <div v-if="$state.appdata.socle_version" class="col">
-          <card-dashboard :item="{title: 'Statut du serveur Tomcat', icon: 'troubleshoot', value: $state.projectPing ? 'Démarré' : 'Arrêté', color1: 'green-5', color2: 'green-7' }"/>
+          <card-dashboard
+              :item="{title: 'Statut du serveur Tomcat', icon: 'troubleshoot', value: $state.projectPing ? 'Démarré' : 'Arrêté', color1: 'green-5', color2: 'green-7' }"/>
         </div>
         <div v-if="$state.appdata.socle_version" class="col">
-          <card-dashboard :item="{title: 'Version du socle', icon: 'mdi-numeric', value: $state.appdata?.socle_version, color1: 'deep-purple-5', color2: 'deep-purple-7' }"/>
+          <card-dashboard
+              :item="{title: 'Version du socle', icon: 'mdi-numeric', value: $state.appdata?.socle_version, color1: 'deep-purple-5', color2: 'deep-purple-7' }"/>
         </div>
         <div v-if="$state.appdata?.entities != null" class="col">
-          <card-dashboard :item="{title: 'Entités', icon: 'mdi-database', value: $state.appdata?.entities?.length, color1: 'orange-5', color2: 'orange-7' }"/>
+          <card-dashboard
+              :item="{title: 'Entités', icon: 'mdi-database', value: $state.appdata?.entities?.length, color1: 'orange-5', color2: 'orange-7' }"/>
         </div>
       </div>
 
@@ -108,7 +138,9 @@ await $state.fetchPing()
 
   </template>
 
-  <div v-else>Aucun projet selectionné. Veuillez selectionner un projet dans la liste, importez en un ou créez en un nouveau.</div>
+  <div v-else>Aucun projet selectionné. Veuillez selectionner un projet dans la liste, importez en un ou créez en un
+    nouveau.
+  </div>
 </template>
 
 <style scoped>

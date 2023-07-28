@@ -58,6 +58,7 @@ export interface ProjectAppData {
   security_key: string;
   application_main_class: string;
   socle_version: string;
+  environments?: string[];
   entities: ProjectAppDataEntity[]
 }
 
@@ -68,6 +69,11 @@ export interface ProjectAppDataEntity {
   file_path: string
   dao?: ProjectAppDataDao
   attributes?: ProjectAppDataAttribute[];
+}
+
+export interface ProjectRunApplicationOptions {
+  profile?: string
+  timeout?: number
 }
 
 export interface ProjectAppDataDao {
@@ -104,29 +110,20 @@ export interface SocketMessage {
   data?: any
 }
 
-export interface ThreadMessage {
-  name: string
-  stdout: string[]
-  stderr: string[]
-  state: boolean
-}
-
 export interface ServerToClientEvents {
-  'log:message': (message: SocketMessage) => void
-  'loader:show': (message: string) => void
-  'loader:hide': () => void
-  'thread': (thread?: ThreadMessage) => void
+  'server:action': (message: string) => void
+  'server:status': (message: string) => void
 }
 
 export interface ClientToServerEvents {
 
 }
 
-export interface InterServerEvents {
-
+export interface ServerToClientDevtoolsEvents {
+  'log:message': (message: SocketMessage) => void
 }
 
-export interface SocketData {
+export interface ClientToServerDevtoolsEvents {
 
 }
 

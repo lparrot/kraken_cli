@@ -1,5 +1,16 @@
-import { ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos } from '@kraken/types'
-import { useApiStore } from '~/store/api'
+import {
+    ClientToServerDevtoolsEvents,
+    ClientToServerEvents,
+    ProjectAppData,
+    ProjectAttributes,
+    ProjectPaths,
+    ServerInfos,
+    ServerToClientDevtoolsEvents,
+    ServerToClientEvents
+} from '@kraken/types'
+import {useApiStore} from '~/store/api'
+import {io, Socket} from 'socket.io-client'
+import {useEventBus} from '@vueuse/core'
 
 interface State {
   project?: ProjectAttributes
@@ -9,6 +20,8 @@ interface State {
   appdata?: ProjectAppData
   projectPing: boolean,
   logs: string[]
+    io?: Socket<ServerToClientEvents, ClientToServerEvents>,
+    ioDevtools?: Socket<ServerToClientDevtoolsEvents, ClientToServerDevtoolsEvents>
 }
 
 export const useStateStore = defineStore('app', {
@@ -19,12 +32,28 @@ export const useStateStore = defineStore('app', {
     infos: undefined,
     appdata: undefined,
     projectPing: false,
-    logs: []
+      logs: [],
+      io: undefined,
+      ioDevtools: undefined
   }),
 
   actions: {
     async fetchPing() {
       await useApiStore().handleProjectApiPing()
+
+        if (this.projectPing) {
+            this.io = io('http://localhost:1337')
+
+            const busAction = useEventBus('server:action')
+
+            this.io.on('server:action', message => {
+                busAction.emit(message)
+            })
+
+            this.io.on('server:status', async message => {
+                await this.fetchPing()
+            })
+        }
     },
 
     async fetchLogs() {
@@ -75,6 +104,10 @@ export const useStateStore = defineStore('app', {
           Loading.hide()
         }
       }
+    },
+
+      initDevtoolsIo() {
+          this.ioDevtools = io()
     }
   }
 })

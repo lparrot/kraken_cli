@@ -1,7 +1,13 @@
-import {OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, WebSocketGateway, WebSocketServer} from "@nestjs/websockets";
+import {
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
+  WebSocketGateway,
+  WebSocketServer
+} from "@nestjs/websockets";
 import {Logger, OnApplicationShutdown} from "@nestjs/common";
 import {Server, Socket} from 'socket.io';
-import {ServerToClientEvents, SocketMessage} from "@kraken/types";
+import {ServerToClientDevtoolsEvents, SocketMessage} from "@kraken/types";
 
 @WebSocketGateway({cors: true})
 export class WebsocketProvider implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnApplicationShutdown {
@@ -31,7 +37,7 @@ export class WebsocketProvider implements OnGatewayInit, OnGatewayConnection, On
     this.logger.log('WebsocketProvider.onApplicationShutdown')
   }
 
-  emit(type: keyof ServerToClientEvents, message?: SocketMessage) {
+  emit(type: keyof ServerToClientDevtoolsEvents, message?: SocketMessage) {
     this.clients.forEach(it => it.emit(type, message))
   }
 }

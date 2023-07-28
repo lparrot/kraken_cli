@@ -9,26 +9,24 @@ defineEmits([
   ...useDialogPluginComponent.emits
 ])
 
-const {$io} = useNuxtApp()
-
 const {dialogRef, onDialogHide} = useDialogPluginComponent()
 
 const $api = useApiStore()
 const $state = useStateStore()
 
-const divEnd = ref(null)
+const divEnd = ref()
 
 onMounted(async () => {
   await $state.fetchLogs()
   scrollToElement(divEnd.value)
 })
 
-$io.on('log:message', async () => {
+$state.ioDevtools?.on('log:message', async () => {
   await $state.fetchLogs()
   scrollToElement(divEnd.value)
 })
 
-function scrollToElement(el) {
+function scrollToElement(el?: HTMLElement) {
   if (el == null) {
     return
   }
@@ -39,7 +37,7 @@ function scrollToElement(el) {
 }
 
 onBeforeUnmount(() => {
-  $io.off('log:message')
+  $state.ioDevtools?.off('log:message')
 })
 </script>
 

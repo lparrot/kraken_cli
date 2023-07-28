@@ -1,17 +1,21 @@
 <script lang="ts" setup>
-import { Dialog } from 'quasar'
-import { ProjectAttributes } from '@kraken/types'
-import { useEventBus } from '@vueuse/core'
-import { useStateStore } from '~/store/state'
-import { useApiStore } from '~/store/api'
+import {Dialog} from 'quasar'
+import {ProjectAttributes} from '@kraken/types'
+import {useEventBus} from '@vueuse/core'
+import {useStateStore} from '~/store/state'
+import {useApiStore} from '~/store/api'
 import AddProject from '~/components/dialogs/AddProject.vue'
 
 const $state = useStateStore()
 const $api = useApiStore()
 const storage = useKrakenSessionStorage()
 const projectsBus = useEventBus('projects')
+const actionBus = useEventBus('server:action')
 
 const drawer = ref(true)
+actionBus.on((message: any) => {
+  Notify.create({message})
+})
 
 function toggleDrawer() {
   drawer.value = !drawer.value
