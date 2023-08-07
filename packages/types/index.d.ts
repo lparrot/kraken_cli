@@ -27,6 +27,12 @@ export interface TemplateInitOptions {
   with_create: boolean
 }
 
+export interface PostGenerateControllerBody {
+  cwd: string
+  name: string
+  url: string
+}
+
 export interface ServerInfos {
   home_dir: string
   separator: string

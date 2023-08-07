@@ -24,14 +24,14 @@ const form = ref<Partial<Form>>({})
 
 async function init() {
   form.value = {
-    cwd: await $api.fetchJavaRootDir($state.paths.server_java_path)
+    cwd: await $api.fetchJavaRootDir($state.paths?.server_java_path!)
   }
 }
 
 await init()
 
 async function submitForm() {
-  $q.loading.show({message: 'Création du controller en cours ...'})
+  $q.loading.show({ message: 'Création du controller en cours ...' })
 
   try {
     await $api.handleGenerateController(form.value)
@@ -57,7 +57,7 @@ const selectedPackage = computed(() => {
     <FileFetcher v-model="form.cwd" :root="$state.paths?.server_java_path"/>
   </q-drawer>
 
-  <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
+  <VeeForm :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
     <q-btn :color="form.cwd == null ? 'blue' : 'green'" class="full-width" no-caps @click="drawer = true">
       <span v-if="form.cwd == null">Selectionnez un package</span>
       <span v-else>Modifier le package</span>
@@ -71,16 +71,16 @@ const selectedPackage = computed(() => {
       </div>
 
       <VeeField #default="{errorMessage, meta, field}" label="nom" name="name" rules="required">
-        <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du controller (sans suffixe)" stack-label v-bind="field" @update:model-value="form.name = deburr(stringcase.pascalcase($event))"/>
+        <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du controller (sans suffixe)" stack-label v-bind="field" @update:model-value="form.name = deburr(stringcase.pascalcase($event as string))"/>
       </VeeField>
 
       <VeeField #default="{errorMessage, meta, field}" label="url" name="url" rules="required">
-        <q-input v-model="form.url" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Url du webservice" stack-label v-bind="field" @update:model-value="form.url = deburr(stringcase.lowercase($event))"/>
+        <q-input v-model="form.url" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Url du webservice" stack-label v-bind="field" @update:model-value="form.url = deburr(stringcase.lowercase($event as string))"/>
       </VeeField>
 
+      <q-btn color="primary" icon="add_circle" label="Créer le controlleur" type="submit"/>
     </template>
 
-    <q-btn color="primary" icon="add_circle" label="Créer le controlleur" type="submit"/>
   </VeeForm>
 </template>
 

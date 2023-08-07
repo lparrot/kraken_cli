@@ -1,17 +1,17 @@
-import {Inject, Injectable} from "@nestjs/common";
-import {ProjectProvider} from "./project.provider";
-import {TemplateProvider} from "./template.provider";
-import {TemplateInitOptions} from "../../../cli_old/types";
-import {dotcase, pascalcase, pathcase, snakecase} from "stringcase";
-import * as path from "path";
-import {ShellCommandsProvider} from "src/services/shell-commands.provider";
+import { Inject, Injectable } from '@nestjs/common'
+import { ProjectProvider } from './project.provider'
+import { TemplateProvider } from './template.provider'
+import { TemplateInitOptions } from '../../../cli_old/types'
+import { dotcase, lowercase, pascalcase, pathcase, snakecase } from 'stringcase'
+import * as path from 'path'
+import { ShellCommandsProvider } from 'src/services/shell-commands.provider'
 
 @Injectable()
 export class GenerateProvider {
 
-  @Inject(ProjectProvider) projectProvider: ProjectProvider;
-  @Inject(TemplateProvider) templateProvider: TemplateProvider;
-  @Inject(ShellCommandsProvider) shellCommandsProvider: ShellCommandsProvider;
+  @Inject(ProjectProvider) projectProvider: ProjectProvider
+  @Inject(TemplateProvider) templateProvider: TemplateProvider
+  @Inject(ShellCommandsProvider) shellCommandsProvider: ShellCommandsProvider
 
   async initProject(templateType: string, data: TemplateInitOptions) {
     const short_name = snakecase(data.name)
@@ -52,14 +52,14 @@ export class GenerateProvider {
       }
     }
 
-    const project_folder = path.resolve(cwd, data.artifact_id);
+    const project_folder = path.resolve(cwd, data.artifact_id)
     if (data.create_git_repo) {
       // logger('info', `Initialisation d'un dépôt Git`)
 
       try {
         await this.shellCommandsProvider.gitInit(project_folder)
         await this.shellCommandsProvider.gitAdd(project_folder)
-        await this.shellCommandsProvider.gitCommit(project_folder, "commit initial")
+        await this.shellCommandsProvider.gitCommit(project_folder, 'commit initial')
       } catch (err) {
         // return logger('error', `Erreur lors de l'initialisation du dépôt Git`)
       }
@@ -71,7 +71,7 @@ export class GenerateProvider {
   }
 
   async generatePage(options: { cwd?: string, data: { name: string, title: string } }, paths?: any) {
-    const {cwd, data} = options
+    const { cwd, data } = options
 
     if (paths == null) {
       paths = this.projectProvider.getProjectPaths(cwd)
@@ -86,4 +86,17 @@ export class GenerateProvider {
     )
   }
 
+  async generateController(options: { cwd?: string, data: { name: string, url: string } }) {
+    const { cwd, data } = options
+
+    data.name = pascalcase(data.name)
+    data.url = lowercase(data.url)
+
+    await this.templateProvider.generate({
+      cwd,
+      data,
+      templatePath: 'ctrl',
+      targetPath: '.',
+    })
+  }
 }

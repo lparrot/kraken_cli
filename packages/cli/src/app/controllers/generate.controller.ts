@@ -1,16 +1,16 @@
-import {Body, Controller, Inject, Post} from "@nestjs/common";
-import {TemplateInitOptions} from "@kraken/types";
-import {GenerateProvider} from "src/services/generate.provider";
-import * as path from "path";
-import {snakecase} from "stringcase";
-import {Project} from "src/app/entities/models/project.entity";
+import { Body, Controller, Inject, Post } from '@nestjs/common'
+import { PostGenerateControllerBody, TemplateInitOptions } from '@kraken/types'
+import { GenerateProvider } from 'src/services/generate.provider'
+import * as path from 'path'
+import { snakecase } from 'stringcase'
+import { Project } from 'src/app/entities/models/project.entity'
 
 const shelljs = require('shelljs')
 
 @Controller('generate')
 export class GenerateController {
 
-  @Inject(GenerateProvider) generateProvider: GenerateProvider;
+  @Inject(GenerateProvider) generateProvider: GenerateProvider
 
   @Post('init')
   async generateInit(@Body() body: TemplateInitOptions) {
@@ -20,9 +20,9 @@ export class GenerateController {
     const project_path = path.join(body.cwd, snakecase(body.name))
 
     if (is_idea_installed) {
-      shelljs.exec(`idea ${project_path}`, {async: true})
+      shelljs.exec(`idea ${project_path}`, { async: true })
     } else {
-      shelljs.exec(`start ${project_path}`, {async: true})
+      shelljs.exec(`start ${project_path}`, { async: true })
     }
 
     if (body.with_create) {
@@ -33,6 +33,12 @@ export class GenerateController {
     }
 
     return body
+  }
+
+  @Post('controller')
+  async generateController(@Body() body: PostGenerateControllerBody) {
+    const { cwd, ...data } = body
+    await this.generateProvider.generateController({ cwd, data })
   }
 
 }
