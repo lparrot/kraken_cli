@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {ResponseFsPackages} from "@kraken/types";
-import {useStateStore} from "~/store/state";
-import {useApiStore} from "~/store/api";
-import {convertPathToPackage} from "~/utils/java.utils";
-import deburr from "lodash/deburr";
-import stringcase from "stringcase";
+import { ResponseFsPackages } from '@kraken/types'
+import { useStateStore } from '~/store/state'
+import { useApiStore } from '~/store/api'
+import { convertPathToPackage } from '~/utils/java.utils'
+import deburr from 'lodash/deburr'
+import stringcase from 'stringcase'
 
 definePageMeta({
   middleware: ['security']
@@ -71,7 +71,7 @@ const selectedPackage = computed(() => {
 </script>
 
 <template>
-  <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
+  <q-drawer v-model="drawer" :width="500" behavior="mobile" overlay side="right">
     <FileFetcher v-model="form.cwd" :root="$state.paths.server_java_path"/>
   </q-drawer>
 

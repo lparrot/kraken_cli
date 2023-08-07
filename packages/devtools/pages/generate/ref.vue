@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import {useStateStore} from "~/store/state";
-import {convertPathToPackage} from "~/utils/java.utils";
-import {useApiStore} from "~/store/api";
-import {QInput} from "quasar";
-import stringcase, {sentencecase, snakecase} from "stringcase";
-import deburr from "lodash/deburr";
-import PageReferentielAfterCreate from "~/components/dialogs/PageReferentielAfterCreate.vue";
-import sortBy from "lodash/sortBy";
-import pluralize from "pluralize";
-import {ProjectAppDataEntity} from "@kraken/types";
+import { useStateStore } from '~/store/state'
+import { convertPathToPackage } from '~/utils/java.utils'
+import { useApiStore } from '~/store/api'
+import { QInput } from 'quasar'
+import stringcase, { sentencecase, snakecase } from 'stringcase'
+import deburr from 'lodash/deburr'
+import PageReferentielAfterCreate from '~/components/dialogs/PageReferentielAfterCreate.vue'
+import sortBy from 'lodash/sortBy'
+import pluralize from 'pluralize'
+import { ProjectAppDataEntity } from '@kraken/types'
 
 definePageMeta({
   middleware: ['security']
@@ -118,7 +118,7 @@ const selected_entity_attributes_options = computed(() => {
 </script>
 
 <template>
-  <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
+  <q-drawer v-model="drawer" :width="500" behavior="mobile" overlay side="right">
     <FileFetcher v-model="form.cwd" :default-dir="defaultSelectedPackage" :root="$state.paths?.server_java_path"/>
   </q-drawer>
 

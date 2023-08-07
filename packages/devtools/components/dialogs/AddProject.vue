@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import {QInput, useDialogPluginComponent} from 'quasar'
-import {isBlank} from "~/utils/string.utils";
-import {useApiStore} from "~/store/api";
-import {useStateStore} from "~/store/state";
+import { QInput, useDialogPluginComponent } from 'quasar'
+import { isBlank } from '~/utils/string.utils'
+import { useApiStore } from '~/store/api'
+import { useStateStore } from '~/store/state'
 
 const $q = useQuasar()
 const $api = useApiStore()
@@ -49,7 +49,7 @@ async function onFolderSelect(folder: string) {
       <VeeForm #default="{isSubmitting, meta}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
         <q-dialog ref="dialogRef" @hide="onDialogHide">
           <q-card class="q-dialog-plugin" style="min-width: 50vw">
-            <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
+            <q-drawer v-model="drawer" :width="500" behavior="mobile" overlay side="right">
               <FileFetcher v-model="form.path" :check="onFolderSelect" :default-dir="$state.infos.home_dir" show-home/>
             </q-drawer>
 

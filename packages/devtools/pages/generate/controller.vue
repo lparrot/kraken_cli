@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {useStateStore} from "~/store/state";
-import {useApiStore} from "~/store/api";
-import {convertPathToPackage} from "~/utils/java.utils";
-import deburr from "lodash/deburr";
-import stringcase from "stringcase";
+import { useStateStore } from '~/store/state'
+import { useApiStore } from '~/store/api'
+import { convertPathToPackage } from '~/utils/java.utils'
+import deburr from 'lodash/deburr'
+import stringcase from 'stringcase'
 
 definePageMeta({
   middleware: ['security']
@@ -53,8 +53,8 @@ const selectedPackage = computed(() => {
 </script>
 
 <template>
-  <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
-    <FileFetcher v-model="form.cwd" :root="$state.paths.server_java_path"/>
+  <q-drawer v-model="drawer" :width="500" behavior="mobile" overlay side="right">
+    <FileFetcher v-model="form.cwd" :root="$state.paths?.server_java_path"/>
   </q-drawer>
 
   <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import {Loading, QInput} from "quasar";
+import { Loading, QInput } from 'quasar'
 import stringcase from 'stringcase'
-import {useKrakenSessionStorage} from "~/composables/useKrakenSessionStorage";
-import {useEventBus} from "@vueuse/core";
-import {useStateStore} from "~/store/state";
-import {useApiStore} from "~/store/api";
+import { useKrakenSessionStorage } from '~/composables/useKrakenSessionStorage'
+import { useEventBus } from '@vueuse/core'
+import { useStateStore } from '~/store/state'
+import { useApiStore } from '~/store/api'
 
 interface Form {
   cwd?: string
@@ -108,7 +108,7 @@ watch(
 </script>
 
 <template>
-  <q-drawer v-model="drawer" :width="500" behavior="mobile" bordered overlay side="right">
+  <q-drawer v-model="drawer" :width="500" behavior="mobile" overlay side="right">
     <FileFetcher v-model="form.cwd" :default-dir="$state.infos.home_dir" show-home/>
   </q-drawer>
 

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import {useStateStore} from "~/store/state";
-import {useApiStore} from "~/store/api";
-import {whenever} from "@vueuse/core";
-import sortBy from "lodash/sortBy";
+import { useStateStore } from '~/store/state'
+import { useApiStore } from '~/store/api'
+import { whenever } from '@vueuse/core'
+import sortBy from 'lodash/sortBy'
 
 interface Props {
   root?: string
@@ -21,8 +21,8 @@ const modelValue = defineModel<string | null>({default: null})
 const filter = ref('')
 const filterRef = ref()
 const treeRef = ref()
-const expanded = ref([])
-const folders = ref([])
+const expanded = ref<any[]>([])
+const folders = ref<any[]>([])
 
 let rootDir
 
@@ -32,11 +32,11 @@ if (props.root == null && $state.project) {
   rootDir = props.root
 }
 
-folders.value = await $api.fetchFolders(rootDir)
+folders.value = await $api.fetchFolders(rootDir!)
 
-const rootdir = await $api.fetchJavaRootDir(rootDir)
+const rootdir = await $api.fetchJavaRootDir(rootDir!)
 
-function filterFn(node, filter) {
+function filterFn(node: any, filter: string) {
   const packageName = convertPathToPackage(node.path)
   if (isNotBlank(filter) && node.path != null && packageName.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
     selectNode(node.path)
@@ -45,7 +45,7 @@ function filterFn(node, filter) {
   return false
 }
 
-function selectNode(key, node?) {
+function selectNode(key: any, node?: any) {
   if (key == null) {
     return
   }
@@ -58,8 +58,8 @@ function selectNode(key, node?) {
     }
 
     while (!rooted) {
-      if (expanded.value.indexOf(current_node.path) < 0) {
-        expanded.value.push(current_node.path)
+      if (expanded.value.indexOf(current_node.path!) < 0) {
+        expanded.value.push(current_node.path!)
         expanded.value = sortBy(expanded.value)
       }
       if (current_node.root) {
