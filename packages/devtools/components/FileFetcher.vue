@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { useStateStore } from '~/store/state'
-import { useApiStore } from '~/store/api'
-import getParentComponentIfExists from '~/utils/vue.utils'
-import { QDrawer } from 'quasar'
+import {useStateStore} from '~/store/state'
+import {useApiStore} from '~/store/api'
+import {getParentComponentIfExists} from '~/utils/vue.utils'
+import {QDrawer} from 'quasar'
 
 interface Props {
   readonly defaultDir?: string

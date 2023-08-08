@@ -14,6 +14,8 @@ export default defineNuxtPlugin(nuxt => {
     generateMessage: localize({
       fr,
     }),
+      bails: false,
+      validateOnModelUpdate: true
   });
 
   setLocale('fr')
