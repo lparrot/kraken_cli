@@ -1,8 +1,8 @@
-import {NuxtConfig} from "nuxt/config";
+import { NuxtConfig } from 'nuxt/config'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig(<NuxtConfig>{
-  ssr: true,
+  ssr: false,
 
   telemetry: false,
 

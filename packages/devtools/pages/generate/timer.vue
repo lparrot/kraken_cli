@@ -26,7 +26,7 @@ const packages = ref<ResponseFsPackages[]>()
 
 async function init() {
   form.value = {
-    cwd: await $api.fetchJavaRootDir($state.paths.server_java_path)
+    cwd: await $api.fetchJavaRootDir($state.paths?.server_java_path!)
   }
 }
 
@@ -34,7 +34,7 @@ await init()
 
 const allPackages: ResponseFsPackages[] = await useApiFetch<ResponseFsPackages[]>('/api/fs/packages', {
   query: {
-    path: $state.project.path
+    path: $state.project?.path
   }
 })
 
@@ -72,10 +72,10 @@ const selectedPackage = computed(() => {
 
 <template>
   <q-drawer v-model="drawer" :width="500" behavior="mobile" overlay side="right">
-    <FileFetcher v-model="form.cwd" :root="$state.paths.server_java_path"/>
+    <FileFetcher v-model="form.cwd" :root="$state.paths?.server_java_path"/>
   </q-drawer>
 
-  <VeeForm #default="{isSubmitting}" :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
+  <VeeForm :initial-values="form" class="column q-gutter-y-md" validate-on-mount @submit="submitForm">
     <q-btn :color="form.cwd == null ? 'blue' : 'green'" class="full-width" no-caps @click="drawer = true">
       <span v-if="form.cwd == null">Selectionnez un package</span>
       <span v-else>Modifier le package</span>
@@ -90,7 +90,7 @@ const selectedPackage = computed(() => {
       <q-separator/>
 
       <VeeField #default="{errorMessage, meta, field}" label="nom" name="name" rules="required">
-        <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du timer" stack-label v-bind="field" @update:model-value="form.name = deburr(stringcase.snakecase($event))"/>
+        <q-input v-model="form.name" :error="!meta.valid" :error-message="errorMessage" dense filled hide-bottom-space label="Nom du timer" stack-label v-bind="field" @update:model-value="form.name = deburr(stringcase.snakecase($event as string))"/>
       </VeeField>
 
       <VeeField #default="{errorMessage, meta, field}" label="description" name="description" rules="required">
