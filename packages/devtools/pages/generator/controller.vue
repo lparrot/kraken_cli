@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { convertPathToPackage } from '~/utils/java.utils'
-import { useDeburr } from '#imports'
+import {convertPathToPackage} from '~/utils/java.utils'
+import {useDeburr} from '#imports'
 import * as stringcase from 'stringcase'
 
 interface FormSchema {
@@ -8,6 +8,10 @@ interface FormSchema {
   name: string
   url: string
 }
+
+definePageMeta({
+  middleware: ['security']
+})
 
 const $state = useStateStore()
 const $api = useApiStore()

@@ -31,6 +31,10 @@ interface ReadonlyForm {
   db_password: boolean
 }
 
+definePageMeta({
+  middleware: ['security']
+})
+
 const validator = ref()
 
 const $state = useStateStore()

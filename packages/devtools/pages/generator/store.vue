@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-
+definePageMeta({
+  middleware: ['security']
+})
 </script>
 
 <template>

@@ -176,6 +176,9 @@ importers:
       pinia:
         specifier: ^2.1.6
         version: 2.1.6(vue@3.3.4)
+      pluralize:
+        specifier: ^8.0.0
+        version: 8.0.0
       stringcase:
         specifier: ^4.3.1
         version: 4.3.1
@@ -183,12 +186,18 @@ importers:
         specifier: ^4.11.1
         version: 4.11.1(vue@3.3.4)
     devDependencies:
+      '@kraken/types':
+        specifier: workspace:*
+        version: link:../types
       '@nuxthq/ui':
         specifier: ^2.7.0
         version: 2.7.0(vue@3.3.4)(webpack@5.88.2)
       '@types/node':
         specifier: ^18.17.1
         version: 18.17.1
+      '@types/pluralize':
+        specifier: ^0.0.30
+        version: 0.0.30
       nuxt:
         specifier: ^3.6.5
         version: 3.6.5(@types/node@18.17.1)(sass@1.64.2)
@@ -2470,6 +2479,10 @@ packages:
 
   /@types/parse-json@4.0.0:
     resolution: { integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA== }
+    dev: true
+
+  /@types/pluralize@0.0.30:
+    resolution: { integrity: sha512-kVww6xZrW/db5BR9OqiT71J9huRdQ+z/r+LbDuT7/EK50mCmj5FoaIARnVv0rvjUS/YpDox0cDU9lpQT011VBA== }
     dev: true
 
   /@types/prettier@2.7.3:

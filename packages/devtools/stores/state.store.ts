@@ -1,76 +1,74 @@
+import {ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from "@kraken/types";
+
 interface StateStore {
-  appdata: any
-  navigation: boolean
-  os_infos: any
-  paths: any
-  ping: boolean
-  project: any
-  projects: any[]
+    appdata: ProjectAppData
+    navigation: boolean
+    os_infos: ServerInfos
+    paths: ProjectPaths
+    ping: boolean
+    project: ProjectAttributes
+    projects: ProjectAttributes[]
 }
 
 export const useStateStore = defineStore('state', {
-  state: (): StateStore => ({
-    appdata: undefined,
-    navigation: false,
-    os_infos: undefined,
-    paths: undefined,
-    ping: false,
-    project: undefined,
-    projects: [],
-  }),
+    state: (): Partial<StateStore> => ({
+        navigation: false,
+        ping: false,
+        projects: [],
+    }),
 
-  actions: {
-    async fetchAppData() {
-      this.appdata = await useApiStore().fetchAppData()
-    },
+    actions: {
+        async fetchAppData() {
+            this.appdata = await useApiStore().fetchAppData()
+        },
 
-    async fetchPing() {
-      await useApiStore().handleProjectPing()
-    },
+        async fetchPing() {
+            await useApiStore().handleProjectPing()
+        },
 
-    async setProject(id?: number) {
-      const $api = useApiStore()
-      const storage = useAppStorage()
+        async setProject(id?: number) {
+            const $api = useApiStore()
+            const storage = useAppStorage()
 
-      storage.value.selected_project = id
+            storage.value.selected_project = id
 
-      if (id == null) {
-        this.project = undefined
-        this.paths = undefined
-        this.appdata = undefined
-        this.ping = false
-        return
-      }
+            if (id == null) {
+                this.project = undefined
+                this.paths = undefined
+                this.appdata = undefined
+                this.ping = false
+                return
+            }
 
-      this.project = await $api.fetchProject(id!)
+            this.project = await $api.fetchProject(id!)
 
-      if (this.project != null) {
-        this.paths = await $api.fetchProjectPaths(this.project.path)
-      }
+            if (this.project != null) {
+                this.paths = await $api.fetchProjectPaths(this.project.path)
+            }
 
-      await this.getOrUpdateAppData()
+            await this.getOrUpdateAppData()
 
-      await this.fetchPing()
+            await this.fetchPing()
 
-      return this.project
-    },
+            return this.project
+        },
 
-    async getOrUpdateAppData() {
-      const loader = useAppLoader()
-      await this.fetchAppData()
+        async getOrUpdateAppData() {
+            const loader = useAppLoader()
+            await this.fetchAppData()
 
-      if (this.appdata == null) {
-        loader.start({ description: 'Génération du fichier appdata' })
-        try {
-          this.appdata = await useApiStore().handleProjectAppdataCreate()
-        } finally {
-          loader.stop()
-        }
-      }
-    },
-  }
+            if (this.appdata == null) {
+                loader.start({description: 'Génération du fichier appdata'})
+                try {
+                    this.appdata = await useApiStore().handleProjectAppdataCreate()
+                } finally {
+                    loader.stop()
+                }
+            }
+        },
+    }
 })
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useStateStore, import.meta.hot))
+    import.meta.hot.accept(acceptHMRUpdate(useStateStore, import.meta.hot))
 }

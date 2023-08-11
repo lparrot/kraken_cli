@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import VerticalSeparator from '~/components/VerticalSeparator.vue'
-import { FormContext } from '~/node_modules/vee-validate'
+import {FormContext} from '~/node_modules/vee-validate'
 
 interface FormAddProject {
   path: string
@@ -39,7 +39,7 @@ async function removeProjectFromList() {
     `Ceci n'entrainera pas la suppression physique du dossier du projet. Le projet n'apparaitra tout simplement plus dans la liste.`,
     'Supprimer',
     async () => {
-      await $api.handleProjectRemove($state.project?.id)
+      await $api.handleProjectRemove($state.project!!.id)
 
       await navigateTo('/')
       await $state.setProject(undefined)
@@ -48,11 +48,11 @@ async function removeProjectFromList() {
 }
 
 async function openInExplorer() {
-  await $api.handleProjectOpenInExplorer($state.project.path)
+  await $api.handleProjectOpenInExplorer($state.project!!.path)
 }
 
 async function openInIntellijIdea() {
-  await $api.handleProjectOpenInIntellijIdea($state.project.path)
+  await $api.handleProjectOpenInIntellijIdea($state.project!!.path)
 }
 
 function showModalAddProject() {
@@ -76,7 +76,7 @@ async function checkAddProjectSelected(path_info: any) {
   const paths = await $api.fetchProjectPaths(path_info?.path)
 
   if (paths != null) {
-    const project = $state.projects.find(it => it.path === paths.project_path)
+    const project = $state.projects!!.find(it => it.path === paths.project_path)
     if (project != null) {
       toast.add({
         color: 'red',
@@ -126,13 +126,6 @@ watch(
     immediate: true
   }
 )
-
-watch(
-  () => storage.value.selected_project,
-  async (value) => {
-    await $state.setProject(value)
-  },
-  { immediate: true })
 
 watchEffect(() => {
   validator.value?.setFieldError('path', form_add_project.value?.path == null ? 'Le champ chemin du dossier est requis' : undefined)

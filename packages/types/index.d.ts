@@ -77,6 +77,19 @@ export interface ProjectAppDataEntity {
   attributes?: ProjectAppDataAttribute[];
 }
 
+export interface OsPathInfo {
+    label: string;
+    path: string;
+    parent: string;
+    breadcrumb?: (BreadcrumbEntityOrChildrenEntity)[] | null;
+    children?: (BreadcrumbEntityOrChildrenEntity)[] | null;
+}
+
+export interface OsPathInfoBreadcrumbEntityOrChildrenEntity {
+    path: string;
+    label: string;
+}
+
 export interface ProjectRunApplicationOptions {
   profile?: string
   timeout?: number

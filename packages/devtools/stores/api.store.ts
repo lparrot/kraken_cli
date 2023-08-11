@@ -1,155 +1,171 @@
-import { useStateStore } from '~/stores/state.store'
-import { promiseTimeout } from '@vueuse/core'
+import {useStateStore} from '~/stores/state.store'
+import {promiseTimeout} from '@vueuse/core'
+import {OsPathInfo, ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from "@kraken/types";
 
 export const useApiStore = defineStore('api', () => {
-  const $state = useStateStore()
+    const $state = useStateStore()
 
-  return {
-    async fetchAppData(cwd?: string) {
-      if (cwd == null) {
-        const $state = useStateStore()
-        cwd = $state.paths?.project_path
-      }
-      return useApiFetch('/api/projects/appdata', { params: { cwd } })
-    },
+    return {
+        async fetchAppData(cwd?: string) {
+            if (cwd == null) {
+                const $state = useStateStore()
+                cwd = $state.paths?.project_path
+            }
+            return useApiFetch<ProjectAppData | undefined>('/api/projects/appdata', {params: {cwd}})
+        },
 
-    async fetchAppProfiles(id?: number) {
-      if (id == null) {
-        id = $state.project?.id
-      }
+        async fetchAppProfiles(id?: number): Promise<string[]> {
+            if (id == null) {
+                id = $state.project?.id
+            }
 
-      if (id == null) {
-        return []
-      }
+            if (id == null) {
+                return []
+            }
 
-      return useApiFetch<string[]>(`/api/projects/${id}/env_profiles`)
-    },
+            return useApiFetch<string[]>(`/api/projects/${id}/env_profiles`)
+        },
 
-    async fetchOsInfos() {
-      return useApiFetch('/api/os/infos')
-    },
+        async fetchFsFilesJava(cwd: string) {
+            return useApiFetch<string[]>('/api/fs/files/java', {query: {cwd}})
+        },
 
-    async fetchOsPathInfo(cwd: string = '/', root: string = '') {
-      return useApiFetch('/api/os/path/info', {
-        query: { path: cwd, root }
-      })
-    },
+        async fetchOsInfos() {
+            return useApiFetch<ServerInfos>('/api/os/infos')
+        },
 
-    async fetchProject(id: number) {
-      return useApiFetch(`/api/projects/${id}`)
-    },
+        async fetchOsPathInfo(cwd: string = '/', root: string = '') {
+            return useApiFetch<OsPathInfo>('/api/os/path/info', {
+                query: {path: cwd, root}
+            })
+        },
 
-    async fetchProjectPaths(cwd?: string) {
-      if (cwd == null) {
-        cwd = $state.project?.path
-      }
-      let { data: paths } = await useApiFetch<any>('/api/projects/paths', { query: { cwd } })
-      return paths
-    },
+        async fetchProject(id: number) {
+            return useApiFetch<ProjectAttributes>(`/api/projects/${id}`)
+        },
 
-    async fetchProjects() {
-      return useApiFetch<any[]>(`/api/projects`)
-    },
+        async fetchProjectJavaRootDir(id?: number) {
+            if (id == null) {
+                id = $state.project!!.id
+            }
 
-    async handleGenerateInit(data: any) {
-      return useApiFetch<any>('/api/generate/init', {
-        method: 'post',
-        body: {
-          ...data,
-          with_create: true
-        }
-      })
-    },
+            if (id == null) {
+                return
+            }
 
-    async handleGenerateController(data: any) {
-      return useApiFetch('/api/generate/controller', { method: 'post', body: data })
-    },
+            return await useApiFetch<string>(`/api/projects/${id}/rootdir`)
+        },
 
-    async handleProjectAppdataCreate(cwd?: string) {
-      if (cwd == null) {
-        const $state = useStateStore()
-        cwd = $state.paths?.project_path
-      }
-      return useApiFetch<any>('/api/projects/appdata', { method: 'post', body: { cwd } })
-    },
+        async fetchProjectPaths(cwd?: string) {
+            if (cwd == null) {
+                cwd = $state.project?.path
+            }
+            return useApiFetch<ProjectPaths>('/api/projects/paths', {query: {cwd}})
+        },
 
-    async handleProjectOpenInExplorer(cwd: string) {
-      return useApiFetch('/api/projects/open_in_exporer', { query: { cwd } })
-    },
+        async fetchProjects() {
+            return useApiFetch<ProjectAttributes[]>(`/api/projects`)
+        },
 
-    async handleProjectOpenInIntellijIdea(cwd: string) {
-      return useApiFetch('/api/projects/open_in_idea', { query: { cwd } })
-    },
+        async handleGenerateInit(data: any) {
+            return useApiFetch<ProjectAttributes>('/api/generate/init', {
+                method: 'post',
+                body: {
+                    ...data,
+                    with_create: true
+                }
+            })
+        },
 
-    async handleProjectCreate(data: any) {
-      return await useApiFetch<any>('/api/projects', {
-        method: 'post',
-        body: data
-      })
-    },
+        async handleGenerateController(data: any) {
+            return useApiFetch<void>('/api/generate/controller', {method: 'post', body: data})
+        },
 
-    async handleProjectPing(id?: number) {
-      const $state = useStateStore()
-      if (id == null) {
-        id = $state.project?.id
-      }
+        async handleProjectAppdataCreate(cwd?: string) {
+            if (cwd == null) {
+                const $state = useStateStore()
+                cwd = $state.paths?.project_path
+            }
+            return useApiFetch<ProjectAppData>('/api/projects/appdata', {method: 'post', body: {cwd}})
+        },
 
-      if (id == null) {
-        return false
-      }
+        async handleProjectOpenInExplorer(cwd: string) {
+            return useApiFetch<void>('/api/projects/open_in_exporer', {query: {cwd}})
+        },
 
-      $state.ping = await useApiFetch<boolean>(`/api/projects/${id}/ping`)
+        async handleProjectOpenInIntellijIdea(cwd: string) {
+            return useApiFetch<void>('/api/projects/open_in_idea', {query: {cwd}})
+        },
 
-      return $state.ping
-    },
+        async handleProjectCreate(data: any) {
+            return await useApiFetch<ProjectAttributes>('/api/projects', {
+                method: 'post',
+                body: data
+            })
+        },
 
-    async handleProjectRemove(id: number) {
-      return useApiFetch(`/api/projects/${id}`, { method: 'delete' })
-    },
+        async handleProjectPing(id?: number) {
+            const $state = useStateStore()
+            if (id == null) {
+                id = $state.project?.id
+            }
 
-    async handleProjetRun(cwd: string, options?: Partial<{ profile: string, timeout: number }>) {
-      options = Object.assign({}, { profile: 'default', timeout: 60 }, options)
+            if (id == null) {
+                return false
+            }
 
-      return new Promise(async (resolve, reject) => {
-        const $state = useStateStore()
-        await $state.fetchPing()
+            $state.ping = await useApiFetch<boolean>(`/api/projects/${id}/ping`)
 
-        await useApiFetch<any>('/api/projects/run', { query: { cwd, profile: options?.profile } })
-        let count = 0
-        while (count < options?.timeout! && !$state.ping) {
-          await $state.fetchPing()
-          if (!$state.ping) {
-            await promiseTimeout(2000)
-          }
-          count++
-        }
-        if (count >= options?.timeout!) {
-          return resolve(false)
-        }
-        return resolve(true)
-      })
-    },
+            return $state.ping
+        },
 
-    async handleProjectExit(id?: number) {
-      if (id == null) {
-        id = $state.project?.id
-      }
+        async handleProjectRemove(id: number) {
+            return useApiFetch<void>(`/api/projects/${id}`, {method: 'delete'})
+        },
 
-      if (id == null) {
-        return
-      }
+        async handleProjetRun(cwd: string, options?: Partial<{ profile: string, timeout: number }>) {
+            options = Object.assign({}, {profile: 'default', timeout: 60}, options)
 
-      const success = await useApiFetch<boolean>(`/api/projects/${id}/exit`)
+            return new Promise(async (resolve, reject) => {
+                const $state = useStateStore()
+                await $state.fetchPing()
 
-      if (success) {
-        $state.ping = false
-      }
+                await useApiFetch<any>('/api/projects/run', {query: {cwd, profile: options?.profile}})
+                let count = 0
+                while (count < options?.timeout! && !$state.ping) {
+                    await $state.fetchPing()
+                    if (!$state.ping) {
+                        await promiseTimeout(2000)
+                    }
+                    count++
+                }
+                if (count >= options?.timeout!) {
+                    return resolve(false)
+                }
+                return resolve(true)
+            })
+        },
 
-      return success
-    },
-  }
+        async handleProjectExit(id?: number) {
+            if (id == null) {
+                id = $state.project?.id
+            }
+
+            if (id == null) {
+                return
+            }
+
+            const success = await useApiFetch<boolean>(`/api/projects/${id}/exit`)
+
+            if (success) {
+                $state.ping = false
+            }
+
+            return success
+        },
+    }
 })
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useApiStore, import.meta.hot))
+    import.meta.hot.accept(acceptHMRUpdate(useApiStore, import.meta.hot))
 }
