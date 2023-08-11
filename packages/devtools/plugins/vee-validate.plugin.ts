@@ -1,7 +1,7 @@
-import {configure, defineRule} from "vee-validate";
+import { configure, defineRule } from 'vee-validate'
 import AllRules from '@vee-validate/rules'
-import fr from '@vee-validate/i18n/dist/locale/fr.json';
-import {localize, setLocale} from "@vee-validate/i18n";
+import fr from '@vee-validate/i18n/dist/locale/fr.json'
+import { localize, setLocale } from '@vee-validate/i18n'
 
 export default defineNuxtPlugin(nuxt => {
   Object.keys(AllRules).forEach(rule => {
@@ -14,10 +14,10 @@ export default defineNuxtPlugin(nuxt => {
     generateMessage: localize({
       fr,
     }),
-      bails: false,
-      validateOnModelUpdate: true
-  });
+    validateOnModelUpdate: true,
+    validateOnChange: true,
+    validateOnInput: true
+  })
 
   setLocale('fr')
-
 })

@@ -1,226 +1,242 @@
 <script lang="ts" setup>
-import {Dialog} from 'quasar'
-import {ProjectAttributes} from '@kraken/types'
-import {useEventBus} from '@vueuse/core'
-import {useStateStore} from '~/store/state'
-import {useApiStore} from '~/store/api'
-import AddProject from '~/components/dialogs/AddProject.vue'
+import VerticalSeparator from '~/components/VerticalSeparator.vue'
+import { FormContext } from '~/node_modules/vee-validate'
 
+interface FormAddProject {
+  path: string
+  name: string
+}
+
+interface FormLaunchApplication {
+  profile: string
+}
+
+const { isTabletOrMobile } = useMedia()
+const storage = useAppStorage()
+const toast = useToast()
+const confirm = useAppConfirm()
 const $state = useStateStore()
 const $api = useApiStore()
-const storage = useKrakenSessionStorage()
-const projectsBus = useEventBus('projects')
-const actionBus = useEventBus('server:action')
+const $bus = useAppBus()
+const $loader = useAppLoader()
 
-const drawer = ref(true)
-actionBus.on((message: any) => {
-  Notify.create({message})
+const validator = ref<FormContext>()
+
+const form_add_project = ref<Partial<FormAddProject>>({})
+const form_launch_application = ref<Partial<FormLaunchApplication>>({})
+
+const app_profiles = ref<string[]>([])
+
+const show = ref({
+  fileselector_project: false,
+  modal_add_project: false,
+  modal_launch_application: false
 })
 
-function toggleDrawer() {
-  drawer.value = !drawer.value
-}
+async function removeProjectFromList() {
+  confirm.confirm(
+    'Etes vous sûr(e) ?',
+    `Ceci n'entrainera pas la suppression physique du dossier du projet. Le projet n'apparaitra tout simplement plus dans la liste.`,
+    'Supprimer',
+    async () => {
+      await $api.handleProjectRemove($state.project?.id)
 
-async function openSelectedProjectFolder() {
-  await $api.handleOpenCurrentProjectDirectory($state.project?.path!)
-}
-
-async function openSelectedProjectIdea() {
-  await $api.handleOpenCurrentProjectInIntellij($state.project?.path!)
-}
-
-async function deleteSelectedProject() {
-  Dialog.create({
-    title: 'Confirmation',
-    message: 'Etes vous sûr de vouloir supprimer le projet ' + $state.project?.name + ' ?',
-    cancel: true,
-    persistent: true
-  }).onOk(async () => {
-    await useApiFetch(`/api/projects/${$state.project?.id}`, {
-      method: 'delete'
+      await navigateTo('/')
+      await $state.setProject(undefined)
+      $bus.projects.emit()
     })
+}
 
-    await navigateTo('/')
-    await $state.setProject(undefined)
-    projectsBus.emit()
+async function openInExplorer() {
+  await $api.handleProjectOpenInExplorer($state.project.path)
+}
 
+async function openInIntellijIdea() {
+  await $api.handleProjectOpenInIntellijIdea($state.project.path)
+}
+
+function showModalAddProject() {
+  form_add_project.value = {}
+  show.value.modal_add_project = true
+}
+
+async function showModalLaunchApplication() {
+  app_profiles.value = await $api.fetchAppProfiles()
+  show.value.modal_launch_application = true
+  form_launch_application.value.profile = app_profiles.value[0]
+}
+
+async function stopApplication() {
+  confirm.confirm('Etes vous sûr ?', `Confirmez vous la fermeture de l'instance de l'application ?`, `Fermer l'application`, async () => {
+    await $api.handleProjectExit()
   })
 }
 
-async function openDialogAddProject() {
+async function checkAddProjectSelected(path_info: any) {
+  const paths = await $api.fetchProjectPaths(path_info?.path)
 
-  Dialog.create({
-    component: AddProject
-  }).onOk(async payload => {
-    const project = await useApiFetch<ProjectAttributes>('/api/projects', {
-      method: 'post',
-      body: payload
+  if (paths != null) {
+    const project = $state.projects.find(it => it.path === paths.project_path)
+    if (project != null) {
+      toast.add({
+        color: 'red',
+        description: `Le projet a déjà été référence sous le nom ${project.name}`
+      })
+    } else {
+      form_add_project.value.name = path_info.label
+      return true
+    }
+  } else {
+    toast.add({
+      color: 'red',
+      title: '',
+      description: `Le dossier selectionné ne correspond pas à un projet Kraken valide`
     })
-
-    await $state.fetchProjects()
-
-    await $state.setProject(project.id)
-  })
-}
-
-async function onSelectProject(param_project: ProjectAttributes) {
-  storage.value.selection.project = param_project.id
-  await $state.setProject(param_project.id)
-  navigateTo('/')
-  await $state.getOrUpdateAppData()
-}
-
-projectsBus.on(async () => {
-  await $state.fetchProjects()
-  if ($state.project == null && ($state.projects != null && $state.projects.length > 0)) {
-    await $state.setProject($state.projects[0].id)
   }
-})
+  return false
+}
+
+async function submitAddProject() {
+  const project = await $api.handleProjectCreate(form_add_project.value)
+  $bus.projects.emit()
+  await $state.setProject(project?.id)
+  await navigateTo('/')
+
+  show.value.modal_add_project = false
+}
+
+async function submitLaunchApplication() {
+  try {
+    show.value.modal_launch_application = false
+    $loader.start({ description: `Lancement de l'application en cours ...` })
+    await $api.handleProjetRun($state.project?.path!, { profile: form_launch_application.value.profile })
+  } finally {
+    $loader.stop()
+  }
+}
+
+watch(
+  isTabletOrMobile,
+  (value) => {
+    if (value) {
+      $state.navigation = false
+    }
+  },
+  {
+    immediate: true
+  }
+)
+
+watch(
+  () => storage.value.selected_project,
+  async (value) => {
+    await $state.setProject(value)
+  },
+  { immediate: true })
+
+watchEffect(() => {
+  validator.value?.setFieldError('path', form_add_project.value?.path == null ? 'Le champ chemin du dossier est requis' : undefined)
+  }
+)
 </script>
 
 <template>
-  <suspense>
-    <template #fallback>
-      <div>Chargement ...</div>
-    </template>
+  <div class="flex flex-col h-full">
+    <Header></Header>
 
-    <ClientOnly>
-      <q-layout view="hHh Lpr lff">
-        <q-header elevated>
-          <q-toolbar>
-            <q-btn aria-label="Menu" dense flat icon="menu" round @click="toggleDrawer"/>
+    <Content>
+      <div class="flex flex-col w-full h-full">
+        <div class="p-2 flex gap-1.5 bg-primary-100">
+          <div class="w-64">
+            <USelectMenu v-model="storage.selected_project" :options="$state.projects" option-attribute="name" searchable searchable-placeholder="Rechercher un projet" value-attribute="id">
+              <template #label>
+                {{ $state.project?.name ?? 'Selectionner un projet' }}
+              </template>
+            </USelectMenu>
+          </div>
+          <UButton icon="i-ic-add" variant="ghost" @click="showModalAddProject"></UButton>
+          <template v-if="$state.project != null">
+            <UButton color="red" icon="i-mdi-trash" variant="ghost" @click="removeProjectFromList"></UButton>
+            <UButton color="orange" icon="i-ic-folder" variant="ghost" @click="openInExplorer"></UButton>
+            <UButton color="orange" variant="ghost" @click="openInIntellijIdea">
+              <img alt="idea_icon" class="w-5" src="/idea.png">
+            </UButton>
+            <VerticalSeparator class="bg-gray-400"/>
+            <UButton v-if="!$state.ping" color="green" icon="i-mdi-play" variant="ghost" @click="showModalLaunchApplication"/>
+            <UButton v-else color="red" icon="i-mdi-stop" variant="ghost" @click="stopApplication"/>
+          </template>
+        </div>
+        <div class="p-2 h-full overflow-auto">
+          <slot></slot>
+        </div>
+      </div>
+    </Content>
+  </div>
 
-            <q-toolbar-title>
-              Kraken UI
-            </q-toolbar-title>
-          </q-toolbar>
-        </q-header>
+  <UModal v-model="show.modal_add_project" prevent-close>
+    <VeeForm ref="validator" #default="{meta, errors}" :initial-values="form_add_project" validate-on-mount @submit="submitAddProject">
+      <UCard>
+        <template #header>
+          <div class="font-semibold">Ajout d'un projet</div>
+        </template>
 
-        <q-drawer v-model="drawer" bordered show-if-above>
-          <q-select :model-value="$state.project" :options="$state.projects" class="q-ma-md" dense filled label="Projet selectionné" option-label="name" options-dense stack-label @update:model-value="onSelectProject">
-            <template #no-option>
-              <q-item>
-                <q-item-section class="text-grey-7">Aucun projet</q-item-section>
-              </q-item>
-            </template>
-            <template v-slot:after>
-              <q-btn color="green" dense flat icon="add_circle" round @click="openDialogAddProject">
-                <q-tooltip>Ajouter un projet déjà existant</q-tooltip>
-              </q-btn>
-            </template>
-          </q-select>
+        <div class="space-y-4">
+          <UFormGroup :error="errors?.path!" label="Chemin du projet">
+            <div class="flex gap-1.5">
+              <UInput v-model="form_add_project.path" :ui="{wrapper: 'relative w-full'}" disabled/>
+              <UButton color="blue" icon="i-ic-search" variant="ghost" @click="show.fileselector_project = true"></UButton>
+            </div>
+          </UFormGroup>
 
-          <q-item v-if="$state.project != null" class="text-red-4" dense @click="deleteSelectedProject">
-            <q-item-section>
-              <q-btn-group flat spread>
-                <q-btn color="orange" dense flat icon="folder" @click="openSelectedProjectFolder">
-                  <q-tooltip>Ouvrir le dossier du projet</q-tooltip>
-                </q-btn>
-                <q-btn color="red" dense flat icon="remove_circle" @click="deleteSelectedProject">
-                  <q-tooltip>Supprimer le projet de la liste (pas de suppression sur le disque)</q-tooltip>
-                </q-btn>
-                <q-btn color="red" dense flat @click="openSelectedProjectIdea">
-                  <q-img src="/idea.png" width="2em"/>
-                  <q-tooltip>Ouvrir le projet dans Intellij Idea</q-tooltip>
-                </q-btn>
-              </q-btn-group>
-            </q-item-section>
-          </q-item>
+          <template v-if="isNotBlank(form_add_project.path!)">
+            <VeeField v-model="form_add_project.name" #default="{errorMessage, field}" as="" label="nom du projet" name="name" rules="required">
+              <UFormGroup :error="errorMessage!" label="Nom du projet">
+                <div class="flex gap-1.5">
+                  <UInput :ui="{wrapper: 'relative w-full'}" v-bind="field"/>
+                </div>
+              </UFormGroup>
+            </VeeField>
+          </template>
+        </div>
 
-          <q-list dense padding>
-            <q-item-label header>Général</q-item-label>
+        <template #footer>
+          <div class="flex justify-end gap-1.5">
+            <UButton @click="show.modal_add_project = false">Annuler</UButton>
+            <UButton :disabled="!meta.valid" type="submit">OK</UButton>
+          </div>
+        </template>
+      </UCard>
+    </VeeForm>
+  </UModal>
 
-            <template v-if="$state.project != null">
-              <q-item dense exact to="/">
-                <q-item-section avatar>
-                  <q-icon color="grey-6" name="space_dashboard"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Tableau de bord</q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
+  <UModal v-model="show.modal_launch_application">
+    <UCard>
+      <template #header>
+        <div class="font-semibold">Lancer l'application</div>
+      </template>
 
-            <q-item dense exact to="/generate/init">
-              <q-item-section avatar>
-                <q-icon color="grey-6" name="create_new_folder"/>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Créer un nouveau projet</q-item-label>
-              </q-item-section>
-            </q-item>
+      <UFormGroup label="Profil à utiliser" name="profile">
+        <URadio v-for="profile in app_profiles" :key="profile" v-model="form_launch_application.profile" :label="profile" :name="profile" :value="profile"/>
+      </UFormGroup>
 
-            <template v-if="$state.project != null">
+      <template #footer>
+        <div class="flex justify-end gap-1.5">
+          <UButton @click="show.modal_launch_application = false">Annuler</UButton>
+          <UButton @click="submitLaunchApplication">Lancer l'application</UButton>
+        </div>
+      </template>
+    </UCard>
+  </UModal>
 
-              <q-separator spaced/>
+  <FileSelector v-model="form_add_project.path" v-model:show="show.fileselector_project" :check="checkAddProjectSelected"
+                :default-dir="$state.os_infos?.home_dir" show-home></FileSelector>
 
-              <q-item-label header>Génération côté serveur</q-item-label>
+  <Teleport to="body">
+    <UNotifications/>
+    <OverlayLoaderBlockScreen/>
+    <ConfirmationModal/>
+  </Teleport>
 
-              <q-item dense exact to="/generate/controller">
-                <q-item-section avatar>
-                  <q-icon color="grey-6" name="api"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Controlleur</q-item-label>
-                </q-item-section>
-                <q-tooltip anchor="center right" self="center start">Génération d'un controlleur Rest et son service associé</q-tooltip>
-              </q-item>
-
-              <q-item dense exact to="/generate/ref">
-                <q-item-section avatar>
-                  <q-icon color="grey-6" name="view_list"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Referentiel</q-item-label>
-                </q-item-section>
-                <q-tooltip anchor="center right" self="center start">Permet de créer les classes de type referentiel</q-tooltip>
-              </q-item>
-
-              <q-item dense exact to="/generate/timer">
-                <q-item-section avatar>
-                  <q-icon color="grey-6" name="schedule"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Timer</q-item-label>
-                </q-item-section>
-                <q-tooltip anchor="center right" self="center start">Crée une classe de timer et le script SQL associé</q-tooltip>
-              </q-item>
-
-              <q-separator spaced/>
-
-              <q-item-label header>Génération côté web</q-item-label>
-
-              <q-item dense exact to="/generate/page">
-                <q-item-section avatar>
-                  <q-icon color="grey-6" name="article"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Page</q-item-label>
-                  <q-tooltip anchor="center right" self="center start">Génération d'une page .vue</q-tooltip>
-                </q-item-section>
-              </q-item>
-
-              <q-item dense exact to="/generate/store">
-                <q-item-section avatar>
-                  <q-icon color="grey-6" name="save"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Store</q-item-label>
-                  <q-tooltip anchor="center right" self="center start">Génération d'un store Nuxt</q-tooltip>
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-list>
-        </q-drawer>
-
-        <q-page-container>
-          <q-page padding>
-            <slot></slot>
-          </q-page>
-        </q-page-container>
-      </q-layout>
-    </ClientOnly>
-  </suspense>
 </template>
 
 <style scoped>

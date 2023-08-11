@@ -35,6 +35,11 @@
       <artifactId>security</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
+    <dependency>
+      <groupId>fr.intradef.cdadr.socle</groupId>
+      <artifactId>devtools</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
 
     <!--  Nécessaire pour la construction du WAR  -->
     <dependency>

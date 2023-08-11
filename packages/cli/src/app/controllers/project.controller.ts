@@ -44,7 +44,7 @@ export class ProjectController {
 
   @Get('run')
   runApplication(@Query('cwd') cwd: string, @Query('profile') profile: string) {
-    return this.shellCommandsProvider.runApplication(cwd, profile)
+    return this.projectProvider.runApplication(cwd, profile)
   }
 
   @Get(':id/exit')

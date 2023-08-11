@@ -1,0 +1,39 @@
+{
+  "name": "@kraken/devtools_old",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build && shx rm -rf ../cli/dist/www && shx mkdir -p ../cli/dist/www && shx cp -r .output/* ../cli/dist/www",
+    "dev": "nuxt prepare && nuxt dev --port=3001",
+    "generate": "nuxt generate && rm -rf ../cli/dist/www && shx mkdir -p ../cli/dist/www && shx mv .output/public/* ../cli/dist/www",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.4.11",
+    "@quasar/extras": "^1.16.4",
+    "@vee-validate/i18n": "^4.10.3",
+    "@vee-validate/nuxt": "^4.10.3",
+    "@vee-validate/rules": "^4.10.3",
+    "clipboard": "^2.0.11",
+    "lodash": "^4.17.21",
+    "pinia": "^2.1.4",
+    "pluralize": "^8.0.0",
+    "prismjs": "^1.29.0",
+    "quasar": "^2.12.2",
+    "sass": "^1.63.6",
+    "socket.io-client": "^4.7.1",
+    "stringcase": "^4.3.1",
+    "vee-validate": "^4.10.3"
+  },
+  "devDependencies": {
+    "@kraken/types": "workspace:*",
+    "@types/lodash": "^4.14.195",
+    "@types/node": "^18.16.19",
+    "@types/prismjs": "^1.26.0",
+    "@vueuse/core": "^10.2.1",
+    "@vueuse/nuxt": "^10.2.1",
+    "nuxt": "^3.6.1",
+    "nuxt-quasar-ui": "^1.7.4",
+    "shx": "^0.3.4"
+  }
+}

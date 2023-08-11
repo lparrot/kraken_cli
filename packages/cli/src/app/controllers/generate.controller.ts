@@ -26,10 +26,13 @@ export class GenerateController {
     }
 
     if (body.with_create) {
-      return Project.create({
+      const project = Project.create({
         name: body.name,
         path: project_path
       })
+      await project.save()
+
+      return project
     }
 
     return body

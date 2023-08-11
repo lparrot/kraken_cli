@@ -1,15 +1,14 @@
-import {Inject, Injectable} from "@nestjs/common";
-import * as path from "path";
-import {globSync} from "glob";
-import {ProjectAppData, ProjectPaths} from "@kraken/types";
-import * as fs from "fs-extra";
-import {HttpService} from "@nestjs/axios";
-import axios from "axios";
-import {InjectorProvider} from "src/services/injector.provider";
-import {AppProvider} from "src/app/app.provider";
-
-const terminate = require('terminate')
-const shell = require('shelljs')
+import { Inject, Injectable } from '@nestjs/common'
+import * as path from 'path'
+import { globSync } from 'glob'
+import { ProjectAppData, ProjectPaths } from '@kraken/types'
+import * as fs from 'fs-extra'
+import { HttpService } from '@nestjs/axios'
+import axios from 'axios'
+import { InjectorProvider } from 'src/services/injector.provider'
+import { AppProvider } from 'src/app/app.provider'
+import child_process from 'child_process'
+import { WebsocketProvider } from 'src/app/websocket.provider'
 
 const BASE_SEARCH_PATH = 'web/nuxt.config.js'
 const SERVER_ROOT_PATH = 'server'
@@ -18,15 +17,21 @@ const SERVER_RESOURCES_PATH = SERVER_ROOT_PATH + '/src/main/resources'
 const WEB_ROOT_PATH = 'web'
 const WEB_PAGES_PATH = WEB_ROOT_PATH + '/pages'
 
+const terminate = require('terminate')
+const Convert = require('ansi-to-html')
+const shell = require('shelljs')
+
 @Injectable()
 export class ProjectProvider {
 
   @Inject(HttpService) http: HttpService;
 
   appProvider: AppProvider;
+  websocketProvider?: WebsocketProvider
 
   constructor(injector: InjectorProvider) {
     this.appProvider = injector.getProvider(AppProvider)
+    this.websocketProvider = injector.getProvider(WebsocketProvider)
   }
 
   getProjectPaths(cwd?: string) {
@@ -138,6 +143,34 @@ export class ProjectProvider {
       return res.data.data
     } catch (err) {
       return false
+    }
+  }
+
+  async runApplication(cwd: string, profile = 'default', check = false) {
+    this.appProvider?.clearLogs()
+
+    if (!check || (shell.which('mvn') != null && shell.which('npm') != null)) {
+      const paths = this.getProjectPaths(cwd)
+
+      const mvn = child_process.spawn(`mvn clean spring-boot:run -q -Dspring-boot.run.arguments="--spring.output.ansi.enabled=always --spring.profiles.active=${profile}"`, { cwd: paths?.server_root_path, shell: true })
+      const npm = child_process.spawn('npm run dev', { cwd: paths?.web_root_path, shell: true })
+
+      mvn.stdout.setEncoding('latin1')
+      npm.stdout.setEncoding('latin1')
+
+      this.appProvider?.addThread('mvn', mvn)
+      this.appProvider?.addThread('npm', npm)
+
+      if (this.websocketProvider != null) {
+        const convert = new Convert({ fg: '#000' })
+        mvn.stdout.on('data', data => {
+          this.appProvider?.addLog(convert.toHtml(data.toString()))
+        })
+
+        npm.stdout.on('data', data => {
+          this.appProvider?.addLog(convert.toHtml(data.toString()))
+        })
+      }
     }
   }
 

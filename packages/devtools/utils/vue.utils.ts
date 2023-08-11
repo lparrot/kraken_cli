@@ -1,22 +1,13 @@
-import {ComponentInternalInstance} from 'vue'
-import {FormContext} from "vee-validate";
+import { FormContext } from 'vee-validate'
 
-export function getParentComponentIfExists(instance: ComponentInternalInstance, name: string) {
-    let component = null
+export async function validateFields(form: FormContext | undefined, fields: string[]) {
+  if (form == null) {
+    return false
+  }
 
-    while (component == null && instance != null) {
-        if (instance.parent?.proxy?.$options.name === name) {
-            component = instance.parent?.proxy
-        }
+  await nextTick(async () => {
+    for await (let field of fields) {
+      await form.validateField(field, { mode: 'silent', warn: false })
     }
-
-    return component
-}
-
-export async function validateFields(form: FormContext, fields: string[]) {
-    await nextTick(async () => {
-        for await (let field of fields) {
-            await form.validateField(field)
-        }
-    })
+  })
 }
