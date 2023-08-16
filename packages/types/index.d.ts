@@ -27,10 +27,28 @@ export interface TemplateInitOptions {
   with_create: boolean
 }
 
+export interface PostFsDirBody {
+    cwd: string
+    name: string
+}
+
 export interface PostGenerateControllerBody {
   cwd: string
   name: string
   url: string
+}
+
+export interface PostGenerateReferentielBody {
+    cwd: string
+    template: string
+    entity_name: string
+    url: string
+    id_type: string
+    dao_name: string
+    fields: any[]
+    with_page: boolean
+    page_name?: string
+    page_title?: string
 }
 
 export interface ServerInfos {

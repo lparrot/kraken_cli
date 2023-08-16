@@ -1,19 +1,19 @@
 <script lang="ts" setup>
 import sortBy from 'lodash/sortBy'
-import {ProjectAppDataEntity} from "@kraken/types";
-import stringcase, {sentencecase, snakecase} from "stringcase";
+import {ProjectAppDataAttribute, ProjectAppDataDao, ProjectAppDataEntity} from '@kraken/types'
+import stringcase, {sentencecase, snakecase} from 'stringcase'
 import pluralize from 'pluralize'
-import {convertPathToPackage} from "~/utils/java.utils";
-import deburr from "lodash/deburr";
+import {convertPathToPackage} from '~/utils/java.utils'
+import deburr from 'lodash/deburr'
 
 interface Form {
   cwd: string
-  dao: any
-  entity: any
+  dao: ProjectAppDataDao
+  entity: ProjectAppDataEntity
   id_type: string
   template: string
   url: string
-  fields: any[],
+  fields: ProjectAppDataAttribute[],
   with_page: boolean
   page_name?: string
   page_title?: string
@@ -28,8 +28,8 @@ const $state = useStateStore()
 
 const templateOptions = [{label: 'Consultation', value: 'simple'}, {label: 'Consultation/Modification', value: 'crud'}]
 
-let entity_files: any[] = []
-let dao_files: any[] = []
+let entity_files: any[]
+let dao_files: any[]
 
 if ($state.appdata?.entities != null) {
   entity_files = $state.appdata.entities
@@ -49,10 +49,15 @@ const defaultSelectedPackage = await $api.fetchProjectJavaRootDir()
 
 const selected_package = computed(() => convertPathToPackage(form.value.cwd!))
 
-const selected_entity_attributes_options = computed(() => sortBy(form.value.entity.attributes?.filter((it: any) => it.id == null).map((att: any) => ({label: att.name, value: {...att, persistent_type_data: getPersistentTypeData(att.persistent_type)}})), [o => o.value.persistent_type != null]))
+const selected_template = computed(() => {
+  return templateOptions.find(it => it.value === form.value.template)
+})
+
+const selected_entity_attributes_options = computed(() => sortBy(form.value.entity?.attributes?.filter(it => it.id == null).map(att => ({...att, persistent_type_data: getPersistentTypeData(att?.persistent_type!)})), [o => o.persistent_type != null]))
 
 function init() {
   form.value = {
+    template: 'simple',
     url: '/api/referentiels/',
     id_type: 'Long',
     fields: [],
@@ -69,7 +74,9 @@ function onSelectEntity(entity: ProjectAppDataEntity) {
 }
 
 async function submit() {
+  const {dao, entity, ...data} = form.value
 
+  await $api.handleGenerateReferentiel({...data, entity_name: entity?.file_path, dao_name: dao?.file_path})
 }
 
 init()
@@ -95,42 +102,26 @@ init()
 
         <hr/>
 
-        <VeeField v-model="form.entity" #default="{errorMessage, field}" label="classe de l'entité" name="entity"
-                  rules="required" validate-on-mount>
-          <UFormGroup :error="errorMessage" label="Classe de l'entité">
-            <USelectMenu :model-value="form.entity" :options="entity_files" :search-attributes="['name', 'type']" searchable
-                         searchable-placeholder="Rechercher..."
-                         v-bind="field" @update:model-value="onSelectEntity">
-              <template #label>
-                <div v-if="form.entity == null">Aucun élément selectionné</div>
-                <div v-else class="flex w-full items-center justify-between">
-                  <div>{{ form.entity?.name }}</div>
-                  <div class="text-xs text-gray-500">{{ form.entity?.type }}</div>
-                </div>
-              </template>
+        <USelectMenu v-model="form.template" :options="templateOptions" option-attribute="label"
+                     value-attribute="value">
+          <template #label>
+            <span>{{ selected_template?.label }}</span>
+          </template>
+        </USelectMenu>
 
-              <template #option="{option}">
-                <div class="flex w-full items-center justify-between">
-                  <div>{{ option.name }}</div>
-                  <div class="text-xs text-gray-500">{{ option.type }}</div>
-                </div>
-              </template>
-            </USelectMenu>
-          </UFormGroup>
-        </VeeField>
-
-        <template v-if="form.entity">
-          <VeeField v-model="form.dao" #default="{errorMessage, field}" label="dao liée à l'entité" name="dao"
+        <template v-if="form.template != null">
+          <VeeField v-model="form.entity" #default="{errorMessage, field}" label="classe de l'entité" name="entity"
                     rules="required" validate-on-mount>
-            <UFormGroup :error="errorMessage" label="Dao liée à l'entité">
-              <USelectMenu :model-value="form.dao" :options="dao_files" :search-attributes="['name', 'type']" searchable
+            <UFormGroup :error="errorMessage" label="Classe de l'entité">
+              <USelectMenu :model-value="form.entity" :options="entity_files" :search-attributes="['name', 'type']"
+                           searchable
                            searchable-placeholder="Rechercher..."
-                           v-bind="field">
+                           v-bind="field" @update:model-value="onSelectEntity">
                 <template #label>
-                  <div v-if="form.dao == null">Aucun élément selectionné</div>
+                  <div v-if="form.entity == null">Aucun élément selectionné</div>
                   <div v-else class="flex w-full items-center justify-between">
-                    <div>{{ form.dao?.name }}</div>
-                    <div class="text-xs text-gray-500">{{ form.dao?.type }}</div>
+                    <div>{{ form.entity?.name }}</div>
+                    <div class="text-xs text-gray-500">{{ form.entity?.type }}</div>
                   </div>
                 </template>
 
@@ -144,64 +135,103 @@ init()
             </UFormGroup>
           </VeeField>
 
-          <VeeField v-model="form.url" #default="{errorMessage, field}" label="url" name="url" rules="required">
-            <UFormGroup :error="errorMessage" label="Url du webservice">
-              <UInput :model-value="form.url" v-bind="field"
-                      @update:model-value="form.url = deburr(stringcase.pathcase($event))"/>
-            </UFormGroup>
-          </VeeField>
+          <template v-if="form.entity">
+            <VeeField v-model="form.dao" #default="{errorMessage, field}" label="dao liée à l'entité" name="dao"
+                      rules="required" validate-on-mount>
+              <UFormGroup :error="errorMessage" label="Dao liée à l'entité">
+                <USelectMenu :model-value="form.dao" :options="dao_files" :search-attributes="['name', 'type']"
+                             searchable
+                             searchable-placeholder="Rechercher..."
+                             v-bind="field">
+                  <template #label>
+                    <div v-if="form.dao == null">Aucun élément selectionné</div>
+                    <div v-else class="flex w-full items-center justify-between">
+                      <div>{{ form.dao?.name }}</div>
+                      <div class="text-xs text-gray-500">{{ form.dao?.type }}</div>
+                    </div>
+                  </template>
 
-          <VeeField v-model="form.id_type" #default="{errorMessage, field}" label="type de propriété @Id"
-                    name="id_type" rules="required">
-            <UFormGroup :error="errorMessage" label="Type de la propriété @Id">
-              <UInput :model-value="form.id_type" v-bind="field"/>
-            </UFormGroup>
-          </VeeField>
+                  <template #option="{option}">
+                    <div class="flex w-full items-center justify-between">
+                      <div>{{ option.name }}</div>
+                      <div class="text-xs text-gray-500">{{ option.type }}</div>
+                    </div>
+                  </template>
+                </USelectMenu>
+              </UFormGroup>
+            </VeeField>
 
-          <div class="flex items-center gap-1.5">
-            <UToggle id="with_page" v-model="form.with_page"/>
-            <label class="text-sm font-medium text-gray-700 dark:text-gray-200" for="with_page">Créer une page contenant
-              la vue
-              du référentiel</label>
-          </div>
+            <VeeField v-model="form.url" #default="{errorMessage, field}" label="url" name="url" rules="required">
+              <UFormGroup :error="errorMessage" label="Url du webservice">
+                <UInput :model-value="form.url" v-bind="field"
+                        @update:model-value="form.url = deburr(stringcase.pathcase($event))"/>
+              </UFormGroup>
+            </VeeField>
 
-          <template v-if="form.with_page">
+            <VeeField v-model="form.id_type" #default="{errorMessage, field}" label="type de propriété @Id"
+                      name="id_type" rules="required">
+              <UFormGroup :error="errorMessage" label="Type de la propriété @Id">
+                <UInput :model-value="form.id_type" v-bind="field"/>
+              </UFormGroup>
+            </VeeField>
+
+            <div class="flex items-center gap-1.5">
+              <UToggle id="with_page" v-model="form.with_page"/>
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-200" for="with_page">Créer une page
+                contenant
+                la vue
+                du référentiel</label>
+            </div>
+
+            <template v-if="form.with_page">
+              <UCard>
+                <VeeField v-model="form.page_name" #default="{errorMessage, field}" label="chemin de la page"
+                          name="page_name"
+                          rules="required">
+                  <UFormGroup :error="errorMessage" label="Chemin de la page (sans extension .vue)">
+                    <UInput :model-value="form.page_name" v-bind="field"/>
+                  </UFormGroup>
+                </VeeField>
+
+                <VeeField v-model="form.page_title" #default="{errorMessage, field}" label="titre de la pag"
+                          name="page_title"
+                          rules="required">
+                  <UFormGroup :error="errorMessage" label="Titre de la page">
+                    <UInput :model-value="form.page_title" v-bind="field"/>
+                  </UFormGroup>
+                </VeeField>
+              </UCard>
+            </template>
+
             <UCard>
-              <VeeField v-model="form.page_name" #default="{errorMessage, field}" label="chemin de la page" name="page_name"
-                        rules="required">
-                <UFormGroup :error="errorMessage" label="Chemin de la page (sans extension .vue)">
-                  <UInput :model-value="form.page_name" v-bind="field"/>
-                </UFormGroup>
-              </VeeField>
+              <div class="text-gray-600 font-semibold underline">Ajouter des champs:</div>
 
-              <VeeField v-model="form.page_title" #default="{errorMessage, field}" label="titre de la pag" name="page_title"
-                        rules="required">
-                <UFormGroup :error="errorMessage" label="Titre de la page">
-                  <UInput :model-value="form.page_title" v-bind="field"/>
-                </UFormGroup>
-              </VeeField>
+              <template v-for="(attribute, attributeIndex) in selected_entity_attributes_options">
+                <div class="flex items-baseline gap-1.5 space-y-1">
+                  <UCheckbox :id="`attribute-${attributeIndex}`" v-model="form.fields"
+                             :value="attribute.name"></UCheckbox>
+                  <label :for="`attribute-${attributeIndex}`" class="flex items-end gap-1.5">
+                    <span class="w-[16px]">
+                      <UIcon v-if="attribute.persistent_type != null"
+                             :name="attribute.persistent_type_data!!.icon"></UIcon>
+                    </span>
+                    <span>{{ attribute.name }}</span>
+                    <span class="text-sm font-thin text-orange-500">
+                      <span>{{ attribute.type_simple }}</span>
+                      <span v-if="attribute.collection">&lt {{ attribute.bind_type_simple }} &gt</span>
+                      <span v-if="attribute.persistent_type != null">(@{{
+                          attribute.persistent_type_data!!.assoc_name
+                        }})</span>
+                  </span>
+                  </label>
+                </div>
+              </template>
             </UCard>
+
+            <UButton block type="submit">
+              Créer le référentiel
+            </UButton>
           </template>
-
-          <UCard>
-            <div class="text-gray-600 font-semibold underline">Ajouter des champs:</div>
-
-            <!--            <UCheckbox v-model="form.fields" v-for="value in selected_entity_attributes_options">-->
-            <!--              <template #label="{value}">-->
-            <!--                <div class="row items-baseline q-gutter-sm">-->
-            <!--                  <div style="width: 16px">-->
-            <!--                    <q-icon v-if="value['persistent_type']" :name="value['persistent_type_data'].icon"></q-icon>-->
-            <!--                  </div>-->
-            <!--                  <div>{{ value['name'] }}</div>-->
-            <!--                  <div class="text-caption text-orange-5">{{ value['type_simple'] }}<span v-if="value['collection']">&lt{{-->
-            <!--                      value['bind_type_simple']-->
-            <!--                    }}&gt</span> <span-->
-            <!--                      v-if="value['persistent_type'] != null">(@{{ value['persistent_type_data'].assoc_name }})</span>-->
-            <!--                  </div>-->
-            <!--                </div>-->
-            <!--              </template>-->
-            <!--            </UCheckbox>-->
-          </UCard>
         </template>
 
       </template>

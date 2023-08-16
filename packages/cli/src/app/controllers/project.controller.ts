@@ -44,6 +44,19 @@ export class ProjectController {
         return res.send(await this.projectProvider.stopApplication(project.path))
     }
 
+    @Get(':id/compile')
+    async compileApplication(@Param('id') id: number) {
+        const project = await Project.findOneBy({id})
+
+        if (project == null) {
+            throw new HttpException('Projet introuvable', HttpStatus.NOT_FOUND)
+        }
+
+        const projectPaths = this.projectProvider.getProjectPaths(project.path);
+
+        await this.shellCommandsProvider.executeCommand('mvn compile', projectPaths.server_root_path)
+    }
+
     @Get(':id/rootdir')
     async getProjectRootdir(@Param('id') id: number) {
         const project = await Project.findOneBy({id})

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import VerticalSeparator from '~/components/VerticalSeparator.vue'
 import {FormContext} from '~/node_modules/vee-validate'
+import {OsPathInfo} from "@kraken/types";
 
 interface FormAddProject {
   path: string
@@ -11,7 +12,7 @@ interface FormLaunchApplication {
   profile: string
 }
 
-const { isTabletOrMobile } = useMedia()
+const {isTabletOrMobile} = useMedia()
 const storage = useAppStorage()
 const toast = useToast()
 const confirm = useAppConfirm()
@@ -34,17 +35,18 @@ const show = ref({
 })
 
 async function removeProjectFromList() {
-  confirm.confirm(
-    'Etes vous sûr(e) ?',
-    `Ceci n'entrainera pas la suppression physique du dossier du projet. Le projet n'apparaitra tout simplement plus dans la liste.`,
-    'Supprimer',
-    async () => {
+  confirm.confirm({
+    title: 'Etes vous sûr(e) ?',
+    message: `Ceci n'entrainera pas la suppression physique du dossier du projet. Le projet n'apparaitra tout simplement plus dans la liste.`,
+    label: 'Supprimer',
+    action: async () => {
       await $api.handleProjectRemove($state.project!!.id)
 
       await navigateTo('/')
       await $state.setProject(undefined)
       $bus.projects.emit()
-    })
+    }
+  })
 }
 
 async function openInExplorer() {
@@ -67,12 +69,26 @@ async function showModalLaunchApplication() {
 }
 
 async function stopApplication() {
-  confirm.confirm('Etes vous sûr ?', `Confirmez vous la fermeture de l'instance de l'application ?`, `Fermer l'application`, async () => {
-    await $api.handleProjectExit()
+  confirm.confirm({
+    title: 'Etes vous sûr ?',
+    message: `Confirmez vous la fermeture de l'instance de l'application ?`,
+    label: `Fermer l'application`,
+    action: async () => {
+      await $api.handleProjectExit()
+    }
   })
 }
 
-async function checkAddProjectSelected(path_info: any) {
+async function compileApplication() {
+  $loader.start()
+  try {
+    await $api.handleProjectCompile()
+  } finally {
+    $loader.stop()
+  }
+}
+
+async function checkAddProjectSelected(path_info: OsPathInfo) {
   const paths = await $api.fetchProjectPaths(path_info?.path)
 
   if (paths != null) {
@@ -108,28 +124,28 @@ async function submitAddProject() {
 async function submitLaunchApplication() {
   try {
     show.value.modal_launch_application = false
-    $loader.start({ description: `Lancement de l'application en cours ...` })
-    await $api.handleProjetRun($state.project?.path!, { profile: form_launch_application.value.profile })
+    $loader.start({description: `Lancement de l'application en cours ...`})
+    await $api.handleProjetRun($state.project?.path!, {profile: form_launch_application.value.profile})
   } finally {
     $loader.stop()
   }
 }
 
 watch(
-  isTabletOrMobile,
-  (value) => {
-    if (value) {
-      $state.navigation = false
+    isTabletOrMobile,
+    (value) => {
+      if (value) {
+        $state.navigation = false
+      }
+    },
+    {
+      immediate: true
     }
-  },
-  {
-    immediate: true
-  }
 )
 
 watchEffect(() => {
-  validator.value?.setFieldError('path', form_add_project.value?.path == null ? 'Le champ chemin du dossier est requis' : undefined)
-  }
+      validator.value?.setFieldError('path', form_add_project.value?.path == null ? 'Le champ chemin du dossier est requis' : undefined)
+    }
 )
 </script>
 
@@ -141,7 +157,8 @@ watchEffect(() => {
       <div class="flex flex-col w-full h-full">
         <div class="p-2 flex gap-1.5 bg-primary-100">
           <div class="w-64">
-            <USelectMenu v-model="storage.selected_project" :options="$state.projects" option-attribute="name" searchable searchable-placeholder="Rechercher un projet" value-attribute="id">
+            <USelectMenu v-model="storage.selected_project" :options="$state.projects" option-attribute="name"
+                         searchable searchable-placeholder="Rechercher un projet" value-attribute="id">
               <template #label>
                 {{ $state.project?.name ?? 'Selectionner un projet' }}
               </template>
@@ -155,7 +172,9 @@ watchEffect(() => {
               <img alt="idea_icon" class="w-5" src="/idea.png">
             </UButton>
             <VerticalSeparator class="bg-gray-400"/>
-            <UButton v-if="!$state.ping" color="green" icon="i-mdi-play" variant="ghost" @click="showModalLaunchApplication"/>
+            <UButton icon="i-mdi-refresh" variant="ghost" @click="compileApplication"/>
+            <UButton v-if="!$state.ping" color="green" icon="i-mdi-play" variant="ghost"
+                     @click="showModalLaunchApplication"/>
             <UButton v-else color="red" icon="i-mdi-stop" variant="ghost" @click="stopApplication"/>
           </template>
         </div>
@@ -167,7 +186,8 @@ watchEffect(() => {
   </div>
 
   <UModal v-model="show.modal_add_project" prevent-close>
-    <VeeForm ref="validator" #default="{meta, errors}" :initial-values="form_add_project" validate-on-mount @submit="submitAddProject">
+    <VeeForm ref="validator" #default="{meta, errors}" :initial-values="form_add_project" validate-on-mount
+             @submit="submitAddProject">
       <UCard>
         <template #header>
           <div class="font-semibold">Ajout d'un projet</div>
@@ -177,12 +197,14 @@ watchEffect(() => {
           <UFormGroup :error="errors?.path!" label="Chemin du projet">
             <div class="flex gap-1.5">
               <UInput v-model="form_add_project.path" :ui="{wrapper: 'relative w-full'}" disabled/>
-              <UButton color="blue" icon="i-ic-search" variant="ghost" @click="show.fileselector_project = true"></UButton>
+              <UButton color="blue" icon="i-ic-search" variant="ghost"
+                       @click="show.fileselector_project = true"></UButton>
             </div>
           </UFormGroup>
 
           <template v-if="isNotBlank(form_add_project.path!)">
-            <VeeField v-model="form_add_project.name" #default="{errorMessage, field}" as="" label="nom du projet" name="name" rules="required">
+            <VeeField v-model="form_add_project.name" #default="{errorMessage, field}" as="" label="nom du projet"
+                      name="name" rules="required">
               <UFormGroup :error="errorMessage!" label="Nom du projet">
                 <div class="flex gap-1.5">
                   <UInput :ui="{wrapper: 'relative w-full'}" v-bind="field"/>
@@ -209,7 +231,8 @@ watchEffect(() => {
       </template>
 
       <UFormGroup label="Profil à utiliser" name="profile">
-        <URadio v-for="profile in app_profiles" :key="profile" v-model="form_launch_application.profile" :label="profile" :name="profile" :value="profile"/>
+        <URadio v-for="profile in app_profiles" :key="profile" v-model="form_launch_application.profile"
+                :label="profile" :name="profile" :value="profile"/>
       </UFormGroup>
 
       <template #footer>
@@ -221,14 +244,16 @@ watchEffect(() => {
     </UCard>
   </UModal>
 
-  <FileSelector v-model="form_add_project.path" v-model:show="show.fileselector_project" :check="checkAddProjectSelected"
+  <FileSelector v-model="form_add_project.path" v-model:show="show.fileselector_project"
+                :check="checkAddProjectSelected"
                 :default-dir="$state.os_infos?.home_dir" show-home></FileSelector>
 
   <Teleport to="body">
     <UNotifications/>
     <OverlayLoaderBlockScreen/>
-    <ConfirmationModal/>
   </Teleport>
+
+  <ConfirmationModal/>
 
 </template>
 

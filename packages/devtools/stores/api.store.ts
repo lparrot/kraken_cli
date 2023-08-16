@@ -1,6 +1,15 @@
 import {useStateStore} from '~/stores/state.store'
 import {promiseTimeout} from '@vueuse/core'
-import {OsPathInfo, ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from "@kraken/types";
+import {
+    OsPathInfo,
+    PostFsDirBody,
+    PostGenerateControllerBody,
+    PostGenerateReferentielBody,
+    ProjectAppData,
+    ProjectAttributes,
+    ProjectPaths,
+    ServerInfos
+} from "@kraken/types";
 
 export const useApiStore = defineStore('api', () => {
     const $state = useStateStore()
@@ -67,6 +76,14 @@ export const useApiStore = defineStore('api', () => {
             return useApiFetch<ProjectAttributes[]>(`/api/projects`)
         },
 
+        async handleFsCreateDir(data: Partial<PostFsDirBody>) {
+            return useApiFetch<void>('/api/fs/dir', {method: 'post', body: data})
+        },
+
+        async handleGenerateController(data: Partial<PostGenerateControllerBody>) {
+            return useApiFetch<void>('/api/generate/controller', {method: 'post', body: data})
+        },
+
         async handleGenerateInit(data: any) {
             return useApiFetch<ProjectAttributes>('/api/generate/init', {
                 method: 'post',
@@ -77,8 +94,8 @@ export const useApiStore = defineStore('api', () => {
             })
         },
 
-        async handleGenerateController(data: any) {
-            return useApiFetch<void>('/api/generate/controller', {method: 'post', body: data})
+        async handleGenerateReferentiel(data: Partial<PostGenerateReferentielBody>) {
+            return useApiFetch<void>('/api/generate/referentiel', {method: 'post', body: data})
         },
 
         async handleProjectAppdataCreate(cwd?: string) {
@@ -89,12 +106,16 @@ export const useApiStore = defineStore('api', () => {
             return useApiFetch<ProjectAppData>('/api/projects/appdata', {method: 'post', body: {cwd}})
         },
 
-        async handleProjectOpenInExplorer(cwd: string) {
-            return useApiFetch<void>('/api/projects/open_in_exporer', {query: {cwd}})
-        },
+        async handleProjectCompile(id?: number) {
+            if (id == null) {
+                id = $state.project!!.id
+            }
 
-        async handleProjectOpenInIntellijIdea(cwd: string) {
-            return useApiFetch<void>('/api/projects/open_in_idea', {query: {cwd}})
+            if (id == null) {
+                return
+            }
+
+            await useApiFetch(`/api/projects/${$state.project?.id}/compile`)
         },
 
         async handleProjectCreate(data: any) {
@@ -102,6 +123,14 @@ export const useApiStore = defineStore('api', () => {
                 method: 'post',
                 body: data
             })
+        },
+
+        async handleProjectOpenInExplorer(cwd: string) {
+            return useApiFetch<void>('/api/projects/open_in_exporer', {query: {cwd}})
+        },
+
+        async handleProjectOpenInIntellijIdea(cwd: string) {
+            return useApiFetch<void>('/api/projects/open_in_idea', {query: {cwd}})
         },
 
         async handleProjectPing(id?: number) {

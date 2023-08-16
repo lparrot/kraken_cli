@@ -12,7 +12,8 @@ const title = ref()
 const description = ref(defaults.DESCRIPTION)
 
 export function useAppLoader() {
-  function start(options: Partial<LoaderOptions>) {
+    function start(options?: Partial<LoaderOptions>) {
+        options = Object.assign({}, options)
     show.value = true
     title.value = options.title
     description.value = options.description ?? defaults.DESCRIPTION
