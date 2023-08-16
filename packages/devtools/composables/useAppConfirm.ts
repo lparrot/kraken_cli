@@ -43,8 +43,6 @@ export const useAppConfirm = () => {
         }
         params.value = Object.assign({}, defaultOptions, _params)
 
-        console.log(params.value)
-
         confirming.value = true
     }
 

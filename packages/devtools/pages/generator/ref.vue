@@ -25,6 +25,7 @@ definePageMeta({
 
 const $api = useApiStore()
 const $state = useStateStore()
+const $loader = useAppLoader()
 
 const templateOptions = [{label: 'Consultation', value: 'simple'}, {label: 'Consultation/Modification', value: 'crud'}]
 
@@ -76,7 +77,14 @@ function onSelectEntity(entity: ProjectAppDataEntity) {
 async function submit() {
   const {dao, entity, ...data} = form.value
 
-  await $api.handleGenerateReferentiel({...data, entity_name: entity?.file_path, dao_name: dao?.file_path})
+  try {
+    $loader.start({description: 'Création du référentiel en cours'})
+    await $api.handleGenerateReferentiel({...data, entity_name: entity?.file_path, dao_name: dao?.file_path})
+
+    await $api.handleProjectCompile()
+  } finally {
+    $loader.stop()
+  }
 }
 
 init()
@@ -209,7 +217,7 @@ init()
               <template v-for="(attribute, attributeIndex) in selected_entity_attributes_options">
                 <div class="flex items-baseline gap-1.5 space-y-1">
                   <UCheckbox :id="`attribute-${attributeIndex}`" v-model="form.fields"
-                             :value="attribute.name"></UCheckbox>
+                             :value="attribute"></UCheckbox>
                   <label :for="`attribute-${attributeIndex}`" class="flex items-end gap-1.5">
                     <span class="w-[16px]">
                       <UIcon v-if="attribute.persistent_type != null"

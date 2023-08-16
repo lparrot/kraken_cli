@@ -2,10 +2,11 @@ import {Inject, Injectable} from '@nestjs/common'
 import {ProjectProvider} from './project.provider'
 import {TemplateProvider} from './template.provider'
 import {TemplateInitOptions} from '../../../cli_old/types'
-import {dotcase, lowercase, pascalcase, pathcase, snakecase} from 'stringcase'
+import {dotcase, lowercase, pascalcase, pathcase, sentencecase, snakecase} from 'stringcase'
 import * as path from 'path'
 import {ShellCommandsProvider} from 'src/services/shell-commands.provider'
 import {PostGenerateControllerBody, PostGenerateReferentielBody, ProjectPaths} from '@kraken/types'
+import {kebabCase} from "lodash";
 
 @Injectable()
 export class GenerateProvider {
@@ -127,5 +128,19 @@ export class GenerateProvider {
                 package_name: paths?.server_current_package
             }
         })
+
+        if (data.with_page) {
+            await this.templateProvider.generate({
+                cwd,
+                templatePath: `referentiel/page`,
+                targetPath: paths?.web_pages_path!,
+                add_to_git: true,
+                data: {
+                    ...data,
+                    ref_state_name: `ref_${snakecase(kebabCase(data.url))}`,
+                    fields: data.fields.map(it => ({...it, label: sentencecase(it.name)}))
+                }
+            })
+        }
     }
 }

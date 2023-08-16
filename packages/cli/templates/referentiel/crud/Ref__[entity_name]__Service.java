@@ -24,7 +24,7 @@ public class Ref<%= entity_name %>Service extends AbstractCrudReferentielService
 	@Override
 	public void assign(Ref<%= entity_name %>Resource resource, <%= entity_name %> entity) {
   <% fields.forEach(function(field){ -%>
-    entity.set<%= field.name.charAt(0).toUpperCase() + field.name.slice(1) %>(resource.get<%= field.name.charAt(0).toUpperCase() + field.name.slice(1) %>());
+    entity.set<%= field.name.charAt(0).toUpperCase() + field.name.slice(1) %>(resource.<%= field.type === 'boolean' ? 'is' : 'get' %><%= field.name.charAt(0).toUpperCase() + field.name.slice(1) %>());
   <% }) -%>
   }
 
