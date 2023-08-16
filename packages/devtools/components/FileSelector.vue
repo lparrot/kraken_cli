@@ -51,6 +51,7 @@ async function fetchPathInfos(path?: string) {
 
 async function addFolder() {
   $confirm.confirm({
+    attachTo: '#fileselector',
     title: 'Nouveau répertoire',
     message: `Donnez le nom du nouveau répertoire`,
     label: 'Créer le répertoire',
@@ -94,7 +95,7 @@ watch(
 </script>
 
 <template>
-  <USlideover v-model="show" prevent-close side="right">
+  <USlideover id="fileselector" v-model="show" prevent-close side="right">
     <div class="flex flex-col h-full">
       <div class="py-2 px-4 flex justify-end border-b">
         <UButton icon="i-ic-close" @click="show = false"/>

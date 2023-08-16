@@ -2,6 +2,7 @@
 import VerticalSeparator from '~/components/VerticalSeparator.vue'
 import {FormContext} from '~/node_modules/vee-validate'
 import {OsPathInfo} from "@kraken/types";
+import DynamicModal from "~/components/DynamicModal.vue";
 
 interface FormAddProject {
   path: string
@@ -253,7 +254,7 @@ watchEffect(() => {
     <OverlayLoaderBlockScreen/>
   </Teleport>
 
-  <ConfirmationModal/>
+  <DynamicModal/>
 
 </template>
 
