@@ -7,7 +7,7 @@ import { HttpService } from '@nestjs/axios'
 import axios from 'axios'
 import { InjectorProvider } from 'src/services/injector.provider'
 import { AppProvider } from 'src/app/app.provider'
-import child_process from 'child_process'
+import { spawn } from 'child_process'
 import { WebsocketProvider } from 'src/app/websocket.provider'
 
 const BASE_SEARCH_PATH = 'web/nuxt.config.js'
@@ -152,8 +152,8 @@ export class ProjectProvider {
     if (!check || (shell.which('mvn') != null && shell.which('npm') != null)) {
       const paths = this.getProjectPaths(cwd)
 
-      const mvn = child_process.spawn(`mvn clean spring-boot:run -q -Dspring-boot.run.arguments="--spring.output.ansi.enabled=always --spring.profiles.active=${profile}"`, { cwd: paths?.server_root_path, shell: true })
-      const npm = child_process.spawn('npm run dev', { cwd: paths?.web_root_path, shell: true })
+      const mvn = spawn(`mvn clean spring-boot:run -q -D"spring-boot.run.arguments"="--spring.output.ansi.enabled=always --spring.profiles.active=${profile}"`, { cwd: paths?.server_root_path, shell: true })
+      const npm = spawn('npm run dev', { cwd: paths?.web_root_path, shell: true })
 
       mvn.stdout.setEncoding('latin1')
       npm.stdout.setEncoding('latin1')

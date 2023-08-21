@@ -13,7 +13,7 @@
         <dl>
           <%_ fields.forEach(function(field){ -%>
           <dt><%= field.label %></dt>
-          <dd>{{ selected. < %= field.name % > }}</dd>
+          <dd>{{ selected.<%= field.name %> }}</dd>
           <%_ }) -%>
         </dl>
       </template>
