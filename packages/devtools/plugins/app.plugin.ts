@@ -1,4 +1,4 @@
-import {useAppBus} from '~/composables/useAppBus'
+import { useAppBus } from '~/composables/useAppBus'
 
 export default defineNuxtPlugin(async nuxt => {
     const {setMenu} = useAppMenu()
@@ -33,6 +33,7 @@ export default defineNuxtPlugin(async nuxt => {
             },
             {
                 label: 'Génération côté serveur', items: [
+                { label: 'Entité JPA', to: '/generator/entity', icon: 'i-mdi-database-outline', showIf: storage.value.selected_project != null },
                     {label: 'Controlleur', to: '/generator/controller', icon: 'i-mdi-api', showIf: storage.value.selected_project != null},
                     {label: 'Referentiel', to: '/generator/ref', icon: 'i-ic-view-list', showIf: storage.value.selected_project != null},
                     {label: 'Timer', to: '/generator/timer', icon: 'i-ic-schedule', showIf: storage.value.selected_project != null},

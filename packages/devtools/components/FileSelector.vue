@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {OsPathInfo} from "@kraken/types";
+import { OsPathInfo } from '@kraken/types'
 
 interface Props {
   readonly check?: (path: OsPathInfo) => Promise<boolean>
@@ -61,7 +61,7 @@ async function addFolder() {
     },
     action: async (prompt: string) => {
       try {
-        await $api.handleFsCreateDir({cwd: path_info.value!!.path, name: prompt})
+        await $api.handleFsCreateDir({ cwd: path_info.value!!.path, name: prompt })
         await fetchPathInfos(path_info.value!!.path)
       } catch (err) {
         return false
@@ -84,24 +84,34 @@ async function submit() {
 }
 
 watch(
-    show,
-    async (value) => {
-      if (value) {
-        await fetchPathInfos(currentPath.value)
-      }
-    },
-    {immediate: true}
+  show,
+  async (value) => {
+    if (value) {
+      await fetchPathInfos(currentPath.value)
+    }
+  },
+  { immediate: true }
 )
 </script>
 
 <template>
-  <USlideover id="fileselector" v-model="show" prevent-close side="right">
+  <USlideover id="fileselector" v-model="show" :ui="{width: 'w-screen max-w-3xl'}" prevent-close side="right">
     <div class="flex flex-col h-full">
       <div class="py-2 px-4 flex justify-end border-b">
         <UButton icon="i-ic-close" @click="show = false"/>
       </div>
 
-      <div class="py-2 px-4 flex gap-1.5 border-b">
+      <div class="py-2 px-4 flex items-center gap-1.5 border-b h-14">
+        <div v-if="path_info?.breadcrumb?.length! < 1" class="text-green-500">/</div>
+        <template v-else>
+          <template v-for="bread in path_info?.breadcrumb">
+            <div class="text-green-500">/</div>
+            <UButton :padded="false" color="green" size="xs" variant="ghost" @click="clickFolder(bread.path)">{{ bread.label }}</UButton>
+          </template>
+        </template>
+      </div>
+
+      <div class="py-2 px-4 flex gap-1.5 border-b h-14">
         <UButton :disabled="!canGoToParent" color="blue" icon="i-ic-arrow-back" variant="ghost" @click="selectParent"/>
         <UButton color="green" icon="i-ic-add" variant="ghost" @click="addFolder"/>
         <UButton v-if="props.showHome" color="orange" icon="i-ic-home" variant="ghost"

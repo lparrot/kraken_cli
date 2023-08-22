@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import {convertPathToPackage} from '~/utils/java.utils'
-import {useDeburr} from '#imports'
+import { convertPathToPackage } from '~/utils/java.utils'
 import * as stringcase from 'stringcase'
 
 interface FormSchema {
@@ -15,7 +14,7 @@ definePageMeta({
 
 const $state = useStateStore()
 const $api = useApiStore()
-const loader = useAppLoader()
+const $loader = useAppLoader()
 
 const form_controller = ref<Partial<FormSchema>>({})
 
@@ -30,12 +29,12 @@ function init() {
 }
 
 async function submit() {
-  loader.start({ description: 'Création du controller en cours ...' })
+  $loader.start({ description: 'Création du controller en cours ...' })
 
   try {
     await $api.handleGenerateController(form_controller.value)
   } finally {
-    loader.stop()
+    $loader.stop()
   }
 }
 
