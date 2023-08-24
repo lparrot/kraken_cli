@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import sortBy from 'lodash/sortBy'
-import {ProjectAppDataAttribute, ProjectAppDataDao, ProjectAppDataEntity} from '@kraken/types'
-import stringcase, {sentencecase, snakecase} from 'stringcase'
+import { ProjectAppDataAttribute, ProjectAppDataDao, ProjectAppDataEntity } from '@kraken/types'
+import stringcase, { sentencecase, snakecase } from 'stringcase'
 import pluralize from 'pluralize'
-import {convertPathToPackage} from '~/utils/java.utils'
+import { convertPathToPackage } from '~/utils/java.utils'
 import deburr from 'lodash/deburr'
 
 interface Form {
@@ -227,9 +227,7 @@ init()
                     <span class="text-sm font-thin text-orange-500">
                       <span>{{ attribute.type_simple }}</span>
                       <span v-if="attribute.collection">&lt {{ attribute.bind_type_simple }} &gt</span>
-                      <span v-if="attribute.persistent_type != null">(@{{
-                          attribute.persistent_type_data!!.assoc_name
-                        }})</span>
+                      <span v-if="attribute.persistent_type != null">(@{{ attribute.persistent_type_data!!.assoc_name }})</span>
                   </span>
                   </label>
                 </div>

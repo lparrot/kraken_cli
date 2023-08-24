@@ -5,6 +5,10 @@ interface Form {
   cwd: string
 }
 
+definePageMeta({
+  middleware: ['security']
+})
+
 const $state = useStateStore()
 const $api = useApiStore()
 const $loader = useAppLoader()

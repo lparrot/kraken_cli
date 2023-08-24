@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { convertPathToPackage } from '~/utils/java.utils'
 
-definePageMeta({
-  middleware: ['security']
-})
-
 interface Form {
   cwd: string
 }
+
+definePageMeta({
+  middleware: ['security']
+})
 
 const $state = useStateStore()
 const $api = useApiStore()

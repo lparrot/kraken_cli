@@ -19,7 +19,7 @@ interface Form {
   create_git_repo?: boolean
 }
 
-interface ReadonlyForm {
+interface ReadOnlyInputs {
   group_id: boolean
   artifact_id: boolean
   node_version: boolean
@@ -44,7 +44,7 @@ const $loader = useAppLoader()
 
 const form = ref<Partial<Form>>({})
 
-const readonly = ref<Partial<ReadonlyForm>>({})
+const readonly = ref<Partial<ReadOnlyInputs>>({})
 
 const show = ref({
   fileselector_cwd: false
