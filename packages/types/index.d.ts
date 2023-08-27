@@ -51,6 +51,12 @@ export interface PostGenerateReferentielBody {
     page_title?: string
 }
 
+export interface PostGeneratePageBody {
+  cwd: string
+  name: string
+  title: string
+}
+
 export interface ServerInfos {
   home_dir: string
   separator: string

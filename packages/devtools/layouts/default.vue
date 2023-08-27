@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import VerticalSeparator from '~/components/VerticalSeparator.vue'
-import {FormContext} from '~/node_modules/vee-validate'
-import {OsPathInfo} from "@kraken/types";
-import DynamicModal from "~/components/DynamicModal.vue";
+import { FormContext } from '~/node_modules/vee-validate'
+import { OsPathInfo } from '@kraken/types'
+import DynamicModal from '~/components/DynamicModal.vue'
 
 interface FormAddProject {
   path: string
@@ -158,8 +158,7 @@ watchEffect(() => {
       <div class="flex flex-col w-full h-full">
         <div class="p-2 flex gap-1.5 bg-primary-100">
           <div class="w-64">
-            <USelectMenu v-model="storage.selected_project" :options="$state.projects" option-attribute="name"
-                         searchable searchable-placeholder="Rechercher un projet" value-attribute="id">
+            <USelectMenu v-model="storage.selected_project" :options="$state.projects" option-attribute="name" searchable searchable-placeholder="Rechercher un projet" value-attribute="id">
               <template #label>
                 {{ $state.project?.name ?? 'Selectionner un projet' }}
               </template>

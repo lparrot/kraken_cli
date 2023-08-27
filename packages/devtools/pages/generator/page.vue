@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 import deburr from 'lodash/deburr'
 import stringcase from 'stringcase'
+import { FormContext } from 'vee-validate'
+import kebabCase from 'lodash/kebabCase'
 
 interface Form {
+  cwd: string
   name: string
   title: string
 }
@@ -18,13 +21,17 @@ definePageMeta({
 const $state = useStateStore()
 const $api = useApiStore()
 const $loader = useAppLoader()
+const $toast = useToast()
 
 const form = ref<Partial<Form>>({})
 const readonly = ref<Partial<ReadOnlyInputs>>({})
 const show = ref({})
+const form_validator = ref<FormContext>()
 
 function init() {
-  form.value = {}
+  form.value = {
+    cwd: $state.project?.path,
+  }
   readonly.value = {
     title: true,
   }
@@ -33,10 +40,18 @@ function init() {
 async function submit() {
   $loader.start()
   try {
-
+    await $api.handleGeneratePage(form.value)
+    init()
+    $toast.add({ description: 'Création de la page effectuée avec succès.' })
   } finally {
     $loader.stop()
   }
+}
+
+async function onModelValueName(modelValue) {
+  form.value.name = deburr(stringcase.pathcase(modelValue))
+  form.value.title = stringcase.sentencecase(kebabCase(modelValue))
+  await validateFields(form_validator.value, ['title'])
 }
 
 init()
@@ -44,10 +59,10 @@ init()
 
 <template>
   <UContainer>
-    <VeeForm #default="{meta}" :initial-values="form" class="space-y-4" validate-on-mount @submit="submit">
+    <VeeForm ref="form_validator" #default="{meta}" :initial-values="form" class="space-y-4" validate-on-mount @submit="submit">
       <VeeField v-model="form.name" #default="{errorMessage, field}" label="nom du fichier" name="name" rules="required" validate-on-mount>
         <UFormGroup :error="errorMessage!" label="Nom du fichier (sans l'extension .vue)">
-          <UInput :model-value="form.name" v-bind="field" @update:model-value="form.title = deburr(stringcase.pathcase($event))"/>
+          <UInput :model-value="form.name" v-bind="field" @update:model-value="onModelValueName"/>
         </UFormGroup>
       </VeeField>
 

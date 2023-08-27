@@ -7,7 +7,7 @@ export async function validateFields(form: FormContext | undefined, fields: stri
 
   await nextTick(async () => {
     for await (let field of fields) {
-      await form.validateField(field, { mode: 'silent', warn: false })
+      await form.validateField(field)
     }
   })
 }
