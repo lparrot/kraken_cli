@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { convertPathToPackage } from '~/utils/java.utils'
+import {convertPathToPackage} from '~/utils/java.utils'
 
 interface Form {
   cwd: string
@@ -40,7 +40,7 @@ init()
   <FileSelector v-model="form.cwd" v-model:show="show.fileselector_cwd" :root="$state.paths?.server_java_path"/>
 
   <UContainer>
-    <VeeForm :initial-values="form" class="space-y-4" validate-on-mount @submit="submit">
+    <VeeForm #default="{meta}" :initial-values="form" class="space-y-4" validate-on-mount @submit="submit">
       <UButton :color="form.cwd == null ? 'blue' : 'green'" block @click="show.fileselector_cwd = true">
         <div v-if="form.cwd == null">Selectionner un package</div>
         <div v-else>Modifier le package</div>
@@ -54,6 +54,10 @@ init()
         </div>
 
         <hr/>
+
+        <UButton :disabled="!meta.valid" block type="submit">
+          Créer
+        </UButton>
       </template>
 
     </VeeForm>

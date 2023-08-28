@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { convertPathToPackage } from '~/utils/java.utils'
+import {convertPathToPackage} from '~/utils/java.utils'
 import * as stringcase from 'stringcase'
 
 interface FormSchema {
@@ -29,7 +29,7 @@ function init() {
 }
 
 async function submit() {
-  $loader.start({ description: 'Création du controller en cours ...' })
+  $loader.start({description: 'Création du controller en cours ...'})
 
   try {
     await $api.handleGenerateController(form_controller.value)
@@ -45,7 +45,7 @@ init()
   <FileSelector v-model="form_controller.cwd" v-model:show="show.fileselector_cwd" :root="$state.paths?.server_java_path"/>
 
   <UContainer>
-    <VeeForm :initial-values="form_controller" class="space-y-4" validate-on-mount @submit="submit">
+    <VeeForm #default="{meta}" :initial-values="form_controller" class="space-y-4" validate-on-mount @submit="submit">
       <UButton :color="form_controller.cwd == null ? 'blue' : 'green'" block @click="show.fileselector_cwd = true">
         <div v-if="form_controller.cwd == null">Selectionner un package</div>
         <div v-else>Modifier le package</div>
@@ -72,7 +72,7 @@ init()
           </UFormGroup>
         </VeeField>
 
-        <UButton block type="submit">
+        <UButton :disabled="!meta.valid" block type="submit">
           Créer le controlleur
         </UButton>
       </template>

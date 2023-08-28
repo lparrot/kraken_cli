@@ -57,6 +57,11 @@ export interface PostGeneratePageBody {
   title: string
 }
 
+export interface PostGenerateEntityBody {
+    cwd: string
+    name: string
+}
+
 export interface ServerInfos {
   home_dir: string
   separator: string
