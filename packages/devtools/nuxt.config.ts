@@ -53,7 +53,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@pinia/nuxt',
     '@vee-validate/nuxt',
-    'nuxt-lodash'
+    'nuxt-lodash',
   ],
 
   typescript: {

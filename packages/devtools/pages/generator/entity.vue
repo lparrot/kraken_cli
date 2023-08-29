@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { convertPathToPackage } from '~/utils/java.utils'
-import { useDeburr } from '#imports'
 import * as stringcase from 'stringcase'
 
 interface Form {
@@ -16,6 +15,7 @@ const $state = useStateStore()
 const $api = useApiStore()
 const $loader = useAppLoader()
 const $toast = useToast()
+const $swal = useSwal()
 
 const form = ref<Partial<Form>>({})
 const show = ref({
@@ -35,7 +35,11 @@ async function submit() {
   try {
     await $api.handleGenerateEntity(form.value)
     init()
-    $toast.add({description: 'Entité créée avec succès.'})
+    await $swal.fire({
+      title: 'Succès',
+      icon: 'success',
+      text: 'Entité créée avec succès.'
+    })
   } finally {
     $loader.stop()
   }
@@ -72,8 +76,6 @@ init()
         <UButton :disabled="!meta.valid" block type="submit">
           Créer l'entité
         </UButton>
-
-        <pre>{{ form }}</pre>
       </template>
     </VeeForm>
   </UContainer>

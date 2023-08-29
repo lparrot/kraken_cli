@@ -18,6 +18,8 @@ definePageMeta({
   middleware: ['security']
 })
 
+const {} = useNuxtApp()
+
 const $state = useStateStore()
 const $api = useApiStore()
 const $loader = useAppLoader()

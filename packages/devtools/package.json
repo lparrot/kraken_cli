@@ -19,6 +19,7 @@
   "dependencies": {
     "@iconify/json": "^2.2.99",
     "@pinia/nuxt": "^0.4.11",
+    "@sweetalert2/themes": "^5.0.15",
     "@vee-validate/i18n": "^4.11.1",
     "@vee-validate/nuxt": "^4.11.1",
     "@vee-validate/rules": "^4.11.1",
@@ -27,6 +28,7 @@
     "pinia": "^2.1.6",
     "pluralize": "^8.0.0",
     "stringcase": "^4.3.1",
+    "sweetalert2": "^11.7.27",
     "vee-validate": "^4.11.1"
   }
 }

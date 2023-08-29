@@ -1,4 +1,5 @@
 @import 'vars';
+@import '@sweetalert2/themes/bulma/bulma.css';
 
 :root {
   --header-height: #{$header_height};
