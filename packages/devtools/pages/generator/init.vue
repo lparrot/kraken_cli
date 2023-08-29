@@ -52,6 +52,7 @@ const show = ref({
 
 function init() {
   form.value = {
+    cwd: form.value.cwd,
     group_id: 'fr.intradef.cdadr',
     node_version: $state.os_infos?.node_version!,
     socle_version: $state.os_infos?.last_npm_version!,
@@ -136,7 +137,7 @@ watchDebounced(() => form.value.name,
 
         <template v-if="form.name != null">
           <UFormGroup label="Description du projet">
-            <UInput :model-value="form.description"/>
+            <UInput v-model="form.description"/>
           </UFormGroup>
 
           <VeeField v-model="form.group_id" #default="{errorMessage, field}" label="group ID" name="group_id" rules="required" validate-on-mount>

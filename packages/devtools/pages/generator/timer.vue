@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {convertPathToPackage} from '~/utils/java.utils'
+import { convertPathToPackage } from '~/utils/java.utils'
 
 interface Form {
   cwd: string
@@ -21,7 +21,9 @@ const show = ref({
 const selected_package = computed(() => convertPathToPackage(form.value.cwd!))
 
 function init() {
-  form.value = {}
+  form.value = {
+    cwd: form.value.cwd
+  }
 }
 
 async function submit() {

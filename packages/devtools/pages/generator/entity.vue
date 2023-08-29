@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {convertPathToPackage} from '~/utils/java.utils'
-import {useDeburr} from '#imports'
+import { convertPathToPackage } from '~/utils/java.utils'
+import { useDeburr } from '#imports'
 import * as stringcase from 'stringcase'
 
 interface Form {
@@ -25,7 +25,9 @@ const show = ref({
 const selected_package = computed(() => convertPathToPackage(form.value.cwd!))
 
 function init() {
-  form.value = {}
+  form.value = {
+    cwd: form.value.cwd
+  }
 }
 
 async function submit() {
@@ -61,15 +63,17 @@ init()
 
         <hr/>
 
-        <VeeField #default="{errorMessage, field}" label="nom de l'entité" name="name" rules="required" validate-on-mount>
+        <VeeField v-model="form.name" #default="{errorMessage, field}" label="nom de l'entité" name="name" rules="required" validate-on-mount>
           <UFormGroup :error="errorMessage!" label="Nom de l'entité" name="name">
-            <UInput v-model="form.name" v-bind="field" @update:model-value="form.name = useDeburr(stringcase.pascalcase($event as string))"/>
+            <UInput :model-value="form.name" v-bind="field" @update:model-value="form.name = useDeburr(stringcase.pascalcase($event as string))"/>
           </UFormGroup>
         </VeeField>
 
         <UButton :disabled="!meta.valid" block type="submit">
           Créer l'entité
         </UButton>
+
+        <pre>{{ form }}</pre>
       </template>
     </VeeForm>
   </UContainer>
