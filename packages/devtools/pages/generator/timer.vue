@@ -1,8 +1,11 @@
 <script lang="ts" setup>
-import {convertPathToPackage} from '~/utils/java.utils'
+import { convertPathToPackage } from '~/utils/java.utils'
+import * as stringcase from 'stringcase'
 
 interface Form {
   cwd: string
+  name: string
+  description: string
 }
 
 definePageMeta({
@@ -30,6 +33,7 @@ function init() {
 async function submit() {
   $loader.start()
   try {
+    await $api.handleGenerateTimer(form.value)
     init()
     await $swal.fire({
       icon: 'success',
@@ -61,6 +65,18 @@ init()
         </div>
 
         <hr/>
+
+        <VeeField v-model="form.name" #default="{errorMessage, field}" label="nom" name="name" rules="required" validate-on-mount>
+          <UFormGroup :error="errorMessage!" label="Nom" name="name">
+            <UInput :model-value="form.name" v-bind="field" @update:model-value="form.name = useDeburr(stringcase.pascalcase($event as string))"/>
+          </UFormGroup>
+        </VeeField>
+
+        <VeeField v-model="form.description" #default="{errorMessage, field}" label="description" name="description" rules="required" validate-on-mount>
+          <UFormGroup :error="errorMessage!" label="Description" name="description">
+            <UInput :model-value="form.description" v-bind="field"/>
+          </UFormGroup>
+        </VeeField>
 
         <UButton :disabled="!meta.valid" block type="submit">
           Créer le timer

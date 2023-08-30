@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {convertPathToPackage} from '~/utils/java.utils'
+import { convertPathToPackage } from '~/utils/java.utils'
 import * as stringcase from 'stringcase'
 
 interface FormSchema {
@@ -32,7 +32,7 @@ function init() {
 }
 
 async function submit() {
-  $loader.start({description: 'Création du controller en cours ...'})
+  $loader.start()
 
   try {
     await $api.handleGenerateController(form.value)
@@ -68,13 +68,13 @@ init()
 
         <hr/>
 
-        <VeeField v-model="form.name" #default="{errorMessage, field}" label="nom du controlleur" name="name" rules="required">
+        <VeeField v-model="form.name" #default="{errorMessage, field}" label="nom du controlleur" name="name" rules="required" validate-on-mount>
           <UFormGroup :error="errorMessage!" label="Nom du controlleur (sans préfixe ou suffixe)" name="name">
             <UInput :model-value="form.name" v-bind="field" @update:model-value="form.name = useDeburr(stringcase.pascalcase($event as string))"/>
           </UFormGroup>
         </VeeField>
 
-        <VeeField v-model="form.url" #default="{errorMessage, field}" label="URL du webservice" name="url" rules="required">
+        <VeeField v-model="form.url" #default="{errorMessage, field}" label="URL du webservice" name="url" rules="required" validate-on-mount>
           <UFormGroup :error="errorMessage!" label="URL du webservice" name="url">
             <UInput :model-value="form.url" v-bind="field" @update:model-value="form.url = useDeburr(stringcase.pathcase($event as string))"/>
           </UFormGroup>

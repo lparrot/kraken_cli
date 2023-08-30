@@ -1,9 +1,9 @@
-import {Body, Controller, Inject, Post} from '@nestjs/common'
-import {PostGenerateControllerBody, PostGenerateEntityBody, PostGeneratePageBody, PostGenerateReferentielBody, TemplateInitOptions} from '@kraken/types'
-import {GenerateProvider} from 'src/services/generate.provider'
+import { Body, Controller, Inject, Post } from '@nestjs/common'
+import { PostGenerateControllerBody, PostGenerateEntityBody, PostGeneratePageBody, PostGenerateReferentielBody, PostGenerateTimerBody, TemplateInitOptions } from '@kraken/types'
+import { GenerateProvider } from 'src/services/generate.provider'
 import * as path from 'path'
-import {snakecase} from 'stringcase'
-import {Project} from 'src/app/entities/models/project.entity'
+import { snakecase } from 'stringcase'
+import { Project } from 'src/app/entities/models/project.entity'
 
 const shelljs = require('shelljs')
 
@@ -40,25 +40,28 @@ export class GenerateController {
 
   @Post('controller')
   async generateController(@Body() body: PostGenerateControllerBody) {
-    const { cwd, ...data } = body
-    await this.generateProvider.generateController({ cwd, data })
+    await this.generateProvider.generateController(body)
   }
 
   @Post('referentiel')
   async generateReferentiel(@Body() body: PostGenerateReferentielBody) {
-    const { cwd, ...data } = body
-    await this.generateProvider.generateReferentiel({ cwd, data })
+    await this.generateProvider.generateReferentiel(body)
   }
 
   @Post('page')
   async generatePage(@Body() body: PostGeneratePageBody) {
     const { cwd, ...data } = body
-    await this.generateProvider.generatePage({ cwd, data })
+    await this.generateProvider.generatePage(body)
   }
 
   @Post('entity')
   async generateEntity(@Body() body: PostGenerateEntityBody) {
     await this.generateProvider.generateEntity(body)
+  }
+
+  @Post('timer')
+  async generateTimer(@Body() body: PostGenerateTimerBody) {
+    await this.generateProvider.generateTimer(body)
   }
 
 }

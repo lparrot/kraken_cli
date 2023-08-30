@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import sortBy from 'lodash/sortBy'
-import {ProjectAppDataAttribute, ProjectAppDataDao, ProjectAppDataEntity} from '@kraken/types'
-import stringcase, {sentencecase, snakecase} from 'stringcase'
+import { ProjectAppDataAttribute, ProjectAppDataDao, ProjectAppDataEntity } from '@kraken/types'
+import stringcase, { sentencecase, snakecase } from 'stringcase'
 import pluralize from 'pluralize'
-import {convertPathToPackage} from '~/utils/java.utils'
+import { convertPathToPackage } from '~/utils/java.utils'
 import deburr from 'lodash/deburr'
 
 interface Form {
@@ -176,7 +176,7 @@ init()
               </UFormGroup>
             </VeeField>
 
-            <VeeField v-model="form.url" #default="{errorMessage, field}" label="url" name="url" rules="required">
+            <VeeField v-model="form.url" #default="{errorMessage, field}" label="url" name="url" rules="required" validate-on-mount>
               <UFormGroup :error="errorMessage" label="Url du webservice">
                 <UInput :model-value="form.url" v-bind="field"
                         @update:model-value="form.url = deburr(stringcase.pathcase($event))"/>
@@ -202,7 +202,7 @@ init()
               <UCard>
                 <VeeField v-model="form.page_name" #default="{errorMessage, field}" label="chemin de la page"
                           name="page_name"
-                          rules="required">
+                          rules="required" validate-on-mount>
                   <UFormGroup :error="errorMessage" label="Chemin de la page (sans extension .vue)">
                     <UInput :model-value="form.page_name" v-bind="field"/>
                   </UFormGroup>
@@ -210,7 +210,7 @@ init()
 
                 <VeeField v-model="form.page_title" #default="{errorMessage, field}" label="titre de la pag"
                           name="page_title"
-                          rules="required">
+                          rules="required" validate-on-mount>
                   <UFormGroup :error="errorMessage" label="Titre de la page">
                     <UInput :model-value="form.page_title" v-bind="field"/>
                   </UFormGroup>

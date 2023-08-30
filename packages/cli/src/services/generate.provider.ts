@@ -1,13 +1,14 @@
-import {Inject, Injectable} from '@nestjs/common'
-import {ProjectProvider} from './project.provider'
-import {TemplateProvider} from './template.provider'
-import {TemplateInitOptions} from '../../../cli_old/types'
+import { Inject, Injectable } from '@nestjs/common'
+import { ProjectProvider } from './project.provider'
+import { TemplateProvider } from './template.provider'
+import { TemplateInitOptions } from '../../../cli_old/types'
 import * as stringcase from 'stringcase'
-import {dotcase, lowercase, pascalcase, pathcase, sentencecase, snakecase} from 'stringcase'
+import { dotcase, lowercase, pascalcase, pathcase, sentencecase, snakecase } from 'stringcase'
 import * as path from 'path'
-import {ShellCommandsProvider} from 'src/services/shell-commands.provider'
-import {PostGenerateControllerBody, PostGenerateEntityBody, PostGenerateReferentielBody, ProjectPaths} from '@kraken/types'
-import {kebabCase} from 'lodash'
+import { ShellCommandsProvider } from 'src/services/shell-commands.provider'
+import { PostGenerateControllerBody, PostGenerateEntityBody, PostGeneratePageBody, PostGenerateReferentielBody, PostGenerateTimerBody, ProjectPaths } from '@kraken/types'
+import { kebabCase } from 'lodash'
+import * as dayjs from 'dayjs'
 
 @Injectable()
 export class GenerateProvider {
@@ -73,8 +74,8 @@ export class GenerateProvider {
         await this.projectProvider.getAppdata(path.resolve(cwd, data.artifact_id))
     }
 
-    async generatePage(options: { cwd?: string, data: { name: string, title: string } }, paths?: any) {
-        const {cwd, data} = options
+  async generatePage(options: PostGeneratePageBody, paths?: any) {
+    const { cwd, ...data } = options
 
         if (paths == null) {
             paths = this.projectProvider.getProjectPaths(cwd)
@@ -89,8 +90,8 @@ export class GenerateProvider {
         )
     }
 
-    async generateController(options: { cwd?: string, data: Omit<PostGenerateControllerBody, 'cwd'> }) {
-        const {cwd, data} = options
+  async generateController(options: PostGenerateControllerBody) {
+    const { cwd, ...data } = options
 
         data.name = pascalcase(data.name)
         data.url = lowercase(data.url)
@@ -103,8 +104,8 @@ export class GenerateProvider {
         })
     }
 
-    async generateReferentiel(options: { cwd: any; data: Omit<PostGenerateReferentielBody, 'cwd'> }, paths?: ProjectPaths | null) {
-        const {cwd, data} = options
+  async generateReferentiel(options: PostGenerateReferentielBody, paths?: ProjectPaths | null) {
+    const { cwd, ...data } = options
 
         if (paths == null) {
             paths = this.projectProvider.getProjectPaths(cwd)
@@ -164,4 +165,43 @@ export class GenerateProvider {
             targetPath: '.',
         })
     }
+
+  async generateTimer(body: PostGenerateTimerBody, paths?: ProjectPaths | null) {
+    const { cwd, ...data } = body
+
+    if (paths == null) {
+      paths = this.projectProvider.getProjectPaths(body.cwd)
+    }
+
+    const timer_name = snakecase(data.name)
+    const timer_description = data.description
+    const timer_class = `${timer_name.includes('timer') ? '' : 'Timer'}${stringcase.pascalcase(timer_name)}`
+    const timer_package = paths.server_current_package
+    const flyway_datetime = dayjs().format('YYYYMMDDHHmm')
+
+    await this.templateProvider.generate({
+        cwd,
+        templatePath: 'timer/java',
+        targetPath: '.',
+        data: {
+          timer_name,
+          timer_class,
+          timer_package
+        }
+      }
+    )
+
+    await this.templateProvider.generate({
+      templatePath: 'timer/sql',
+      targetPath: path.join(paths.server_resources_path, 'db', 'migration'),
+      cwd: paths.server_java_path,
+      data: {
+        timer_name,
+        timer_description,
+        flyway_datetime,
+        timer_class,
+        timer_package
+      }
+    })
+  }
 }

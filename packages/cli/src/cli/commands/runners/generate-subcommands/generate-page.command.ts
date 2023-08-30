@@ -1,9 +1,9 @@
-import {CommandRunner, InquirerService, Option, Question, QuestionSet, SubCommand} from "nest-commander";
-import {Inject} from "@nestjs/common";
+import { CommandRunner, InquirerService, Option, Question, QuestionSet, SubCommand } from 'nest-commander'
+import { Inject } from '@nestjs/common'
 
-import {logger} from "src/utils/logger.utils";
-import {GenerateProvider} from "src/services/generate.provider";
-import {ProjectProvider} from "src/services/project.provider";
+import { logger } from 'src/utils/logger.utils'
+import { GenerateProvider } from 'src/services/generate.provider'
+import { ProjectProvider } from 'src/services/project.provider'
 
 @SubCommand({
   name: 'page',
@@ -11,9 +11,9 @@ import {ProjectProvider} from "src/services/project.provider";
   aliases: ['p'],
 })
 export class GeneratePageCommand extends CommandRunner {
-  @Inject(InquirerService) inquirer: InquirerService;
-  @Inject(GenerateProvider) generateProvider: GenerateProvider;
-  @Inject(ProjectProvider) projectProvider: ProjectProvider;
+  @Inject(InquirerService) inquirer: InquirerService
+  @Inject(GenerateProvider) generateProvider: GenerateProvider
+  @Inject(ProjectProvider) projectProvider: ProjectProvider
 
   async run(passedParams: string[], options?: Record<string, any>): Promise<void> {
     const paths = this.projectProvider.getProjectPaths(process.cwd())
@@ -24,25 +24,25 @@ export class GeneratePageCommand extends CommandRunner {
 
     const ask = await this.inquirer.ask<{ name: string, title: string }>('tasks-generate-page', options)
 
-    await this.generateProvider.generatePage({cwd: process.cwd(), data: ask}, paths)
+    await this.generateProvider.generatePage({ cwd: process.cwd(), ...ask }, paths)
 
     logger.success('Page générée dans le dossier ' + paths.web_pages_path)
 
-    return Promise.resolve(undefined);
+    return Promise.resolve(undefined)
   }
 
-  @Option({name: 'name', description: 'Nom du fichier de la page (sans extension) ?', flags: '-n --name <name>'})
+  @Option({ name: 'name', description: 'Nom du fichier de la page (sans extension) ?', flags: '-n --name <name>' })
   name(val: string) {
-    return val;
+    return val
   }
 
-  @Option({name: 'title', description: 'Titre de la page ?', flags: '-t --title <title>'})
+  @Option({ name: 'title', description: 'Titre de la page ?', flags: '-t --title <title>' })
   title(val: string) {
-    return val;
+    return val
   }
 }
 
-@QuestionSet({name: 'tasks-generate-page'})
+@QuestionSet({ name: 'tasks-generate-page' })
 export class GeneratePageQuestions {
 
   @Question({
@@ -50,7 +50,7 @@ export class GeneratePageQuestions {
     name: 'name'
   })
   name(val: string) {
-    return val;
+    return val
   }
 
   @Question({
@@ -58,6 +58,6 @@ export class GeneratePageQuestions {
     name: 'title'
   })
   title(val: string) {
-    return val;
+    return val
   }
 }

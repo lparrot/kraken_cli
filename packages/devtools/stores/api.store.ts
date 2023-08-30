@@ -1,6 +1,6 @@
-import {useStateStore} from '~/stores/state.store'
-import {promiseTimeout} from '@vueuse/core'
-import {OsPathInfo, PostFsDirBody, PostGenerateControllerBody, PostGenerateEntityBody, PostGeneratePageBody, PostGenerateReferentielBody, ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from '@kraken/types'
+import { useStateStore } from '~/stores/state.store'
+import { promiseTimeout } from '@vueuse/core'
+import { OsPathInfo, PostFsDirBody, PostGenerateControllerBody, PostGenerateEntityBody, PostGeneratePageBody, PostGenerateReferentielBody, PostGenerateTimerBody, ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos } from '@kraken/types'
 
 export const useApiStore = defineStore('api', () => {
     const $state = useStateStore()
@@ -96,6 +96,10 @@ export const useApiStore = defineStore('api', () => {
         async handleGenerateReferentiel(data: Partial<PostGenerateReferentielBody>) {
             return useApiFetch<void>('/api/generate/referentiel', {method: 'post', body: data})
         },
+
+      async handleGenerateTimer(data: Partial<PostGenerateTimerBody>) {
+        return useApiFetch<void>('/api/generate/timer', { method: 'post', body: data })
+      },
 
         async handleProjectAppdataCreate(cwd?: string) {
             if (cwd == null) {
