@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import deburr from 'lodash/deburr'
 import stringcase from 'stringcase'
-import { FormContext } from 'vee-validate'
+import {FormContext} from 'vee-validate'
 import kebabCase from 'lodash/kebabCase'
 
 interface Form {
@@ -23,7 +23,7 @@ const {} = useNuxtApp()
 const $state = useStateStore()
 const $api = useApiStore()
 const $loader = useAppLoader()
-const $toast = useToast()
+const $swal = useSwal()
 
 const form = ref<Partial<Form>>({})
 const readonly = ref<Partial<ReadOnlyInputs>>({})
@@ -44,7 +44,10 @@ async function submit() {
   try {
     await $api.handleGeneratePage(form.value)
     init()
-    $toast.add({ description: 'Création de la page effectuée avec succès.' })
+    await $swal.fire({
+      icon: 'success',
+      text: 'Création de la page effectuée avec succès.'
+    })
   } finally {
     $loader.stop()
   }

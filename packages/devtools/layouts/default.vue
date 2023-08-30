@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import VerticalSeparator from '~/components/VerticalSeparator.vue'
-import { FormContext } from '~/node_modules/vee-validate'
-import { OsPathInfo } from '@kraken/types'
+import {FormContext} from '~/node_modules/vee-validate'
+import {OsPathInfo} from '@kraken/types'
 import DynamicModal from '~/components/DynamicModal.vue'
 
 interface FormAddProject {
@@ -15,8 +15,8 @@ interface FormLaunchApplication {
 
 const {isTabletOrMobile} = useMedia()
 const storage = useAppStorage()
-const toast = useToast()
 const confirm = useAppConfirm()
+const $swal = useSwal()
 const $state = useStateStore()
 const $api = useApiStore()
 const $bus = useAppBus()
@@ -95,19 +95,18 @@ async function checkAddProjectSelected(path_info: OsPathInfo) {
   if (paths != null) {
     const project = $state.projects!!.find(it => it.path === paths.project_path)
     if (project != null) {
-      toast.add({
-        color: 'red',
-        description: `Le projet a déjà été référence sous le nom ${project.name}`
+      await $swal.fire({
+        icon: 'error',
+        text: `Le projet a déjà été référencé sous le nom ${project.name}`
       })
     } else {
       form_add_project.value.name = path_info.label
       return true
     }
   } else {
-    toast.add({
-      color: 'red',
-      title: '',
-      description: `Le dossier selectionné ne correspond pas à un projet Kraken valide`
+    await $swal.fire({
+      icon: 'error',
+      text: 'Le dossier selectionné ne correspond pas à un projet Kraken valide'
     })
   }
   return false

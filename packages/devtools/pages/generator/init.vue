@@ -4,7 +4,7 @@ import * as stringcase from 'stringcase'
 interface Form {
   cwd?: string
   folder?: string
-  name?: string | null
+  name?: string
   description?: string
   group_id: string
   artifact_id?: string
@@ -41,6 +41,7 @@ const $state = useStateStore()
 const $api = useApiStore()
 const $bus = useAppBus()
 const $loader = useAppLoader()
+const $swal = useSwal()
 
 const form = ref<Partial<Form>>({})
 
@@ -84,6 +85,10 @@ async function submit() {
     $bus.projects.emit()
     await $state.setProject(project?.id)
     init()
+    await $swal.fire({
+      icon: 'success',
+      text: 'Projet créé avec succès.'
+    })
   } finally {
     $loader.stop()
   }

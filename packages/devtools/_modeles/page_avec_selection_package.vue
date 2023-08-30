@@ -12,6 +12,7 @@ definePageMeta({
 const $state = useStateStore()
 const $api = useApiStore()
 const $loader = useAppLoader()
+const $swal = useSwal()
 
 const form = ref<Partial<Form>>({})
 const show = ref({
@@ -28,6 +29,11 @@ async function submit() {
   $loader.start()
   try {
 
+    init()
+    await $swal.fire({
+      icon: 'success',
+      text: 'créé avec succès.'
+    })
   } finally {
     $loader.stop()
   }

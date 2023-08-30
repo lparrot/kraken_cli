@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { convertPathToPackage } from '~/utils/java.utils'
+import {convertPathToPackage} from '~/utils/java.utils'
 import * as stringcase from 'stringcase'
 
 interface Form {
@@ -14,7 +14,6 @@ definePageMeta({
 const $state = useStateStore()
 const $api = useApiStore()
 const $loader = useAppLoader()
-const $toast = useToast()
 const $swal = useSwal()
 
 const form = ref<Partial<Form>>({})
@@ -36,7 +35,6 @@ async function submit() {
     await $api.handleGenerateEntity(form.value)
     init()
     await $swal.fire({
-      title: 'Succès',
       icon: 'success',
       text: 'Entité créée avec succès.'
     })

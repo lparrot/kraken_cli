@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { convertPathToPackage } from '~/utils/java.utils'
+import {convertPathToPackage} from '~/utils/java.utils'
 
 interface Form {
   cwd: string
@@ -12,6 +12,7 @@ definePageMeta({
 const $state = useStateStore()
 const $api = useApiStore()
 const $loader = useAppLoader()
+const $swal = useSwal()
 
 const form = ref<Partial<Form>>({})
 const show = ref({
@@ -29,7 +30,11 @@ function init() {
 async function submit() {
   $loader.start()
   try {
-
+    init()
+    await $swal.fire({
+      icon: 'success',
+      text: 'Timer créé avec succès.'
+    })
   } finally {
     $loader.stop()
   }

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import sortBy from 'lodash/sortBy'
-import { ProjectAppDataAttribute, ProjectAppDataDao, ProjectAppDataEntity } from '@kraken/types'
-import stringcase, { sentencecase, snakecase } from 'stringcase'
+import {ProjectAppDataAttribute, ProjectAppDataDao, ProjectAppDataEntity} from '@kraken/types'
+import stringcase, {sentencecase, snakecase} from 'stringcase'
 import pluralize from 'pluralize'
-import { convertPathToPackage } from '~/utils/java.utils'
+import {convertPathToPackage} from '~/utils/java.utils'
 import deburr from 'lodash/deburr'
 
 interface Form {
@@ -26,6 +26,7 @@ definePageMeta({
 const $api = useApiStore()
 const $state = useStateStore()
 const $loader = useAppLoader()
+const $swal = useSwal()
 
 const templateOptions = [{label: 'Consultation', value: 'simple'}, {label: 'Consultation/Modification', value: 'crud'}]
 
@@ -83,6 +84,11 @@ async function submit() {
     await $api.handleGenerateReferentiel({...data, entity_name: entity?.file_path, dao_name: dao?.file_path})
 
     await $api.handleProjectCompile()
+    init()
+    await $swal.fire({
+      icon: 'success',
+      text: 'Référentiel créé avec succès.'
+    })
   } finally {
     $loader.stop()
   }

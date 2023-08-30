@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { convertPathToPackage } from '~/utils/java.utils'
+import {convertPathToPackage} from '~/utils/java.utils'
 import * as stringcase from 'stringcase'
 
 interface FormSchema {
@@ -15,6 +15,7 @@ definePageMeta({
 const $state = useStateStore()
 const $api = useApiStore()
 const $loader = useAppLoader()
+const $swal = useSwal()
 
 const form = ref<Partial<FormSchema>>({})
 
@@ -35,6 +36,11 @@ async function submit() {
 
   try {
     await $api.handleGenerateController(form.value)
+    init()
+    await $swal.fire({
+      icon: 'success',
+      text: 'Controlleur créé avec succès.'
+    })
   } finally {
     $loader.stop()
   }
