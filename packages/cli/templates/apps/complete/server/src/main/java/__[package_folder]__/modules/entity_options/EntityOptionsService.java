@@ -5,6 +5,8 @@ import <%= package %>.utils.UIUtils;
 import fr.intradef.cdadr.socle.core.exceptions.ApplicationException;
 import fr.intradef.cdadr.socle.core.utils.ReflectUtils;
 import fr.intradef.cdadr.socle.ui.dto.TextValueDto;
+import lombok.SneakyThrows;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,11 +33,20 @@ public class EntityOptionsService {
 		if (repository instanceof JpaRepository) {
 			return UIUtils.convertToBootstrapVueOptions(
 				((JpaRepository<?, ?>) repository).findAll(),
-				instance -> ReflectUtils.get(textField, instance),
+				instance -> getProperty(instance, textField),
 				instance -> StringUtils.isNotBlank(valueField) ? ReflectUtils.get(valueField, instance) : instance
 			);
 		}
 
 		throw new ApplicationException(String.format("Le repository de l'entité %s n'existe pas ou n'étend pas au minimum %s", entityName, JpaRepository.class.getSimpleName()));
+	}
+
+	@SneakyThrows
+	public String getProperty(Object instance, String textField) {
+		Object value = PropertyUtils.getProperty(instance, textField);
+		if (value == null) {
+			return "";
+		}
+		return value.toString();
 	}
 }

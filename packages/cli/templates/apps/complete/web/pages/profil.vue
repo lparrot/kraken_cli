@@ -9,16 +9,9 @@
 </template>
 
 <script>
-import {ProfileActions, ProfileChangePassword} from "@socle/security/bootstrap";
-
 export default {
   head: {
     title: 'Profil'
-  },
-
-  components: {
-    ProfileChangePassword,
-    ProfileActions,
   },
 
   access: [],

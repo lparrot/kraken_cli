@@ -12,6 +12,8 @@ const $state = useStateStore()
       <DashboardElement :description="String($state.appdata?.entities?.length)" icon="i-mdi-database" icon-class="bg-orange-500" title="Entités"/>
     </div>
   </template>
+
+  <div v-else>Veuillez selectionner un projet dans la liste ci-dessous, ou en créer un nouveau.</div>
 </template>
 
 <style scoped>

@@ -31,10 +31,6 @@ interface ReadOnlyInputs {
   db_password: boolean
 }
 
-definePageMeta({
-  middleware: ['security']
-})
-
 const validator = ref()
 
 const $state = useStateStore()
@@ -231,7 +227,7 @@ watchDebounced(() => form.value.name,
           <UCheckbox v-model="form.create_git_repo" label="Initialiser un dépôt Git ?"/>
 
           <UButton block type="submit">
-            Créer le controlleur
+            Créer le projet
           </UButton>
         </template>
       </template>

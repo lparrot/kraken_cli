@@ -23,16 +23,9 @@
 </template>
 
 <script>
-import {DatePicker, Referentiel} from '@socle/ui/bootstrap'
-
 export default {
   head: {
     title: '<%= page_title %>'
-  },
-
-  components: {
-    DatePicker,
-    Referentiel,
   },
 
   data() {

@@ -6,6 +6,9 @@ const { isTabletOrMobile } = useMedia()
 <template>
   <USlideover v-if="isTabletOrMobile" v-model="$state.navigation" side="left">
     <div class="p-4 overflow-auto">
+      <div class="flex justify-end cursor-pointer" @click="$state.navigation = false">
+        <UIcon name="i-ic-baseline-close"/>
+      </div>
       <NavigationMenu/>
     </div>
   </USlideover>

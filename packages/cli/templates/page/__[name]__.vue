@@ -10,8 +10,6 @@ export default {
     title: '<%= title %>'
   },
 
-  components: {},
-
   data() {
     return {}
   },

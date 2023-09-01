@@ -60,7 +60,7 @@ const selected_entity_attributes_options = computed(() => sortBy(form.value.enti
 function init() {
   form.value = {
     cwd: form.value.cwd,
-    template: 'simple',
+    template: 'crud',
     url: '/api/referentiels/',
     id_type: 'Long',
     fields: [],

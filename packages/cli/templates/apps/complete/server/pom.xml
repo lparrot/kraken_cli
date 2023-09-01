@@ -5,8 +5,7 @@
   <parent>
     <groupId>fr.intradef.cdadr.socle</groupId>
     <artifactId>server</artifactId>
-    <version><%= socle_version %>
-    </version>
+    <version><%= socle_version %></version>
     <relativePath/>
   </parent>
 
@@ -54,11 +53,16 @@
       <version>8.0.33</version>
       <scope>runtime</scope>
     </dependency>
+
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.9.4</version>
+    </dependency>
   </dependencies>
 
   <build>
-    <finalName><%= artifact_id %>
-    </finalName>
+    <finalName><%= artifact_id %></finalName>
 
     <resources>
       <resource>

@@ -29,15 +29,9 @@
 </template>
 
 <script>
-import {Referentiel} from '@socle/ui/bootstrap'
-
 export default {
   head: {
     title: 'Référentiel utilisateurs'
-  },
-
-  components: {
-    Referentiel
   },
 
   data() {

@@ -6,9 +6,9 @@ const $state = useStateStore()
 
 <template>
   <header class="flex items-center justify-between gap-3 p-4 backdrop-blur border-b">
-    <div class="md:flex-1 flex items-center gap-1.5">
+    <nuxt-link class="md:flex-1 flex items-center gap-1.5" to="/">
       <div class="text-2xl text-primary-500 font-bold">DEVTOOLS</div>
-    </div>
+    </nuxt-link>
 
     <div v-show="isTabletOrMobile">
       <UButton icon="i-heroicons-bars-3" variant="ghost"

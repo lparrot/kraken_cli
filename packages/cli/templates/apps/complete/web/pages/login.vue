@@ -7,15 +7,9 @@
 </template>
 
 <script>
-import {Login} from "@socle/security/bootstrap";
-
 export default {
   head: {
     title: 'Connexion'
-  },
-
-  components: {
-    Login
   },
 
   data() {
