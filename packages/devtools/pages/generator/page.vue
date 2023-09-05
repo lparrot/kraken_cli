@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import deburr from 'lodash/deburr'
 import stringcase from 'stringcase'
-import {FormContext} from 'vee-validate'
+import { FormContext } from 'vee-validate'
 import kebabCase from 'lodash/kebabCase'
 
 interface Form {
@@ -17,8 +17,6 @@ interface ReadOnlyInputs {
 definePageMeta({
   middleware: ['security']
 })
-
-const {} = useNuxtApp()
 
 const $state = useStateStore()
 const $api = useApiStore()
