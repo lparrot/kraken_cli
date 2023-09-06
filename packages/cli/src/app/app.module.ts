@@ -1,15 +1,23 @@
-import {Module} from '@nestjs/common';
-import {TypeOrmModule} from "@nestjs/typeorm";
-import * as path from "path";
-import {join} from "path";
-import {DataSource} from "typeorm";
-import {createDatabase, dropDatabase,} from "typeorm-extension";
-import {EntityModule} from "./entities/_entity.module";
-import {ConfigModule} from "@nestjs/config";
-import configuration from "../../config/configuration";
-import {ProvidersModule} from "../services/_providers.module";
-import {ControllerModule} from "./controllers/_controller.module";
-import {ServeStaticModule} from "@nestjs/serve-static";
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import * as path from 'path'
+import { join } from 'path'
+import { DataSource } from 'typeorm'
+import { createDatabase, dropDatabase, } from 'typeorm-extension'
+import { EntityModule } from './entities/_entity.module'
+import { ConfigModule } from '@nestjs/config'
+import configuration from '../../config/configuration'
+import { ProvidersModule } from '../services/_providers.module'
+import { ControllerModule } from './controllers/_controller.module'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import * as os from 'os'
+import * as fs from 'fs'
+
+const database_folder = path.resolve(os.homedir(), 'kraken_cli')
+
+if (!fs.existsSync(database_folder)) {
+  fs.mkdirSync(database_folder, { recursive: true })
+}
 
 @Module({
   imports: [
@@ -21,7 +29,7 @@ import {ServeStaticModule} from "@nestjs/serve-static";
       useFactory: async () => {
         return {
           type: 'better-sqlite3',
-          database: path.resolve(process.env.APPDATA, 'kraken_cli', 'database.sqlite'),
+          database: path.resolve(database_folder, 'database.sqlite'),
           autoLoadEntities: true,
           synchronize: true,
         }
