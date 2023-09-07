@@ -1,9 +1,8 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common'
-import { PostGenerateControllerBody, PostGenerateEntityBody, PostGeneratePageBody, PostGenerateReferentielBody, PostGenerateTimerBody, TemplateInitOptions } from '@kraken/types'
-import { GenerateProvider } from 'src/services/generate.provider'
+import {Body, Controller, Inject, Post} from '@nestjs/common'
+import {PostGenerateControllerBody, PostGenerateEntityBody, PostGeneratePageBody, PostGenerateReferentielBody, PostGenerateTimerBody, TemplateInitOptions} from '@kraken/types'
+import {GenerateProvider} from 'src/services/generate.provider'
 import * as path from 'path'
-import { snakecase } from 'stringcase'
-import { Project } from 'src/app/entities/models/project.entity'
+import {Project} from 'src/app/entities/models/project.entity'
 
 const shelljs = require('shelljs')
 
@@ -17,7 +16,7 @@ export class GenerateController {
     await this.generateProvider.initProject('complete', body)
 
     const is_idea_installed = shelljs.which('idea') != null
-    const project_path = path.join(body.cwd, snakecase(body.name))
+    const project_path = path.join(body.cwd, body.artifact_id)
 
     if (is_idea_installed) {
       shelljs.exec(`idea ${project_path}`, { async: true })

@@ -1,17 +1,17 @@
 <%_ if (field.sql_type != null) { -%>
-<validation-provider #default="{errors, valid}" name="<%= field.label.toLowerCase() %>" rules="">
-          <b-form-group :invalid-feedback="errors[0]" :state="valid" label="<%= field.label %>">
-          <%_ if (['INTEGER', 'BIGINT', 'FLOAT', 'REAL', 'DOUBLE', 'NUMERIC', 'DECIMAL'].indexOf(field.sql_type) > -1) { -%>
-            <b-form-input v-model="selected.<%= field.name %>" :state="valid" type="number"/>
-          <%_ } else if (['BIT', 'BOOLEAN'].indexOf(field.sql_type) > -1) { -%>
-            <b-form-checkbox v-model="selected.<%= field.name %>" :state="valid"/>
-          <%_ } else if (['DATE'].indexOf(field.sql_type) > -1) { -%>
-            <date-picker v-model="selected.<%= field.name %>" :config="{format: 'DD/MM/YYYY'}" :state="valid"></date-picker>
-          <%_ } else if (['TIMESTAMP', 'TIME'].indexOf(field.sql_type) > -1) { -%>
-            <date-picker v-model="selected.<%= field.name %>" :config="{format: 'DD/MM/YYYY HH:mm'}" :state="valid"></date-picker>
-          <%_ } else { -%>
-            <b-form-input v-model="selected.<%= field.name %>" :state="valid"/>
-          <%_ } -%>
-          </b-form-group>
-        </validation-provider>
+    <%_ if (['INTEGER', 'BIGINT', 'FLOAT', 'REAL', 'DOUBLE', 'NUMERIC', 'DECIMAL'].indexOf(field.sql_type) > -1) { -%>
+        <kn-input v-model="selected.<%= field.name %>" label="field.label" :component="{type: 'number'}" />
+    <%_ } else if (['BIT', 'BOOLEAN'].indexOf(field.sql_type) > -1) { -%>
+        <kn-input #default="{field}" label="field.label" :component="{is: 'b-form-checkbox'}"/>
+    <%_ } else if (['DATE'].indexOf(field.sql_type) > -1) { -%>
+        <kn-input #default="{field}" label="field.label">
+            <date-picker v-model="selected.<%= field.name %>" :config="{format: 'DD/MM/YYYY'}" v-bind="field"></date-picker>
+        </kn-input>
+    <%_ } else if (['TIMESTAMP', 'TIME'].indexOf(field.sql_type) > -1) { -%>
+        <kn-input #default="{field}" label="field.label">
+            <date-picker v-model="selected.<%= field.name %>" :config="{format: 'DD/MM/YYYY HH:mm'}" v-bind="field"></date-picker>
+        </kn-input>
+    <%_ } else { -%>
+        <kn-input v-model="selected.<%= field.name %>" label="field.label" />
+    <%_ } -%>
 <%_ } -%>

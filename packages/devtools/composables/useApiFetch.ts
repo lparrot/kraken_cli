@@ -1,7 +1,7 @@
-import { NitroFetchOptions } from 'nitropack'
+import {NitroFetchOptions} from 'nitropack'
 
-export const useApiFetch = <T>(input: string, opts?: NitroFetchOptions<any>): Promise<T> => {
-  return $fetch<T>(input.toString(), {
+export const useApiFetch = async <T>(input: string, opts?: NitroFetchOptions<any>): Promise<T | undefined> => {
+    const result = await $fetch<T>(input.toString(), {
     retry: false,
 
     onRequest({}) {
@@ -23,4 +23,10 @@ export const useApiFetch = <T>(input: string, opts?: NitroFetchOptions<any>): Pr
 
     ...opts
   })
+
+    if (typeof result === 'string' && isBlank(result)) {
+        return undefined
+    }
+
+    return result
 }

@@ -1,13 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { ProjectProvider } from './project.provider'
-import { TemplateProvider } from './template.provider'
-import { TemplateInitOptions } from '../../../cli_old/types'
+import {Inject, Injectable} from '@nestjs/common'
+import {ProjectProvider} from './project.provider'
+import {TemplateProvider} from './template.provider'
+import {TemplateInitOptions} from '../../../cli_old/types'
 import * as stringcase from 'stringcase'
-import { dotcase, lowercase, pascalcase, pathcase, sentencecase, snakecase } from 'stringcase'
+import {dotcase, lowercase, pascalcase, pathcase, sentencecase, snakecase} from 'stringcase'
 import * as path from 'path'
-import { ShellCommandsProvider } from 'src/services/shell-commands.provider'
-import { PostGenerateControllerBody, PostGenerateEntityBody, PostGeneratePageBody, PostGenerateReferentielBody, PostGenerateTimerBody, ProjectPaths } from '@kraken/types'
-import { kebabCase } from 'lodash'
+import {ShellCommandsProvider} from 'src/services/shell-commands.provider'
+import {PostGenerateControllerBody, PostGenerateEntityBody, PostGeneratePageBody, PostGenerateReferentielBody, PostGenerateTimerBody, ProjectPaths} from '@kraken/types'
+import {kebabCase} from 'lodash'
 import * as dayjs from 'dayjs'
 
 @Injectable()
@@ -18,14 +18,14 @@ export class GenerateProvider {
   @Inject(ShellCommandsProvider) shellCommandsProvider: ShellCommandsProvider
 
   async initProject(templateType: string, data: TemplateInitOptions) {
-    const short_name = snakecase(data.name)
+      const short_name = data.artifact_id
     const group_id = dotcase(data.group_id)
     const classname = pascalcase(short_name)
     const cwd = data.cwd == null ? process.cwd() : data.cwd
 
     await this.templateProvider.generate({
       templatePath: `apps/${templateType}`,
-      targetPath: data.artifact_id,
+        targetPath: short_name,
       cwd,
       data: {
         ...data,

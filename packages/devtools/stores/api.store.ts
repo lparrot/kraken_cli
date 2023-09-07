@@ -1,6 +1,6 @@
-import { useStateStore } from '~/stores/state.store'
-import { promiseTimeout } from '@vueuse/core'
-import { OsPathInfo, PostFsDirBody, PostGenerateControllerBody, PostGenerateEntityBody, PostGeneratePageBody, PostGenerateReferentielBody, PostGenerateTimerBody, ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos } from '@kraken/types'
+import {useStateStore} from '~/stores/state.store'
+import {promiseTimeout} from '@vueuse/core'
+import {OsPathInfo, PostFsDirBody, PostGenerateControllerBody, PostGenerateEntityBody, PostGeneratePageBody, PostGenerateReferentielBody, PostGenerateTimerBody, ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from '@kraken/types'
 
 export const useApiStore = defineStore('api', () => {
     const $state = useStateStore()
@@ -14,7 +14,7 @@ export const useApiStore = defineStore('api', () => {
             return useApiFetch<ProjectAppData | undefined>('/api/projects/appdata', {params: {cwd}})
         },
 
-        async fetchAppProfiles(id?: number): Promise<string[]> {
+        async fetchAppProfiles(id?: number) {
             if (id == null) {
                 id = $state.project?.id
             }
@@ -97,9 +97,9 @@ export const useApiStore = defineStore('api', () => {
             return useApiFetch<void>('/api/generate/referentiel', {method: 'post', body: data})
         },
 
-      async handleGenerateTimer(data: Partial<PostGenerateTimerBody>) {
-        return useApiFetch<void>('/api/generate/timer', { method: 'post', body: data })
-      },
+        async handleGenerateTimer(data: Partial<PostGenerateTimerBody>) {
+            return useApiFetch<void>('/api/generate/timer', {method: 'post', body: data})
+        },
 
         async handleProjectAppdataCreate(cwd?: string) {
             if (cwd == null) {
@@ -158,7 +158,7 @@ export const useApiStore = defineStore('api', () => {
         async handleProjetRun(cwd: string, options?: Partial<{ profile: string, timeout: number }>) {
             options = Object.assign({}, {profile: 'default', timeout: 60}, options)
 
-            return new Promise(async (resolve, reject) => {
+            return new Promise(async (resolve) => {
                 const $state = useStateStore()
                 await $state.fetchPing()
 

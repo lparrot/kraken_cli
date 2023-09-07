@@ -75,12 +75,12 @@ function init() {
 }
 
 async function submit() {
-  $loader.start({ description: 'Création du projet en cours ...' })
+  $loader.start({description: 'Création du projet en cours ...'})
   try {
     const project = await $api.handleGenerateInit(form.value)
     $bus.projects.emit()
     await $state.setProject(project?.id)
-    init()
+    await navigateTo('/')
     await $swal.fire({
       icon: 'success',
       text: 'Projet créé avec succès.'
@@ -94,20 +94,20 @@ async function submit() {
 init()
 
 watchDebounced(() => form.value.name,
-  async (value) => {
-    if (readonly.value.artifact_id) {
-      form.value.artifact_id = stringcase.snakecase(value!)
-    }
+    async (value) => {
+      if (readonly.value.artifact_id) {
+        form.value.artifact_id = stringcase.snakecase(value!)
+      }
 
-    if (readonly.value.db_name) {
-      form.value.db_name = stringcase.snakecase(value!)
-    }
+      if (readonly.value.db_name) {
+        form.value.db_name = stringcase.snakecase(value!)
+      }
 
-    await nextTick(async () => {
-      await validator.value.validate()
-    })
-  },
-  { debounce: 500 }
+      await nextTick(async () => {
+        await validator.value.validate()
+      })
+    },
+    {debounce: 500}
 )
 </script>
 

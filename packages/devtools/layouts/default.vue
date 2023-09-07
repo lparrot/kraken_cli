@@ -10,11 +10,11 @@ interface FormAddProject {
 }
 
 interface FormLaunchApplication {
-  profile: string
+  profile?: string
 }
 
 const {isTabletOrMobile} = useMedia()
-const storage = useAppStorage()
+const $storage = useAppStorage()
 const confirm = useAppConfirm()
 const $swal = useSwal()
 const $state = useStateStore()
@@ -27,7 +27,9 @@ const validator = ref<FormContext>()
 const form_add_project = ref<Partial<FormAddProject>>({})
 const form_launch_application = ref<Partial<FormLaunchApplication>>({})
 
-const app_profiles = ref<string[]>([])
+const app_profiles = ref<string[] | undefined>([])
+
+await $state.refreshSelectedProject()
 
 const show = ref({
   fileselector_project: false,
@@ -43,9 +45,11 @@ async function removeProjectFromList() {
     action: async () => {
       await $api.handleProjectRemove($state.project!!.id)
 
-      await navigateTo('/')
-      await $state.setProject(undefined)
+      $state.unselectProject()
+
       $bus.projects.emit()
+
+      await navigateTo('/')
     }
   })
 }
@@ -66,7 +70,7 @@ function showModalAddProject() {
 async function showModalLaunchApplication() {
   app_profiles.value = await $api.fetchAppProfiles()
   show.value.modal_launch_application = true
-  form_launch_application.value.profile = app_profiles.value[0]
+  form_launch_application.value.profile = app_profiles.value?.[0]
 }
 
 async function stopApplication() {
@@ -92,32 +96,35 @@ async function compileApplication() {
 async function checkAddProjectSelected(path_info: OsPathInfo) {
   const paths = await $api.fetchProjectPaths(path_info?.path)
 
-  if (paths != null) {
-    const project = $state.projects!!.find(it => it.path === paths.project_path)
-    if (project != null) {
-      await $swal.fire({
-        icon: 'error',
-        text: `Le projet a déjà été référencé sous le nom ${project.name}`
-      })
-    } else {
-      form_add_project.value.name = path_info.label
-      return true
-    }
-  } else {
+  if (paths == null) {
     await $swal.fire({
       icon: 'error',
       text: 'Le dossier selectionné ne correspond pas à un projet Kraken valide'
     })
+    return false
   }
-  return false
+
+  const project = $state.projects!!.find(it => it.path === paths.project_path)
+
+  if (project != null) {
+    await $swal.fire({
+      icon: 'error',
+      text: `Le projet a déjà été référencé sous le nom ${project.name}`
+    })
+    return false
+  }
+
+  form_add_project.value.name = path_info.label
+  return true
+
 }
 
 async function submitAddProject() {
   const project = await $api.handleProjectCreate(form_add_project.value)
   $bus.projects.emit()
   await $state.setProject(project?.id)
-  await navigateTo('/')
 
+  await navigateTo('/')
   show.value.modal_add_project = false
 }
 
@@ -129,6 +136,10 @@ async function submitLaunchApplication() {
   } finally {
     $loader.stop()
   }
+}
+
+async function handleInputChangeProject(projectId: number) {
+  await $state.setProject(projectId)
 }
 
 watch(
@@ -157,7 +168,7 @@ watchEffect(() => {
       <div class="flex flex-col w-full h-full">
         <div class="p-2 flex gap-1.5 bg-primary-100">
           <div class="w-64">
-            <USelectMenu v-model="storage.selected_project" :options="$state.projects" option-attribute="name" searchable searchable-placeholder="Rechercher un projet" value-attribute="id">
+            <USelectMenu v-model="$storage.selected_project" :options="$state.projects" option-attribute="name" searchable searchable-placeholder="Rechercher un projet" value-attribute="id" @change="handleInputChangeProject">
               <template #label>
                 {{ $state.project?.name ?? 'Selectionner un projet' }}
               </template>

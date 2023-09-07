@@ -1,4 +1,4 @@
-import {ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from "@kraken/types";
+import {ProjectAppData, ProjectAttributes, ProjectPaths, ServerInfos} from '@kraken/types'
 
 interface StateStore {
     appdata: ProjectAppData
@@ -12,8 +12,12 @@ interface StateStore {
 
 export const useStateStore = defineStore('state', {
     state: (): Partial<StateStore> => ({
+        appdata: undefined,
         navigation: false,
+        os_infos: undefined,
+        paths: undefined,
         ping: false,
+        project: undefined,
         projects: [],
     }),
 
@@ -26,25 +30,47 @@ export const useStateStore = defineStore('state', {
             await useApiStore().handleProjectPing()
         },
 
+        async refreshSelectedProject() {
+            const $loader = useAppLoader()
+            const $storage = useAppStorage()
+
+            $loader.start()
+            try {
+                await this.setProject($storage.value.selected_project)
+            } finally {
+                $loader.stop()
+            }
+        },
+
+        unselectProject() {
+            const $storage = useAppStorage()
+
+            this.project = undefined
+            this.paths = undefined
+            this.appdata = undefined
+            this.ping = false
+            $storage.value.selected_project = undefined
+        },
+
         async setProject(id?: number) {
             const $api = useApiStore()
-            const storage = useAppStorage()
-
-            storage.value.selected_project = id
+            const $storage = useAppStorage()
 
             if (id == null) {
-                this.project = undefined
-                this.paths = undefined
-                this.appdata = undefined
-                this.ping = false
+                this.unselectProject()
                 return
             }
 
             this.project = await $api.fetchProject(id!)
 
-            if (this.project != null) {
-                this.paths = await $api.fetchProjectPaths(this.project.path)
+            if (this.project == null) {
+                this.unselectProject()
+                return
             }
+
+            $storage.value.selected_project = id
+
+            this.paths = await $api.fetchProjectPaths(this.project.path)
 
             await this.getOrUpdateAppData()
 
