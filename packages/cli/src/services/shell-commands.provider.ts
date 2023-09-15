@@ -1,8 +1,8 @@
-import {Injectable} from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import * as child_process from 'child_process'
-import {ProjectProvider} from './project.provider'
-import {AppProvider} from 'src/app/app.provider'
-import {InjectorProvider} from 'src/services/injector.provider'
+import { ProjectProvider } from './project.provider'
+import { AppProvider } from 'src/app/app.provider'
+import { InjectorProvider } from 'src/services/injector.provider'
 
 const shell = require('shelljs')
 
@@ -46,7 +46,7 @@ export class ShellCommandsProvider {
 
     async gitCommit(cwd: string, message: string = 'commit', check = false) {
         if (!check || shell.which('git') != null) {
-            return this.executeCommand(`git commit -m "${message}`, cwd)
+          return this.executeCommand(`git commit -m "${message}"`, cwd)
         }
     }
 

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import VerticalSeparator from '~/components/VerticalSeparator.vue'
-import {FormContext} from '~/node_modules/vee-validate'
-import {OsPathInfo} from '@kraken/types'
+import { FormContext } from '~/node_modules/vee-validate'
+import { OsPathInfo } from '@kraken/types'
 import DynamicModal from '~/components/DynamicModal.vue'
 
 interface FormAddProject {
@@ -176,16 +176,16 @@ watchEffect(() => {
           </div>
           <UButton icon="i-ic-add" variant="ghost" @click="showModalAddProject"></UButton>
           <template v-if="$state.project != null">
-            <UButton color="red" icon="i-mdi-trash" variant="ghost" @click="removeProjectFromList"></UButton>
-            <UButton color="orange" icon="i-ic-folder" variant="ghost" @click="openInExplorer"></UButton>
-            <UButton color="orange" variant="ghost" @click="openInIntellijIdea">
+            <UButton color="red" icon="i-mdi-trash" title="Retire le projet de la liste" variant="ghost" @click="removeProjectFromList"></UButton>
+            <UButton color="orange" icon="i-ic-folder" title="Ouvre le dossier du projet dans l'explorateur" variant="ghost" @click="openInExplorer"></UButton>
+            <UButton color="orange" title="Ouvre le projet dans Intellij Idea" variant="ghost" @click="openInIntellijIdea">
               <img alt="idea_icon" class="w-5" src="/idea.png">
             </UButton>
             <VerticalSeparator class="bg-gray-400"/>
-            <UButton icon="i-mdi-refresh" variant="ghost" @click="compileApplication"/>
+            <UButton icon="i-mdi-refresh" title="Re-compile l'application" variant="ghost" @click="compileApplication"/>
             <UButton v-if="!$state.ping" color="green" icon="i-mdi-play" variant="ghost"
-                     @click="showModalLaunchApplication"/>
-            <UButton v-else color="red" icon="i-mdi-stop" variant="ghost" @click="stopApplication"/>
+                     title="Démarre l'application" @click="showModalLaunchApplication"/>
+            <UButton v-else color="red" icon="i-mdi-stop" title="Arrête l'application en cours" variant="ghost" @click="stopApplication"/>
           </template>
         </div>
         <div class="p-2 h-full overflow-auto">
