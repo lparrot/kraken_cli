@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {convertPathToPackage} from '~/utils/java.utils'
+import { convertPathToPackage } from '~/utils/java.utils'
 import * as stringcase from 'stringcase'
 
 interface Form {

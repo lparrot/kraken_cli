@@ -1,4 +1,4 @@
-import {useAppBus} from '~/composables/useAppBus'
+import { useAppBus } from '~/composables/useAppBus'
 
 export default defineNuxtPlugin(async nuxt => {
     const {setMenu} = useAppMenu()
@@ -20,21 +20,21 @@ export default defineNuxtPlugin(async nuxt => {
             {
                 label: 'Général', items: [
                     {label: 'Tableau de bord', to: '/', icon: 'i-ic-baseline-space-dashboard', showIf: $storage.value.selected_project != null},
-                    {label: 'Créer projet', to: '/generator/init', icon: 'i-ic-create-new-folder'},
+                { label: 'Créer projet', to: '/create/init', icon: 'i-ic-create-new-folder' },
                 ]
             },
             {
                 label: 'Génération côté serveur', items: [
-                    {label: 'Entité JPA', to: '/generator/entity', icon: 'i-mdi-database-outline', showIf: $storage.value.selected_project != null},
-                    {label: 'Controlleur', to: '/generator/controller', icon: 'i-mdi-api', showIf: $storage.value.selected_project != null},
-                    {label: 'Referentiel', to: '/generator/ref', icon: 'i-ic-view-list', showIf: $storage.value.selected_project != null},
-                    {label: 'Timer', to: '/generator/timer', icon: 'i-ic-schedule', showIf: $storage.value.selected_project != null},
+                { label: 'Entité JPA', to: '/create/entity', icon: 'i-mdi-database-outline', showIf: $storage.value.selected_project != null },
+                { label: 'Controlleur', to: '/create/controller', icon: 'i-mdi-api', showIf: $storage.value.selected_project != null },
+                { label: 'Referentiel', to: '/create/ref', icon: 'i-ic-view-list', showIf: $storage.value.selected_project != null },
+                { label: 'Timer', to: '/create/timer', icon: 'i-ic-schedule', showIf: $storage.value.selected_project != null },
                 ]
             },
             {
                 label: 'Génération côté web', items: [
-                    {label: 'Page', to: '/generator/page', icon: 'i-ic-baseline-article', showIf: $storage.value.selected_project != null},
-                    {label: 'Store', to: '/generator/store', icon: 'i-ic-save', showIf: $storage.value.selected_project != null},
+                { label: 'Page', to: '/create/page', icon: 'i-ic-baseline-article', showIf: $storage.value.selected_project != null },
+                { label: 'Store', to: '/create/store', icon: 'i-ic-save', showIf: $storage.value.selected_project != null },
                 ]
             }
         ])
