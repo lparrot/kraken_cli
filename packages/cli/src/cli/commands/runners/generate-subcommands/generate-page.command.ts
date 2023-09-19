@@ -27,8 +27,6 @@ export class GeneratePageCommand extends CommandRunner {
     await this.generateProvider.generatePage({ cwd: process.cwd(), ...ask }, paths)
 
     logger.success('Page générée dans le dossier ' + paths.web_pages_path)
-
-    return Promise.resolve(undefined)
   }
 
   @Option({ name: 'name', description: 'Nom du fichier de la page (sans extension) ?', flags: '-n --name <name>' })

@@ -1,16 +1,19 @@
-import {Command, CommandRunner} from "nest-commander";
-import {GeneratePageCommand} from "./generate-subcommands/generate-page.command";
+import { Command, CommandRunner } from 'nest-commander'
+import { GeneratePageCommand } from './generate-subcommands/generate-page.command'
+import { GenerateTimerCommand } from 'src/cli/commands/runners/generate-subcommands/generate-timer.command'
 
 @Command({
   name: 'generate',
   aliases: ['g'],
-  subCommands: [GeneratePageCommand]
+  subCommands: [
+    GeneratePageCommand,
+    GenerateTimerCommand
+  ]
 })
 export class GenerateCommand extends CommandRunner {
 
-  run(passedParams: string[], options?: Record<string, any>): Promise<void> {
+  async run(passedParams: string[], options?: Record<string, any>) {
     this.command.help()
-    return Promise.resolve(undefined);
   }
 
 }

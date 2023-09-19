@@ -1,8 +1,9 @@
-import {Module} from '@nestjs/common';
-import {InitCommand} from "./runners/init.command";
-import {UiCommand} from "./runners/ui.command";
-import {GenerateCommand} from "./runners/generate.command";
-import {GeneratePageCommand, GeneratePageQuestions} from "./runners/generate-subcommands/generate-page.command";
+import { Module } from '@nestjs/common'
+import { InitCommand } from './runners/init.command'
+import { UiCommand } from './runners/ui.command'
+import { GenerateCommand } from './runners/generate.command'
+import { GeneratePageCommand, GeneratePageQuestions } from './runners/generate-subcommands/generate-page.command'
+import { GenerateTimerCommand, GenerateTimerQuestions } from 'src/cli/commands/runners/generate-subcommands/generate-timer.command'
 
 @Module({
   providers: [
@@ -11,6 +12,9 @@ import {GeneratePageCommand, GeneratePageQuestions} from "./runners/generate-sub
 
     GeneratePageCommand,
     GeneratePageQuestions,
+
+    GenerateTimerCommand,
+    GenerateTimerQuestions,
 
     UiCommand
   ],
