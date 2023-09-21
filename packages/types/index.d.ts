@@ -68,6 +68,11 @@ export interface PostGenerateTimerBody {
   description: string
 }
 
+export interface PostGenerateStoreBody {
+  cwd: string
+  name: string
+}
+
 export interface ServerInfos {
   home_dir: string
   separator: string
