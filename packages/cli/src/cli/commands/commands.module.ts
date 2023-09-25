@@ -5,11 +5,15 @@ import {GenerateCommand} from './runners/generate.command'
 import {GeneratePageCommand, GeneratePageQuestions} from './runners/generate-subcommands/generate-page.command'
 import {GenerateTimerCommand, GenerateTimerQuestions} from 'src/cli/commands/runners/generate-subcommands/generate-timer.command'
 import {GenerateStoreCommand, GenerateStoreQuestions} from "src/cli/commands/runners/generate-subcommands/generate-store.command";
+import {GenerateControllerCommand, GenerateControllerQuestions} from "src/cli/commands/runners/generate-subcommands/generate-controller.command";
 
 @Module({
     providers: [
         InitCommand,
         GenerateCommand,
+
+        GenerateControllerCommand,
+        GenerateControllerQuestions,
 
         GeneratePageCommand,
         GeneratePageQuestions,
