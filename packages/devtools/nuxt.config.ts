@@ -49,7 +49,7 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    '@nuxthq/ui',
+    '@nuxt/ui',
     '@vueuse/nuxt',
     '@pinia/nuxt',
     '@vee-validate/nuxt',

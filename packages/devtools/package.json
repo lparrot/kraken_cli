@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@kraken/types": "workspace:*",
-    "@nuxthq/ui": "^2.7.0",
+    "@nuxt/ui": "^2.8.1",
     "@types/node": "^18.17.1",
     "@types/pluralize": "^0.0.30",
     "nuxt": "^3.6.5",
