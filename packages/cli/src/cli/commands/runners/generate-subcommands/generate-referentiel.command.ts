@@ -44,8 +44,17 @@ export class GenerateReferentielCommand extends CommandRunner {
 export class GenerateReferentielQuestions {
 
   @Question({
-    message: 'Classe de l\'entité à utiliser ?',
-    name: 'entity',
+    type: 'list', message: 'Type de réferentiel ?', name: 'template', choices: [
+      { value: 'simple', name: 'Consultation' },
+      { value: 'crud', name: 'Consultation/Modification' },
+    ]
+  })
+  template(val: string) {
+    return val
+  }
+
+  @Question({
+    message: 'Classe de l\'entité à utiliser ?', name: 'entity',
     when(options) {
       return isBlank(options['entity'])
     }
